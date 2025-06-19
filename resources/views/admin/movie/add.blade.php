@@ -82,8 +82,8 @@
                             <div class="col-md-6 mb-4">
                                 <label for="stream_type">Stream Type*</label>
                                 <select name="source_type" id="source_type" class="form-control">
-                                    <option value="M3u8" @if(isset($channel) && $channel->stream_type == 'M3u8'){{'selected'}} @endif>M3u8</option>
-                                    <option value="YoutubeLive" @if(isset($channel) && $channel->stream_type == 'YoutubeLive'){{'selected'}} @endif>Youtube</option>
+                                    <option value="M3u8" @if(isset($movie) && $movie->source_type == 'M3u8'){{'selected'}} @endif>M3u8</option>
+                                    <option value="YoutubeLive" @if(isset($movie) && $movie->source_type == 'YoutubeLive'){{'selected'}} @endif>Youtube</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     @error('stream_type') {{ $message }} @enderror
