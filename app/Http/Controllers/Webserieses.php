@@ -152,6 +152,7 @@ class Webserieses extends Controller
             $webseries->status = $request->status;
             $webseries->youtube_trailer = $request->trailer_url ?? null;
             $webseries->genres = implode(',', $request->webseries_genre);
+
             
             if($webseries->save()){
                 // WebSeriesGenre::where('web_series_id',$webseries->id)->delete();
@@ -162,8 +163,8 @@ class Webserieses extends Controller
                 //     $WebseriesGenre->save();
                 // }
 
+                WebSeriesContentNetwork::where('webseries_id',$webseries->id)->delete();
                 if ($request->has('content_network') && !empty($request->content_network)) {
-                    WebSeriesContentNetwork::where('webseries_id',$webseries->id)->delete();
                     DB::table('content_network_log')->where('content_id', $webseries->id)->where('content_type', $webseries->content_type)->delete();                                           
                     foreach ($request->content_network as $key => $network) {
                         $MovieNetwork = new WebSeriesContentNetwork();

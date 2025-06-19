@@ -317,9 +317,8 @@ class Movies extends Controller
                 //     $MovieGenre->save();
                 // }
 
-                if ($request->has('content_network') && !empty($request->content_network)) {
-                    # code...
-                    MovieContentNetwork::where('movie_id',$movie->id)->delete();
+                MovieContentNetwork::where('movie_id',$movie->id)->delete();
+                if ($request->has('content_network') && !empty($request->content_network)) {                    
                     DB::table('content_network_log')->where('content_id', $movie->id)->where('content_type', $movie->content_type)->delete();                                                                
                     foreach ($request->content_network as $key => $network) {
                         $MovieNetwork = new MovieContentNetwork();
