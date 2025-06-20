@@ -25,6 +25,7 @@ use App\Http\Controllers\MovieLinks;
 use App\Http\Controllers\WebseriesSeasons;
 use App\Http\Controllers\WebseriesEpisodes;
 use App\Http\Controllers\ContentNetworks;
+use App\Http\Controllers\ManageTvShow;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,6 +150,20 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/genre-order', [ManageGenre::class, 'getGenreOrderList'])->name('admin.genre.order');
 
         Route::post('/save-genre-orders', [ManageGenre::class,'saveGenreOrders'])->name('saveGenreOrders');
+
+        // tvshow
+        Route::get('/tvshow', [ManageTvShow::class, 'index'])->name('admin.tvshow');
+        Route::get('/getTvShowList', [ManageTvShow::class, 'getTvShowList'])->name('getTvShowList');
+        Route::get('/add-tvshow', [ManageTvShow::class,'addTvShow'])->name('addTvShow');
+        Route::post('/addTvShow', [ManageTvShow::class,'add'])->name('saveTvShow');
+        Route::get('/edit-tvshow/{id}', [ManageTvShow::class, 'editTvShow'])->name('editTvShow');
+        Route::post('/tvshow/destroy', [ManageTvShow::class,'destroy'])->name('tvshow.destroy');
+
+        Route::get('/tvshow/update-status/{id}', [ManageTvShow::class,'updateStatus'])->name('tvshow.update-status');
+        Route::get('/tvshow-order', [ManageTvShow::class, 'getTvShowOrderList'])->name('admin.tvshow.order');
+
+        Route::post('/save-tvshow-orders', [ManageTvShow::class,'saveTvShowOrders'])->name('saveTvShowOrders');
+
 
         // slider
         Route::get('/sliders', [ManageSlider::class, 'index'])->name('admin.sliders');

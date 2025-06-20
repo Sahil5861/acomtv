@@ -78,6 +78,24 @@
             </ul>
         </li>
 
+         <li class="menu">
+            <a href="#tvapp" data-toggle="collapse" <?php if(request()->is('*tvshow*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+                <div class="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    <span>Manage TV Show</span>
+                </div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*tvshow*')){ echo 'show';} ?>" id="tvapp" data-parent="#accordionExample">
+                <li class="<?php if(request()->is('*tvshow')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.tvshow')}}"> List </a>
+                </li>
+            </ul>
+        </li>
+
+
         <li class="menu">
             <a href="{{route('admin.languages')}}" <?php if(request()->is('*language*')){ echo 'data-active="true"';} ?> aria-expanded="false" class="dropdown-toggle">
                 <div class="">
