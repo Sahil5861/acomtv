@@ -1,6 +1,6 @@
 @extends('layout.default')
-@section('mytitle', 'TvShow List')
-@section('page', 'TvShow / List')
+@section('mytitle', 'Tv Channel List')
+@section('page', 'Tv Channel / List')
 @section('content')
 <div class="layout-px-spacing">
     <div class="row layout-top-spacing">
@@ -16,34 +16,29 @@
                 @endif
 
                 <div class="text-right">
-                    <a href="{{ url('add-tvshow') }}" class="btn btn-primary mb-2">Add +</a>
+                    <a href="{{ url('add-tvchannel') }}" class="btn btn-primary mb-2">Add +</a>
                 </div>
 
                 <div class="table-responsive mb-4 mt-4">
                     <table id="multi-column-ordering" class="table table-hover" style="width:100%">
                         <thead>
                             <tr>
-                            <tr>
-                                <th>Show ID</th>
+                                <th>ID</th>
                                 <th>Name</th>
-                                <th>Thumbnail</th>
-                                <th>Genre</th>
+                                <th>Logo</th>
+                                <th>Language</th>
                                 <th>Description</th>
-                                <th>Channel ID</th>
-                                <th>Release Date</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <th>Show ID</th>
+                                <th>ID</th>
                                 <th>Name</th>
-                                <th>Thumbnail</th>
-                                <th>Genre</th>
+                                <th>Logo</th>
+                                <th>Language</th>
                                 <th>Description</th>
-                                <th>Channel ID</th>
-                                <th>Release Date</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -67,7 +62,7 @@ $(document).ready(function() {
             infoFiltered: ''
         },
         ajax: {
-            url: "{{ route('getTvShowList') }}",
+            url: "{{ route('getTvChannelList') }}",
             data: function (d) {
                 console.log(d);
             }
@@ -75,10 +70,9 @@ $(document).ready(function() {
         columns: [
             { data: 'id', name: 'id' },
             { data: 'name', name: 'name' },
-            { data: 'genre', name: 'genre' },
             { 
-                data: 'thumbnail', 
-                name: 'thumbnail',
+                data: 'logo', 
+                name: 'logo',
                 render: function(data) {
                     if (data) {
                         return '<img src="/' + data + '" alt="Logo" height="40">';
@@ -89,14 +83,14 @@ $(document).ready(function() {
                 orderable: false,
                 searchable: false
             },
-            {
-                data: 'description', name: 'description',
+            { data: 'language', name: 'language' },
+            { 
+                data: 'description', 
+                name: 'description',
                 render: function(data) {
                     return data ? data.substring(0, 50) + '...' : '';
                 }
             },
-            { data: 'tv_channel_id', name: 'tv_channel_id' },
-            { data: 'release_date', name: 'release_date', orderable: false, searchable: false },
             { data: 'status', name: 'status', orderable: false, searchable: false },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ],

@@ -1,6 +1,6 @@
 @extends('layout.default')
 @section('mytitle', 'Manage TvShow')
-@if(isset($tvshow))
+@if(isset($tvchannel))
 @section('page', 'TvShow / Update')
 @else
 @section('page', 'TvShow / Add')
@@ -29,9 +29,9 @@
                 </div>
                 @endif
 
-                <form id="tvshow-form" method="post" action="{{ route('saveTvShow') }}" enctype="multipart/form-data" novalidate>
+                <form id="tvchannel-form" method="post" action="{{ route('saveTvShow') }}" enctype="multipart/form-data" novalidate>
                     @csrf
-                    <input type="hidden" name="id" value="{{ $tvshow->id ?? '' }}">
+                    <input type="hidden" name="id" value="{{ $tvchannel->id ?? '' }}">
 
                     <div class="form-row">
                         <!-- Name -->
@@ -39,45 +39,34 @@
                             <label for="name">Name</label>
                             <input type="text" class="form-control" id="name" name="name"
                                 placeholder="Name"
-                                value="{{ old('name', $tvshow->name ?? '') }}" required>
+                                value="{{ old('name', $tvchannel->name ?? '') }}" required>
                             <div class="invalid-feedback">
                                 @error('name') {{ $message }} @enderror
                             </div>
                         </div>
 
-
-                        {{-- <!-- Language -->
+                        <!-- Language -->
                         <div class="col-md-6 mb-4">
                             <label for="language">Language</label>
                             <input type="text" class="form-control" id="language" name="language"
                                 placeholder="e.g. Hindi, English"
-                                value="{{ old('language', $tvshow->language ?? '') }}" required>
+                                value="{{ old('language', $tvchannel->language ?? '') }}" required>
                             <div class="invalid-feedback">
                                 @error('language') {{ $message }} @enderror
                             </div>
-                        </div> --}}
+                        </div>
 
                         <!-- Logo -->
                         <div class="col-md-6 mb-4">
-                            <label for="thumbnail">Thumbnail</label>
-                            <input type="text" class="form-control" id="thumbnail" name="thumbnail"
+                            <label for="logo">Logo</label>
+                            <input type="text" class="form-control" id="logo" name="logo"
                                 placeholder="Enter image path or URL"
-                                value="{{ old('logo', $tvshow->thumbnail ?? '') }}">
-                            @if(isset($tvshow) && $tvshow->thumbnail)
-                                <img src="/{{ $tvshow->thumbnail }}" width="40" style="margin-top: 5px;" alt="Logo Preview">
+                                value="{{ old('logo', $tvchannel->logo ?? '') }}">
+                            @if(isset($tvchannel) && $tvchannel->logo)
+                                <img src="/{{ $tvchannel->logo }}" width="40" style="margin-top: 5px;" alt="Logo Preview">
                             @endif
                             <div class="invalid-feedback">
-                                @error('thumbnail') {{ $message }} @enderror
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-4">
-                            <label for="genre">Genre</label>
-                            <input type="text" class="form-control" id="genre" name="genre"
-                                placeholder="Genre"
-                                value="{{ old('genre', $tvshow->genre ?? '') }}" required>
-                            <div class="invalid-feedback">
-                                @error('genre') {{ $message }} @enderror
+                                @error('logo') {{ $message }} @enderror
                             </div>
                         </div>
 
@@ -85,7 +74,7 @@
                         <div class="col-md-6 mb-4">
                             <label for="description">Description</label>
                             <textarea class="form-control" id="description" name="description"
-                                placeholder="Description">{{ old('description', $tvshow->description ?? '') }}</textarea>
+                                placeholder="Description">{{ old('description', $tvchannel->description ?? '') }}</textarea>
                             <div class="invalid-feedback">
                                 @error('description') {{ $message }} @enderror
                             </div>
@@ -95,8 +84,8 @@
                         <div class="col-md-6 mb-4">
                             <label for="status">Status</label>
                             <select name="status" id="status" class="form-control">
-                                <option value="1" @if(old('status', $tvshow->status ?? '') == 1) selected @endif>Active</option>
-                                <option value="0" @if(old('status', $tvshow->status ?? '') == 0) selected @endif>Inactive</option>
+                                <option value="1" @if(old('status', $tvchannel->status ?? '') == 1) selected @endif>Active</option>
+                                <option value="0" @if(old('status', $tvchannel->status ?? '') == 0) selected @endif>Inactive</option>
                             </select>
                             <div class="invalid-feedback">
                                 @error('status') {{ $message }} @enderror
@@ -105,7 +94,7 @@
                     </div>
 
                     <button class="btn btn-primary submit-fn mt-4" type="submit">
-                        {{ isset($tvshow) ? 'Update' : 'Add' }}
+                        {{ isset($tvchannel) ? 'Update' : 'Add' }}
                     </button>
                 </form>
 

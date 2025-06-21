@@ -79,7 +79,7 @@
         </li>
 
          <li class="menu">
-            <a href="#tvapp" data-toggle="collapse" <?php if(request()->is('*tvshow*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+            <a href="#tvapp" data-toggle="collapse" <?php if(request()->is('*tvshow*') || request()->is('*tvchannel*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
                 <div class="">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                     <span>Manage TV Show</span>
@@ -88,11 +88,15 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </a>
-            <ul class="collapse submenu list-unstyled <?php if(request()->is('*tvshow*')){ echo 'show';} ?>" id="tvapp" data-parent="#accordionExample">
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*tvshow*') || request()->is('*tvchannel*')){ echo 'show';} ?>" id="tvapp" data-parent="#accordionExample">
+                <li class="<?php if(request()->is('*tvchannel')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.tvchannel')}}"> Channel List </a>
+                </li>
                 <li class="<?php if(request()->is('*tvshow')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.tvshow')}}"> List </a>
+                    <a href="{{route('admin.tvshow')}}"> Show List </a>
                 </li>
             </ul>
+            
         </li>
 
 
@@ -133,7 +137,7 @@
         </li>
 
         <li class="menu">
-            <a href="#app" data-toggle="collapse" <?php if(request()->is('*channel*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+            <a href="#app" data-toggle="collapse" <?php if(request()->is('channel*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
                 <div class="">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-airplay"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 21 7 21 12 15"></polygon></svg>
                     <span>Manage Channels</span>

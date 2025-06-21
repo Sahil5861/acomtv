@@ -26,6 +26,7 @@ use App\Http\Controllers\WebseriesSeasons;
 use App\Http\Controllers\WebseriesEpisodes;
 use App\Http\Controllers\ContentNetworks;
 use App\Http\Controllers\ManageTvShow;
+use App\Http\Controllers\ManageTvChannel;
 
 /*
 |--------------------------------------------------------------------------
@@ -158,11 +159,27 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/addTvShow', [ManageTvShow::class,'add'])->name('saveTvShow');
         Route::get('/edit-tvshow/{id}', [ManageTvShow::class, 'editTvShow'])->name('editTvShow');
         Route::post('/tvshow/destroy', [ManageTvShow::class,'destroy'])->name('tvshow.destroy');
+        
 
         Route::get('/tvshow/update-status/{id}', [ManageTvShow::class,'updateStatus'])->name('tvshow.update-status');
         Route::get('/tvshow-order', [ManageTvShow::class, 'getTvShowOrderList'])->name('admin.tvshow.order');
 
         Route::post('/save-tvshow-orders', [ManageTvShow::class,'saveTvShowOrders'])->name('saveTvShowOrders');
+
+
+        // tvchannel
+        Route::get('/tvchannel', [ManageTvChannel::class, 'index'])->name('admin.tvchannel');
+        Route::get('/getTvChannelList', [ManageTvChannel::class, 'getTvChannelList'])->name('getTvChannelList');
+        Route::get('/add-tvchannel', [ManageTvChannel::class,'addTvChannel'])->name('addTvChannel');
+        Route::post('/addTvChannel', [ManageTvChannel::class,'add'])->name('saveTvChannel');
+        Route::get('/edit-tvchannel/{id}', [ManageTvChannel::class, 'editTvChannel'])->name('editTvChannel');
+        Route::post('/tvchannel/destroy', [ManageTvChannel::class,'destroy'])->name('tvchannel.destroy');
+        
+
+        Route::get('/tvchannel/update-status/{id}', [ManageTvChannel::class,'updateStatus'])->name('tvchannel.update-status');
+        Route::get('/tvchannel-order', [ManageTvChannel::class, 'getTvChannelOrderList'])->name('admin.tvchannel.order');
+
+        Route::post('/save-tvchannel-orders', [ManageTvChannel::class,'saveTvChannelOrders'])->name('saveTvChannelOrders');
 
 
         // slider

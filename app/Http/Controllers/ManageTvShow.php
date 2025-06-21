@@ -17,7 +17,11 @@ class ManageTvShow extends Controller
         $columns = [
             0 => 'id',
             1 => 'name',
-            2 => 'created_at',
+            2 => 'thumbnail',
+            3 => 'genre',
+            4 => 'description',
+            5 => 'tv_channel_id',
+            6 => 'release_date',
         ];
 
         $totalData = TvShow::whereNull('deleted_at')->count();
@@ -59,9 +63,11 @@ class ManageTvShow extends Controller
         foreach ($tvshows as $tvshow) {
             $tvshowsData['id'] = $tvshow->id;
             $tvshowsData['name'] = $tvshow->name;
-            $tvshowsData['logo'] = $tvshow->image ?? '';
-            $tvshowsData['language'] = $tvshow->language ?? '';
+            $tvshowsData['thumbnail'] = $tvshow->image ?? '';
+            $tvshowsData['genre'] = $tvshow->genre ?? '';
             $tvshowsData['description'] = $tvshow->description ?? '';
+            $tvshowsData['tv_channel_id'] = $tvshow->tv_channel_id ?? '';
+            $tvshowsData['release_date'] = $tvshow->release_date ?? '';
 
             $statusUrl = url('tvshow/update-status', base64_encode($tvshow->id));
             $checked = $tvshow->status == 1 ? 'checked' : '';
