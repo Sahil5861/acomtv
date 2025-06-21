@@ -10,7 +10,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Total Shows</small></p>
+                            <p class=""><small>Total </small></p>
                             <h6 class="value" id="totalRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -29,7 +29,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Active Shows</small></p>
+                            <p class=""><small>Active </small></p>
                             <h6 class="value" id="activeRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -48,7 +48,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Inactive Shows</small></p>
+                            <p class=""><small>Inactive </small></p>
                             <h6 class="value" id="inactiveRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -67,7 +67,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Deleted Shows</small></p>
+                            <p class=""><small>Deleted </small></p>
                             <h6 class="value" id="deletedRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -91,32 +91,17 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif
-
-                <?php 
-                    $channel_id = $id;
-                    $channel = \App\Models\TvChannel::where('id', $channel_id)->first();
-                    $show = \App\Models\TvShow::where('id', $channel->id)->first();
-                ?>
-                
-                <div class="text-left">
-                    <p>
-                        <a href="{{route('admin.tvchannel')}}">{{strtoupper('TV Channels')}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.tvshow', base64_encode($channel_id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
-                    </p>
-                </div>
+                @endif                
                 
                 <div class="text-right">
-                    <a href="{{route('addTvShow', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    <a href="{{route('addsportscategory')}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
                     <table id="multi-column-ordering" class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Name</th>                                                                                                                         
-                                <th>Thumbnail</th>   
-                                <th>Description</th>                                                                                                                             
+                                <th>Title</th>                                                                                                                                                                                                                                                                                                                        
                                 <th>Status</th>                                                                                                                             
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -127,10 +112,8 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>Name</th>                                                                                                                                
-                                <th>Thumbnail</th>   
-                                <th>Status</th>                                                                                                                                                                                          
-                                <th>Description</th>                                                                
+                                <th>Title</th>                                                                                                                                                                                                                                                                                                                                                                                
+                                <th>Status</th>                                                                   
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -227,11 +210,9 @@
          processing: true,
          serverSide: true,
          order: [[0, 'asc']],
-         ajax: "{{route('getTvShowList', $id)}}",
+         ajax: "{{route('getsportscategoryList')}}",
          columns: [
-            { data: 'name' },                                                          
-            { data: 'image',orderable: false, searchable: false },                                                
-            { data: 'desc' },
+            { data: 'title' },                                                                                  
             { data: 'status' },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },

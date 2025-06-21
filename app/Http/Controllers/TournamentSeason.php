@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\TvChannel;
 use App\Models\Language;
 
-class ManageTvChannel extends Controller
+class TournamentSeason extends Controller
 {
     public function index()
     {

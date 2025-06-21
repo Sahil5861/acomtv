@@ -10,7 +10,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Total Shows</small></p>
+                            <p class=""><small>Total Seasons</small></p>
                             <h6 class="value" id="totalRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -29,7 +29,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Active Shows</small></p>
+                            <p class=""><small>Active Seasons</small></p>
                             <h6 class="value" id="activeRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -48,7 +48,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Inactive Shows</small></p>
+                            <p class=""><small>Inactive Seasons</small></p>
                             <h6 class="value" id="inactiveRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -67,7 +67,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Deleted Shows</small></p>
+                            <p class=""><small>Deleted Seasons</small></p>
                             <h6 class="value" id="deletedRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -91,33 +91,35 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif
-
-                <?php 
-                    $channel_id = $id;
-                    $channel = \App\Models\TvChannel::where('id', $channel_id)->first();
-                    $show = \App\Models\TvShow::where('id', $channel->id)->first();
-                ?>
+                @endif  
                 
+                <?php                     
+                    $season = \App\Models\TvShowSeason::where('id', $id)->first();
+                    $show = \App\Models\TvShow::where('id', $season->show_id)->first();
+                    $channel = \App\Models\TvChannel::where('id', $show->tv_channel_id)->first();
+                ?>
+
                 <div class="text-left">
                     <p>
                         <a href="{{route('admin.tvchannel')}}">{{strtoupper('TV Channels')}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.tvshow', base64_encode($channel_id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshow', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshow.season', base64_encode($show->id))}}">{{strtoupper($show->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshow.episode', base64_encode($id))}}">{{strtoupper($season->title)}}</a>
                     </p>
                 </div>
                 
                 <div class="text-right">
-                    <a href="{{route('addTvShow', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    <a href="{{route('addTvShowEpisode', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
                     <table id="multi-column-ordering" class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Name</th>                                                                                                                         
-                                <th>Thumbnail</th>   
-                                <th>Description</th>                                                                                                                             
-                                <th>Status</th>                                                                                                                             
+                                <th>Title</th>                                                                                                                         
+                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                     
+                                <th>Duration</th>                                                                                                                             
+                                <th>Video Url</th>                                                                                                                                                                                                                                                                                        
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -127,10 +129,10 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>Name</th>                                                                                                                                
-                                <th>Thumbnail</th>   
-                                <th>Status</th>                                                                                                                                                                                          
-                                <th>Description</th>                                                                
+                                <th>Title</th>                                                                                                                         
+                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                      
+                                <th>Duration</th>                                                                                                                             
+                                <th>Video Url</th>                                                                                                                                                                                                                                                                                         
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -227,12 +229,12 @@
          processing: true,
          serverSide: true,
          order: [[0, 'asc']],
-         ajax: "{{route('getTvShowList', $id)}}",
+         ajax: "{{route('getTvShowEpisodeList', $id)}}",
          columns: [
-            { data: 'name' },                                                          
-            { data: 'image',orderable: false, searchable: false },                                                
-            { data: 'desc' },
-            { data: 'status' },
+            { data: 'title' },                                                          
+            { data: 'thumbnail',orderable: false, searchable: false },                                                                                      
+            { data: 'duration' },
+            { data: 'url'},
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
@@ -251,7 +253,7 @@
     });
 
     function deleteRowModal(id){ 
-        $('#d_title').text('TV Show')
+        $('#d_title').text('TV Shows Episode')
         $('#d_id').val(id);
         $('#delete_modal').modal('show');        
     }
@@ -260,7 +262,7 @@
         var id = $('#d_id').val();
         $.ajax({
             type: 'POST',
-            url: "{{route('tvshow.destroy')}}",
+            url: "{{route('tvshowepisode.destroy')}}",
             data: {
                 _token: '{{ csrf_token() }}',
                 id:id
