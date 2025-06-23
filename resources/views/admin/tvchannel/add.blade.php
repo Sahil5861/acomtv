@@ -29,7 +29,7 @@
                 </div>
                 @endif
 
-                <form id="tvchannel-form" method="post" action="{{ route('saveTvShow') }}" enctype="multipart/form-data" novalidate>
+                <form id="tvchannel-form" method="post" action="{{ route('saveTvChannel') }}" enctype="multipart/form-data" novalidate>
                     @csrf
                     <input type="hidden" name="id" value="{{ $tvchannel->id ?? '' }}">
 
@@ -66,7 +66,7 @@
                                 placeholder="Enter image path or URL"
                                 value="{{ old('logo', $tvchannel->logo ?? '') }}">
                             @if(isset($tvchannel) && $tvchannel->logo)
-                                <img src="/{{ $tvchannel->logo }}" width="40" style="margin-top: 5px;" alt="Logo Preview">
+                                <img src="{{ $tvchannel->logo }}" width="40" style="margin-top: 5px;" alt="Logo Preview">
                             @endif
                             <div class="invalid-feedback">
                                 @error('logo') {{ $message }} @enderror

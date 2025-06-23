@@ -49,6 +49,29 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="delete_modal">
+        <div class="modal-dialog action-modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="d_title"></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p id="delete_user_deletemsg">Do you want to delete this <span id="d_body"></span>?</p>
+            </div>
+            <input type="hidden" name="id" id="d_id" value="">
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+              <button type="button" class="btn btn-danger" onclick="delete_row(this);" >Yes, Delete</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
 @endsection
 
 @section('footer')
@@ -75,7 +98,7 @@ $(document).ready(function() {
                 name: 'logo',
                 render: function(data) {
                     if (data) {
-                        return '<img src="/' + data + '" alt="Logo" height="40">';
+                        return '<img src="' + data + '" alt="Logo" height="40">';
                     } else {
                         return '—';
                     }
@@ -113,5 +136,27 @@ $(document).ready(function() {
         a.preventDefault();
     });
 });
+
+    function deleteRowModal(id){ 
+        $('#d_title').text('TV Channel')
+        $('#d_id').val(id);
+        $('#delete_modal').modal('show');        
+    }
+
+    function delete_row(){
+        var id = $('#d_id').val();
+        $.ajax({
+            type: 'POST',
+            url: "{{route('tvchannel.destroy')}}",
+            data: {
+                _token: '{{ csrf_token() }}',
+                id:id
+            },
+            success: function(data){
+                $('#delete_modal').modal('hide');
+                $('#multi-column-ordering').DataTable().ajax.reload();
+            }
+        })
+    }
 </script>
 @endsection
