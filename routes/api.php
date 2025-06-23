@@ -48,3 +48,8 @@ Route::get('/searchContent/{searchTerm}/0', [AppApiController::class, 'searchCon
 Route::get('/getFeaturedLiveTV', [AppApiController::class, 'getFeaturedLiveTV']);
 Route::get('/getCustomImageSlider', [AppApiController::class, 'getCustomImageSlider']);
 
+
+Route::get('/getTvChannels', [AppApiController::class, 'getTvChannels']);
+Route::get('/getTvShows/{id}', [AppApiController::class, 'getTvShows']);
+Route::get('/getShowSeasons/{id}', [AppApiController::class, 'getTvShowSeasons']);
+Route::get('/getShowSeasonsEpisodes/{id}', [AppApiController::class, 'getTvShowEpisodes']);

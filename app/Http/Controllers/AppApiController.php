@@ -10,6 +10,10 @@ use App\Models\WebSeries;
 use App\Models\WebSeriesSeason;
 use App\Models\WebSeriesEpisode;
 use App\Models\ContentNetwork;
+use App\Models\TvChannel;
+use App\Models\TvShow;
+use App\Models\TvShowEpisode;
+use App\Models\TvShowSeason;
 
 
 use App\Models\MovieLink;
@@ -1251,6 +1255,83 @@ class AppApiController extends Controller
             }
 
         }
+    }
+
+    public function getTvChannels(Request $request){
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvChannels = TvChannel::where('deleted_at', null)->where('status',1)->get();
+
+        if ($tvChannels) {
+            
+            print_r(json_encode($tvChannels));
+        }
+        else{
+            print_r(json_encode([]));
+        }
+        exit;
+    }
+
+    public function getTvShows(Request $request,$channelId = null){
+        if(!$channelId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvShows = TvShow::where('deleted_at', null)->where('tv_channel_id',$channelId)->where('status',1)->get();
+
+        if ($tvShows) {
+            
+            print_r(json_encode($tvShows));
+        }
+        else{
+            print_r(json_encode([]));
+        }
+        exit;
+    }
+
+    public function getTvShowSeasons(Request $request,$showId = null){
+        if(!$showId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvShowSeasons = TvShowSeason::where('deleted_at', null)->where('show_id',$showId)->where('status',1)->get();
+
+        if ($tvShowSeasons) {
+            
+            print_r(json_encode($tvShowSeasons));
+        }
+        else{
+            print_r(json_encode([]));
+        }
+        exit;
+    }
+
+
+    public function getTvShowEpisodes(Request $request,$seasonId = null){
+        if(!$seasonId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvShowEpisodes = TvShowEpisode::where('deleted_at', null)->where('season_id',$seasonId)->where('status',1)->get();
+
+        if ($tvShowEpisodes) {
+            
+            print_r(json_encode($tvShowEpisodes));
+        }
+        else{
+            print_r(json_encode([]));
+        }
+        exit;
     }
 
 
