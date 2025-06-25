@@ -10,7 +10,7 @@ class ManageSportsChannel extends Controller
 {
     public function index()
     {
-        return view('admin.sportscategory.index');
+        return view('admin.sportschannel.index');
     }
 
     public function getSportsCategoryList(Request $request){
@@ -73,7 +73,7 @@ class ManageSportsChannel extends Controller
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">
                         <a href="'.route("editsportscategory",base64_encode($record->id)).'" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>
-                        <a href="tvshow-episode/'.base64_encode($record->id).'" title="Manage Episodes"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"></path><path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"></path></svg></a>
+                        <a href="sports-tournament/'.base64_encode($record->id).'" title="Manage Tournaments"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"></path><path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"></path></svg></a>
                         <a href="javascript:;" onclick="deleteRowModal(\''.base64_encode($record->id).'\')">'.$del_icon.'</a>
                       </div>',
             );
@@ -94,7 +94,7 @@ class ManageSportsChannel extends Controller
 
     public function add()
     {        
-        return view('admin.sportscategory.add');
+        return view('admin.sportschannel.add');
     }
 
     public function updateStatus($id)
@@ -149,7 +149,7 @@ class ManageSportsChannel extends Controller
     public function edit($id)
     {
         $this->data['sportcategory'] = SportsCategory::find(base64_decode($id));        
-        return view('admin.sportscategory.add', $this->data);
+        return view('admin.sportschannel.add', $this->data);
     }
 
     public function destroy(Request $request)

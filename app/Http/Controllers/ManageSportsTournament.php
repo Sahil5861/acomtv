@@ -3,189 +3,213 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\TvChannel;
+use App\Models\SportsTournament;
 use App\Models\Language;
 
 class ManageSportsTournament extends Controller
 {
-    public function index()
+    public function index($id)
     {
-        return view('admin.tvchannel.index');
+        $id = base64_decode($id);
+        return view('admin.sportsctournament.index', compact('id'));
     }
 
-    public function getTvChannelList(Request $request)
-    {
-        $columns = [
-            0 => 'id',
-            1 => 'name',
-            2 => 'created_at',
-        ];
+    public function getSportsTournamentList(Request $request, $id)
+{
+    $draw = $request->get('draw');
+    $start = $request->get("start");
+    $rowperpage = $request->get("length");
 
-        $totalData = TvChannel::whereNull('deleted_at')->count();
-        $totalFiltered = $totalData;
+    $columnIndex_arr = $request->get('order');
+    $columnName_arr = $request->get('columns');
+    $order_arr = $request->get('order');
+    $search_arr = $request->get('search');
 
-        $limit = $request->input('length');
-        $start = $request->input('start');
-        $order = $request->input('order.0.column') ? $columns[$request->input('order.0.column')] : 'id';
-        $dir = $request->input('order.0.dir') ?? 'desc';
+    $columnIndex = $columnIndex_arr[0]['column'];
+    $columnName = $columnName_arr[$columnIndex]['data'];
+    $columnSortOrder = $order_arr[0]['dir'];
+    $searchValue = $search_arr['value'];
 
-        if (empty($request->input('search.value'))) {
-            $tvchannels = TvChannel::whereNull('deleted_at')
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
-        } else {
-            $search = $request->input('search.value');
+    // Record counts
+    $totalRecords = SportsTournament::whereNull('sports_tournaments.deleted_at')
+        ->where('sports_tournaments.sports_category_id', $id)
+        ->count();
 
-            $tvchannels = TvChannel::where(function($query) use ($search) {
-                    $query->where('id', 'LIKE', "%{$search}%")
-                          ->orWhere('name', 'LIKE', "%{$search}%");
-                })
-                ->whereNull('deleted_at')
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
+    $inactiveRecords = SportsTournament::whereNull('sports_tournaments.deleted_at')
+        ->where('sports_tournaments.sports_category_id', $id)
+        ->where('status', 0)
+        ->count();
 
-            $totalFiltered = TvChannel::where(function($query) use ($search) {
-                $query->where('id', 'LIKE', "%{$search}%")
-                      ->orWhere('name', 'LIKE', "%{$search}%");
-            })
-            ->whereNull('deleted_at')
-            ->count();
-        }
+    $activeRecords = SportsTournament::whereNull('sports_tournaments.deleted_at')
+        ->where('sports_tournaments.sports_category_id', $id)
+        ->where('status', 1)
+        ->count();
 
-        $data = [];
-        foreach ($tvchannels as $tvchannel) {
-            $tvchannelsData['id'] = $tvchannel->id;
-            $tvchannelsData['name'] = $tvchannel->name;
-            $tvchannelsData['logo'] = $tvchannel->image ?? '';
-            $tvchannelsData['language'] = $tvchannel->language ?? '';
-            $tvchannelsData['description'] = $tvchannel->description ?? '';
+    $deletedRecords = SportsTournament::whereNotNull('sports_tournaments.deleted_at')
+        ->where('sports_tournaments.sports_category_id', $id)
+        ->count();
 
-            $statusUrl = url('tvchannel/update-status', base64_encode($tvchannel->id));
-            $checked = $tvchannel->status == 1 ? 'checked' : '';
-            $tvchannelsData['status'] = '<a onchange="updateStatus(\'' . $statusUrl . '\')" href="javascript:void(0);">
-                <label class="switch s-primary mr-2">
-                    <input type="checkbox" value="' . $tvchannel->status . '" ' . $checked . ' id="accountSwitch' . $tvchannel->id . '">
-                    <span class="slider round"></span>
-                </label>
-            </a>';
+    $query = SportsTournament::where('sports_category_id', $id)
+        ->whereNull('deleted_at');
 
-            $tvchannelsData['action'] = '<div class="action-btn">
-                                            <a href="edit-tvchannel/' . base64_encode($tvchannel->id) . '">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                            </a>
-
-                                            <a href="tvshow/'.base64_encode($tvchannel->id).'" title="Manage Shows"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"></path><path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"></path></svg></a>
-
-                                            <a href="javascript:;" onclick="delete_item(\''.base64_encode($tvchannel->id) . '\',\'tvchannel\')">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                            </a>
-                                        </div>';
-
-            $data[] = $tvchannelsData;
-        }
-
-        return response()->json([
-            "draw" => intval($request->input('draw')),
-            "recordsTotal" => $totalData,
-            "recordsFiltered" => $totalFiltered,
-            "data" => $data,
-        ]);
+    if (!empty($searchValue)) {
+        $query->where(function ($q) use ($searchValue) {
+            $q->where('id', 'like', '%' . $searchValue . '%')
+              ->orWhere('title', 'like', '%' . $searchValue . '%');
+        });
     }
 
-    public function addtvchannel()
+    $totalRecordswithFilter = $query->count();
+
+    $records = $query->orderBy($columnName, $columnSortOrder)
+        ->skip($start)
+        ->take($rowperpage)
+        ->get();
+
+    $data_arr = [];
+
+    foreach ($records as $key => $record) {
+        $statusUrl = url('tournament/update-status', base64_encode($record->id));
+        $checked = $record->status == 1 ? 'checked' : '';
+
+        $status = '<a onchange="updateStatus(\'' . $statusUrl . '\')" href="javascript:void(0);">
+            <label class="switch s-primary mr-2">
+                <input type="checkbox" value="' . $record->status . '" ' . $checked . ' id="accountSwitch' . $record->id . '">
+                <span class="slider round"></span>
+            </label>
+        </a>';
+
+        if($record->deleted_at){
+            $del_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>';
+        }else{
+            $del_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+        }
+
+        $data_arr[] = array(
+            'id' => $key + 1,
+            "title" => $record->title,
+            "logo" => $record->logo ?? '',
+            "description" => $record->description ?? '',
+            "status" => $status,
+            "created_at" => date('j M Y h:i a', strtotime($record->created_at)),
+            "action" => '<div class="action-btn">
+                        <a href="'.route("editsportstournament",base64_encode($record->id)).'" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>
+                        <a href="'. route("admin.sporttournamentseasons",base64_encode($record->id)).'" title="Manage Seasons"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"></path><path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"></path></svg></a>
+                        <a href="javascript:;" onclick="deleteRowModal(\''.base64_encode($record->id).'\')">'.$del_icon.'</a>
+                      </div>'
+        );
+    }
+
+    $response = array(
+        "draw" => intval($draw),
+        "iTotalRecords" => $totalRecords,
+        "iTotalDisplayRecords" => $totalRecordswithFilter,
+        "aaData" => $data_arr,
+        "totalRecords" => number_format($totalRecords),
+        "activeRecords" => number_format($activeRecords),
+        "inactiveRecords" => number_format($inactiveRecords),
+        "deletedRecords" => number_format($deletedRecords),
+    );
+    echo json_encode($response);
+}
+
+    
+
+    public function add($id)
     {
-        $languages = Language::all();
-        return view('admin.tvchannel.add', compact('languages'));
+        $id = base64_decode($id);
+        return view('admin.sportsctournament.add', compact('id'));
     }
 
     public function updateStatus($id)
     {
-        $tvchannel = TvChannel::find(base64_decode($id));
+        $tournament = SportsTournament::find(base64_decode($id));
 
-        if ($tvchannel) {
-            $tvchannel->status = $tvchannel->status == 1 ? 0 : 1;
-            $tvchannel->save();
-            return response()->json(['message' => 'TvChannel status updated successfully']);
+        if ($tournament) {
+            $tournament->status = $tournament->status == 1 ? 0 : 1;
+            $tournament->save();
+            return response()->json(['message' => 'SportsTournament status updated successfully']);
         }
 
         return response()->json(['message' => 'Something went wrong!!']);
     }
 
-    public function add(Request $request)
+    public function save(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'title' => 'required',
         ]);
 
         if (!empty($request->id)) {
-            $tvchannel = TvChannel::find($request->id);
+            $tournament = SportsTournament::find($request->id);
         } else {
-            $tvchannel = new TvChannel();
+            $tournament = new SportsTournament();
         }
 
-        $tvchannel->name = $request->name;
-        $tvchannel->language = $request->language ?? null;
-        $tvchannel->description = $request->description ?? null;
-        $tvchannel->status = $request->status;
+        $tournament->title = $request->title;        
+        $tournament->logo = $request->logo;        
+        $tournament->sports_category_id  = $request->sport_id;        
+        $tournament->description = $request->description ?? null;
+        $tournament->status = $request->status;
+
+        // print_r($tournament); exit;
 
         
 
         if (!empty($request->id)) {
-            if ($tvchannel->save()) {
-                return back()->with('message', 'TV channel updated Successfully !');
+            if ($tournament->save()) {
+                return back()->with('message', 'Tournament updated Successfully !');
             }
             else{
-                return back()->with('message', 'TV channel not updated Successfully !');
+                return back()->with('message', 'Tournament not updated Successfully !');
             }
             
         } else {
-            if ($tvchannel->save()) {
-                return redirect()->route('admin.tvshow', base64_encode($id))->with('message', 'TV channel added Successfully !');
+            if ($tournament->save()) {
+                // return redirect()->route('admin.tvshow', base64_encode($id))->with('message', 'Tournament added Successfully !');
+                return redirect()->route('admin.sporttournament', base64_encode($request->sport_id))->with('message', 'Tournament added Successfully !');
             }
             else{
-                return back()->with('message', 'TV channel not added Successfully !');
+                return back()->with('message', 'Tournament not added Successfully !');
             }
         }
         
     }
 
-    public function editTvChannel($id)
+    public function edit($id)
     {
-        $this->data['tvchannel'] = TvChannel::find(base64_decode($id));
-        $this->data['languages'] = Language::all();
-        return view('admin.tvchannel.add', $this->data);
+        $tournament = SportsTournament::find(base64_decode($id));        
+        $this->data['tournament'] = $tournament;
+        $this->data['id'] = $tournament->sports_category_id;
+        return view('admin.sportsctournament.add', $this->data);
     }
 
     public function destroy(Request $request)
     {
-        $tvchannel = TvChannel::find(base64_decode($request->id));
-        $tvchannel->deleted_at = time();
+        $tournament = SportsTournament::find(base64_decode($request->id));
+        $tournament->deleted_at = time();
 
-        if ($tvchannel->save()) {
-            return response()->json(['message' => 'TvChannel deleted successfully']);
+        if ($tournament->save()) {
+            return response()->json(['message' => 'SportsTournament deleted successfully']);
         } else {
-            return response()->json(['message' => 'TvChannel not deleted']);
+            return response()->json(['message' => 'SportsTournament not deleted']);
         }
     }
 
-    public function getTvChannelOrderList()
+    public function getSportsTournamentOrderList()
     {
-        $this->data['tvchannels'] = TvChannel::orderBy('index', 'asc')->get();
-        return view('admin.tvchannel.dragdrop', $this->data);
+        $this->data['tournaments'] = SportsTournament::orderBy('index', 'asc')->get();
+        return view('admin.tournament.dragdrop', $this->data);
     }
 
-    public function saveTvChannelOrders(Request $request)
+    public function saveSportsTournamentOrders(Request $request)
     {
         foreach ($request->numbers as $key => $id) {
-            $tvchannel = TvChannel::find($id);
-            $tvchannel->index = $key + 1;
-            $tvchannel->save();
+            $tournament = SportsTournament::find($id);
+            $tournament->index = $key + 1;
+            $tournament->save();
         }
 
-        return back()->with('message', 'TvChannel ordered successfully');
+        return back()->with('message', 'SportsTournament ordered successfully');
     }
 }

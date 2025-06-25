@@ -115,8 +115,7 @@
                     <table id="multi-column-ordering" class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Name</th>                                                                                                                         
-                                <th>Banner</th>                                                                                                                                                               
+                                <th>Name</th>                                                                                                                                                                                                                                                                                                                      
                                 <th>Status</th>                                                                                                                             
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -127,8 +126,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>Name</th>                                                                                                                                
-                                <th>Banner</th>   
+                                <th>Name</th>                                                                                                                                                                 
                                 <th>Status</th>                                                                                                                                                                                                                                                                                        
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -228,8 +226,7 @@
          order: [[0, 'asc']],
          ajax: "{{route('getTvShowSeasonList', $id)}}",
          columns: [
-            { data: 'title' },                                                          
-            { data: 'poster',orderable: false, searchable: false },                                                              
+            { data: 'title' },                                                                      
             { data: 'status' },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },

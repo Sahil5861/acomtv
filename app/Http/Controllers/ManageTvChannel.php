@@ -145,7 +145,7 @@ class ManageTvChannel extends Controller
             
         } else {
             if ($tvchannel->save()) {
-                return redirect()->route('admin.tvshow', base64_encode($id))->with('message', 'TV channel added Successfully !');
+                return redirect()->route('admin.tvshow', base64_encode($tvchannel->id))->with('message', 'TV channel added Successfully !');
             }
             else{
                 return back()->with('message', 'TV channel not added Successfully !');

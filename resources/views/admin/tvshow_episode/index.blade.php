@@ -10,7 +10,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Total Seasons</small></p>
+                            <p class=""><small>Total Episodes</small></p>
                             <h6 class="value" id="totalRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -29,7 +29,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Active Seasons</small></p>
+                            <p class=""><small>Active Episodes</small></p>
                             <h6 class="value" id="activeRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -48,7 +48,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Inactive Seasons</small></p>
+                            <p class=""><small>Inactive Episodes</small></p>
                             <h6 class="value" id="inactiveRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -67,7 +67,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Deleted Seasons</small></p>
+                            <p class=""><small>Deleted Episodes</small></p>
                             <h6 class="value" id="deletedRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -116,10 +116,11 @@
                     <table id="multi-column-ordering" class="table table-hover">
                         <thead>
                             <tr>
+                                <th>Episode No.</th>
                                 <th>Title</th>                                                                                                                         
                                 <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                     
-                                <th>Duration</th>                                                                                                                             
-                                <th>Video Url</th>                                                                                                                                                                                                                                                                                        
+                                <th>Status</th>                                                                                                                                                                                                                                                                                                                     
+                                <th>Duration</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                    
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -129,10 +130,11 @@
                         </tbody>
                         <tfoot>
                             <tr>
+                                <th>Episode No.</th>
                                 <th>Title</th>                                                                                                                         
-                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                      
-                                <th>Duration</th>                                                                                                                             
-                                <th>Video Url</th>                                                                                                                                                                                                                                                                                         
+                                <th>Thumbnail</th> 
+                                <th>Status</th>                                                                                                                                                                                                                                                                                                                        
+                                <th>Duration</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                     
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -231,10 +233,11 @@
          order: [[0, 'asc']],
          ajax: "{{route('getTvShowEpisodeList', $id)}}",
          columns: [
+            {data: 'episode_number'},
             { data: 'title' },                                                          
             { data: 'thumbnail',orderable: false, searchable: false },                                                                                      
-            { data: 'duration' },
-            { data: 'url'},
+            { data: 'status' },            
+            { data: 'duration' },            
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],

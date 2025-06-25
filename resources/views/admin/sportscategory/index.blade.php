@@ -91,7 +91,8 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif                
+                @endif 
+                
                 
                 <div class="text-right">
                     <a href="{{route('addsportscategory')}}" class="btn btn-primary mb-2">Add +</a>

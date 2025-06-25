@@ -1,9 +1,9 @@
 @extends('layout.default')
 @section('mytitle', 'Manage TvShow')
-@if(isset($tournament))
-@section('page', 'Tournament / Update')
+@if(isset($tvchannel))
+@section('page', 'TvShow / Update')
 @else
-@section('page', 'Tournament / Add')
+@section('page', 'TvShow / Add')
 @endif
 
 @section('content')
@@ -29,65 +29,49 @@
                 </div>
                 @endif
 
-                <form id="tournament-form" method="post" action="{{ route('savesportstournament') }}" enctype="multipart/form-data" novalidate>
+                <form id="tvchannel-form" method="post" action="{{ route('savesportscategory') }}" enctype="multipart/form-data" novalidate>
                     @csrf
-                    <input type="hidden" name="id" value="{{ isset($tournament) ? $tournament->id : '' }}">
-                    <input type="hidden" name="sport_id" value="{{ $id}}">
+                    <input type="hidden" name="id" value="{{ $sportcategory->id ?? '' }}">
 
                     <div class="form-row">
                         <!-- Name -->
-                        <div class="col-md-4 mb-4">
-                            <label for="name">Tournament Title</label>
-                            <input type="text" class="form-control" id="title" name="title"
-                                placeholder="Name"
-                                value="{{ old('title', $tournament->title ?? '') }}" required>
+                        <div class="col-md-6 mb-4">
+                            <label for="name">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $sportcategory->title ?? '') }}" required placeholder="Enter Sport Category">
                             <div class="invalid-feedback">
-                                @error('title') {{ $message }} @enderror
+                                @error('name') {{ $message }} @enderror
                             </div>
                         </div>
-                                                
 
                         <!-- Logo -->
-                        <div class="col-md-4 mb-4">
+                        {{-- <div class="col-md-6 mb-4">
                             <label for="logo">Logo</label>
                             <input type="text" class="form-control" id="logo" name="logo"
                                 placeholder="Enter image path or URL"
-                                value="{{ old('logo', $tournament->logo ?? '') }}">
-                            @if(isset($tournament) && $tournament->logo)
-                                <img src="{{ $tournament->logo }}" width="100" style="margin-top: 5px;" alt="Logo Preview">
+                                value="{{ old('logo', $tvchannel->logo ?? '') }}">
+                            @if(isset($tvchannel) && $tvchannel->logo)
+                                <img src="/{{ $tvchannel->logo }}" width="40" style="margin-top: 5px;" alt="Logo Preview">
                             @endif
                             <div class="invalid-feedback">
                                 @error('logo') {{ $message }} @enderror
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Status -->
-                        <div class="col-md-4 mb-4">
+                        <div class="col-md-6 mb-4">
                             <label for="status">Status</label>
                             <select name="status" id="status" class="form-control">
-                                <option value="1" @if(old('status', $tournament->status ?? '') == 1) selected @endif>Active</option>
-                                <option value="0" @if(old('status', $tournament->status ?? '') == 0) selected @endif>Inactive</option>
+                                <option value="1" @if(old('status', $sportcategory->status ?? '') == 1) selected @endif>Active</option>
+                                <option value="0" @if(old('status', $sportcategory->status ?? '') == 0) selected @endif>Inactive</option>
                             </select>
                             <div class="invalid-feedback">
                                 @error('status') {{ $message }} @enderror
                             </div>
                         </div>
-
-                        <!-- Description -->
-                        <div class="col-md-12 mb-4">
-                            <label for="description">Description</label>
-                            <textarea class="form-control" id="description" name="description"
-                                placeholder="Description">{{ old('description', $tournament->description ?? '') }}</textarea>
-                            <div class="invalid-feedback">
-                                @error('description') {{ $message }} @enderror
-                            </div>
-                        </div>
-
-
                     </div>
 
                     <button class="btn btn-primary submit-fn mt-4" type="submit">
-                        {{ isset($tournament) ? 'Update' : 'Add' }}
+                        {{ isset($tvchannel) ? 'Update' : 'Add' }}
                     </button>
                 </form>
 

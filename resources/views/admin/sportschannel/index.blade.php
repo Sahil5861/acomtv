@@ -10,7 +10,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Total Seasons</small></p>
+                            <p class=""><small>Total </small></p>
                             <h6 class="value" id="totalRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -29,7 +29,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Active Seasons</small></p>
+                            <p class=""><small>Active </small></p>
                             <h6 class="value" id="activeRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -48,7 +48,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Inactive Seasons</small></p>
+                            <p class=""><small>Inactive </small></p>
                             <h6 class="value" id="inactiveRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -67,7 +67,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Deleted Seasons</small></p>
+                            <p class=""><small>Deleted </small></p>
                             <h6 class="value" id="deletedRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -81,7 +81,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
             
             <div class="widget-content widget-content-area br-6">
@@ -92,35 +91,18 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif
-
-                <?php 
-                    $tournamentId = $id;                    
-                    $tournament = \App\Models\SportsTournament::where('id', $tournamentId)->first();
-                    $sport = \App\Models\SportsCategory::where('id', $tournament->sports_category_id )->first();
-                ?> 
+                @endif                
                 
-                <div class="text-left">
-                    <p>
-                        <a href="{{route('admin.sportscategory')}}">{{strtoupper('Sports')}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.sporttournament', base64_encode($sport->id))}}">{{strtoupper($sport->title)}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.sporttournamentseasons', base64_encode($tournament->id))}}">{{strtoupper($tournament->title)}}</a>&nbsp; &gt;                                                
-                    </p>
-                </div>
                 <div class="text-right">
-                    <a href="{{route('addsportstournamentseason', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    <a href="{{route('addsportscategory')}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
                     <table id="multi-column-ordering" class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Name</th>                                                                                                                         
-                                <th>Thumbnail</th>   
-                                <th>Description</th>                                                                                                                             
-                                <th>Status</th>                                                                                                                                                             
-                                <th>Start Date</th>                                                                                                                             
-                                <th>End Date</th>                                                                                                                             
+                                <th>Title</th>                                                                                                                                                                                                                                                                                                                        
+                                <th>Status</th>                                                                                                                             
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -130,10 +112,8 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>Name</th>                                                                                                                                
-                                <th>Thumbnail</th>   
-                                <th>Status</th>                                                                                                                                                                                          
-                                <th>Description</th>                                                                
+                                <th>Title</th>                                                                                                                                                                                                                                                                                                                                                                                
+                                <th>Status</th>                                                                   
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -230,14 +210,10 @@
          processing: true,
          serverSide: true,
          order: [[0, 'asc']],
-         ajax: "{{route('getsportstournamentseasonList', $id)}}",
+         ajax: "{{route('getsportscategoryList')}}",
          columns: [
-            { data: 'season_title' },                                                          
-            { data: 'logo',orderable: false, searchable: false },                                                
-            { data: 'desc' },
+            { data: 'title' },                                                                                  
             { data: 'status' },
-            { data: 'start_date' },
-            { data: 'end_date' },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
@@ -256,7 +232,7 @@
     });
 
     function deleteRowModal(id){ 
-        $('#d_title').text('Tournament Season')
+        $('#d_title').text('TV Show')
         $('#d_id').val(id);
         $('#delete_modal').modal('show');        
     }
@@ -265,7 +241,7 @@
         var id = $('#d_id').val();
         $.ajax({
             type: 'POST',
-            url: "{{route('sportstournamentseason.destroy')}}",
+            url: "{{route('tvshow.destroy')}}",
             data: {
                 _token: '{{ csrf_token() }}',
                 id:id

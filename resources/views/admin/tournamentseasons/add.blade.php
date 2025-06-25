@@ -1,9 +1,9 @@
 @extends('layout.default')
 @section('mytitle', 'Manage TvShow')
-@if(isset($tvchannel))
-@section('page', 'TvShow / Update')
+@if(isset($tournamentseason))
+@section('page', 'Season / Update')
 @else
-@section('page', 'TvShow / Add')
+@section('page', 'Season / Add')
 @endif
 
 @section('content')
@@ -29,56 +29,76 @@
                 </div>
                 @endif
 
-                <form id="tvchannel-form" method="post" action="{{ route('saveTvShow') }}" enctype="multipart/form-data" novalidate>
+                <form id="tournamentseason-form" method="post" action="{{ route('savesportstournamentseason') }}" enctype="multipart/form-data" novalidate>
                     @csrf
-                    <input type="hidden" name="id" value="{{ $tvchannel->id ?? '' }}">
+                    @if (isset($tournamentseason))                        
+                        <input type="hidden" name="id" value="{{isset($tournamentseason) ? $tournamentseason->id : ''}}">
+                    @endif
+
+                    <input type="hidden" name="sports_tournament_id" id="sports_tournament_id" value="{{$id}}">
 
                     <div class="form-row">
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name"
-                                placeholder="Name"
-                                value="{{ old('name', $tvchannel->name ?? '') }}" required>
+                            <label for="name">Season Title</label>
+                            <input type="text" class="form-control" id="season_title" name="season_title" placeholder="Season Title" value="{{ old('season_title', $tournamentseason->season_title ?? '') }}" required>
                             <div class="invalid-feedback">
-                                @error('name') {{ $message }} @enderror
+                                @error('season_title') {{ $message }} @enderror
                             </div>
                         </div>
 
-                        <!-- Language -->
+
+                        {{-- <!-- Language -->
                         <div class="col-md-6 mb-4">
                             <label for="language">Language</label>
-                            <select name="language" id="language" class="form-control select">
-                                <option value="">--Select Language--</option>
-                                @foreach ($languages as $language)
-                                    <option value="{{$language->title}}" @if(isset($tvchannel) && $tvchannel->language == $language->title) selected @endif>{{$language->title}}</option>
-                                @endforeach
-                            </select>
+                            <input type="text" class="form-control" id="language" name="language"
+                                placeholder="e.g. Hindi, English"
+                                value="{{ old('language', $tournamentseason->language ?? '') }}" required>
                             <div class="invalid-feedback">
                                 @error('language') {{ $message }} @enderror
+                            </div>
+                        </div> --}}
+
+                        <!-- Logo -->
+                        <div class="col-md-6 mb-4">
+                            <label for="thumbnail">Logo</label>
+                            <input type="text" class="form-control" id="logo" name="logo"
+                                placeholder="Enter image path or URL"
+                                value="{{ old('logo', $tournamentseason->logo ?? '') }}">
+                            @if(isset($tournamentseason) && $tournamentseason->logo)
+                                <img src="{{ $tournamentseason->logo }}" width="70" style="margin-top: 5px;" alt="Logo Preview">
+                            @endif
+                            <div class="invalid-feedback">
+                                @error('thumbnail') {{ $message }} @enderror
+                            </div>
+                        </div>
+
+
+                        <!-- Logo -->
+                        <div class="col-md-6 mb-4">
+                            <label for="thumbnail">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" placeholder="Enter Start Date" value="{{ old('start_date', $tournamentseason->start_date ?? '') }}">                            
+                            <div class="invalid-feedback">
+                                @error('thumbnail') {{ $message }} @enderror
                             </div>
                         </div>
 
                         <!-- Logo -->
                         <div class="col-md-6 mb-4">
-                            <label for="logo">Logo</label>
-                            <input type="text" class="form-control" id="logo" name="logo"
-                                placeholder="Enter image path or URL"
-                                value="{{ old('logo', $tvchannel->logo ?? '') }}">
-                            @if(isset($tvchannel) && $tvchannel->logo)
-                                <img src="/{{ $tvchannel->logo }}" width="40" style="margin-top: 5px;" alt="Logo Preview">
-                            @endif
+                            <label for="thumbnail">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" placeholder="Enter End Date" value="{{ old('end_date', $tournamentseason->end_date ?? '') }}">                            
                             <div class="invalid-feedback">
-                                @error('logo') {{ $message }} @enderror
+                                @error('thumbnail') {{ $message }} @enderror
                             </div>
                         </div>
+
 
                         <!-- Status -->
                         <div class="col-md-6 mb-4">
                             <label for="status">Status</label>
                             <select name="status" id="status" class="form-control">
-                                <option value="1" @if(old('status', $tvchannel->status ?? '') == 1) selected @endif>Active</option>
-                                <option value="0" @if(old('status', $tvchannel->status ?? '') == 0) selected @endif>Inactive</option>
+                                <option value="1" @if(old('status', $tournamentseason->status ?? '') == 1) selected @endif>Active</option>
+                                <option value="0" @if(old('status', $tournamentseason->status ?? '') == 0) selected @endif>Inactive</option>
                             </select>
                             <div class="invalid-feedback">
                                 @error('status') {{ $message }} @enderror
@@ -89,17 +109,16 @@
                         <div class="col-md-12 mb-4">
                             <label for="description">Description</label>
                             <textarea class="form-control" id="description" name="description"
-                                placeholder="Description">{{ old('description', $tvchannel->description ?? '') }}</textarea>
+                                placeholder="Description">{{ old('description', $tournamentseason->description ?? '') }}</textarea>
                             <div class="invalid-feedback">
                                 @error('description') {{ $message }} @enderror
                             </div>
                         </div>
-
-
+                        
                     </div>
 
                     <button class="btn btn-primary submit-fn mt-4" type="submit">
-                        {{ isset($tvchannel) ? 'Update' : 'Add' }}
+                        {{ isset($tournamentseason) ? 'Update' : 'Add' }}
                     </button>
                 </form>
 

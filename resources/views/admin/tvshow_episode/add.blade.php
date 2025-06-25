@@ -29,6 +29,10 @@
                 </div>
                 @endif
 
+                <div class="text-left">
+                    <a href="{{route('admin.tvshow.episode', base64_encode($id))}}" class="btn btn-sm btn-primary mb-3">Back to List</a>
+                </div>
+
                 <form id="episode-form" method="post" action="{{ route('saveTvShowEpisode') }}" enctype="multipart/form-data" novalidate>
                     @csrf
                     @if (isset($episode))                        
@@ -47,10 +51,16 @@
                             </div>
                         </div>
 
+                        <?php 
+                        
+                            $count = \App\Models\TvShowEpisode::whereNull('deleted_at')->where('season_id', $id)->count();
+                            $count = $count + 1;
+                        ?>
+
                         <!-- Episode Number -->
                         <div class="col-md-6 mb-4">
                             <label for="name">Episode Number</label>
-                            <input type="text" class="form-control" id="episode_number" name="episode_number" placeholder="Episode Number" value="{{ old('title', $episode->title ?? 0) }}" oninput="this.value = this.value.replace(/[^0-9]/g, '');" >
+                            <input type="text" class="form-control" id="episode_number" name="episode_number" placeholder="Episode Number" value="{{ old('episode_number', $episode->episode_number ?? $count) }}" oninput="this.value = this.value.replace(/[^0-9]/g, '');" >
                             <div class="invalid-feedback">
                                 @error('name') {{ $message }} @enderror
                             </div>
@@ -63,6 +73,14 @@
                             <div class="invalid-feedback">
                                 @error('thumbnail') {{ $message }} @enderror
                             </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="streaming_type">Streaming Type</label>
+                            <select name="streaming_type" id="streaming_type" class="form-control select">
+                                <option value="youtube" @if(isset($episode) && $episode->streaming_type == 'youtube') selected @endif>Youtube</option>
+                                <option value="m3u8" @if(isset($episode) && $episode->streaming_type == 'm3u8') selected @endif>m3u8</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6 mb-4">
@@ -84,12 +102,20 @@
                         </div>
 
                         <div class="col-md-6 mb-4">
-                            <label for="status">Release Date</label>
+                            <label for="release_date">Release Date</label>
                             <input type="date" name="release_date" id="release_date" class="form-control" placeholder="Release Date" value="{{old('release_date', $episode->release_date ?? '')}}">
                             <div class="invalid-feedback">
                                 @error('release_date') {{ $message }} @enderror
                             </div>
                         </div>
+
+                        {{-- <div class="col-md-6 mb-4">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control select">
+                                <option value="1" @if(isset($episode) && $episode->status == 1) selected @endif>Active</option>
+                                <option value="0" @if(isset($episode) && $episode->status == 0) selected @endif>In active</option>
+                            </select>
+                        </div> --}}
 
                         <!-- Description -->
                         <div class="col-md-12 mb-4">
