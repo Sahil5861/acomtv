@@ -36,8 +36,8 @@
                       </div>
                   @endif
                 <!-- <div class="row"> -->
-                    <a href="{{route('admin.movies')}}" class="btn btn-primary mb-3">Back to List</a>
-                    <form id="user-form"  method="post" action="{{route('saveMovie')}}" enctype="multipart/form-data" novalidate class="simple-example" >
+                    <a href="{{route('admin.adultmovies')}}" class="btn btn-primary mb-3">Back to List</a>
+                    <form id="user-form"  method="post" action="{{route('save-above-18')}}" enctype="multipart/form-data" novalidate class="simple-example" >
                         @csrf
                         <input type="hidden" name="id" value="@if(isset($movie)){{$movie->id}}@endif">
                         <input type="hidden" name="channel_logo_old" value="@if(isset($channel)){{$channel->channel_logo}}@endif">
@@ -53,7 +53,7 @@
 
                             <?php 
                             
-                                $channel_number = \App\Models\Movie::whereNull('deleted_at')->count();
+                                $channel_number = \App\Models\AdultMovie::whereNull('deleted_at')->count();
                                 $formated_number = $channel_number + 1;
                             ?>
 
@@ -66,7 +66,6 @@
                                 <div class="channel-error"></div>
                             </div>
 
-
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Movie Index*</label>
                                 <input type="number" class="form-control" id="index" name="index" placeholder="Movie Index" value="{{old('index',isset($movie) ? $movie->index : $formated_number)}}" required>
@@ -75,7 +74,6 @@
                                 </div>
                                 <div class="channel-error"></div>
                             </div>
-
 
                             <div class="col-md-6 mb-4">
                                 <label for="release_date">Release Date</label>
@@ -98,7 +96,7 @@
 
                             <div class="col-md-6 mb-4">
                                 <label for="stream_type">Stream Type*</label>
-                                <select name="source_type" id="source_type" class="form-control">
+                                <select name="source_type" id="source_type" class="form-control select">
                                     <option value="M3u8" @if(isset($movie) && $movie->source_type == 'M3u8'){{'selected'}} @endif>M3u8</option>
                                     <option value="YoutubeLive" @if(isset($movie) && $movie->source_type == 'YoutubeLive'){{'selected'}} @endif>Youtube</option>
                                 </select>
@@ -150,7 +148,9 @@
                             <div class="col-md-6 mb-4">
                                 <label for="banner">Movie Banner*</label>
                                 <input type="text" name="banner" id="banner" class="form-control" placeholder="Movie Banner" value="{{ old('banner', isset($movie) ? $movie->banner : '') }}" required>
-
+                                @if (isset($movie->banner))
+                                    <img src="{{$movie->banner}}" alt="image" style="width:100px" class="img my-2">
+                                @endif
                             </div>
 
                             {{-- <div class="col-md-6 mb-4">

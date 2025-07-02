@@ -20,6 +20,7 @@ use App\Http\Controllers\ResellerPlanController;
 use App\Http\Controllers\ResellerWallets;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Movies;
+use App\Http\Controllers\AdultMovies;
 use App\Http\Controllers\Webserieses;
 use App\Http\Controllers\MovieLinks;
 use App\Http\Controllers\WebseriesSeasons;
@@ -35,6 +36,21 @@ use App\Http\Controllers\ManageSportsChannel;
 use App\Http\Controllers\ManageSportsTournament;
 use App\Http\Controllers\ManageTournamentSeason;
 use App\Http\Controllers\ManageTournamentMatches;
+
+use App\Http\Controllers\ManageKidsChannel;
+use App\Http\Controllers\ManageKidsShows;
+use App\Http\Controllers\KidsShowSeasons;
+use App\Http\Controllers\KidsShowEpisodes;
+use App\Http\Controllers\ManageRelChannel;
+use App\Http\Controllers\ManageRelShows;
+use App\Http\Controllers\RelShowEpisodes;
+
+
+
+
+
+
+
 
 
 
@@ -322,6 +338,24 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/check-channel-number', [Movies::class,'checkChannelNumber'])->name('check-channel-number');
 
 
+        //Adult Movies
+
+        Route::middleware(['adultmovies.email'])->group(function (){
+            Route::get('/above-18', [AdultMovies::class, 'index'])->name('admin.adultmovies');
+            Route::get('/getAdultMoviesList', [AdultMovies::class, 'getAdultMoviesList'])->name('getAdultMoviesList');
+            Route::get('/adultmovies-order', [AdultMovies::class, 'getChannelOrderList'])->name('admin.add-above-18.order');
+            Route::get('/deleted-above-18', [AdultMovies::class, 'deletedChannel'])->name('admin.add-above-18.deleted');
+            Route::get('/getDeletedChannelList', [AdultMovies::class, 'getDeletedChannelList'])->name('getDeletedadd-above-18List');
+            Route::get('/recover-channel/{id}', [AdultMovies::class, 'recoverChannel'])->name('admin.add-above-18.recoverMovie');
+            Route::get('/add-above-18', [AdultMovies::class,'add'])->name('add-above-18');
+            Route::post('/addabove-18', [AdultMovies::class,'save'])->name('save-above-18');
+            Route::post('/save-above-18-orders', [AdultMovies::class,'saveChannelOrders'])->name('saveMovieOrders');
+            Route::get('/edit-above-18-movie/{id}', [AdultMovies::class,'editChannel'])->name('edit-above-18-movie');
+            Route::post('/adultmovies/destroy', [AdultMovies::class,'destroy'])->name('above-18.destroy');
+            Route::get('/above-18/update-status/{id}', [AdultMovies::class,'updateStatus'])->name('above-18.update-status');        
+        });
+        
+
         // Manage Movie Links
         Route::get('/manage-movie-links/{id}', [MovieLinks::class, 'index'])->name('admin.movie.links');
         Route::get('/getMoviesLinkList/{id}', [MovieLinks::class, 'getMoviesLinkList'])->name('getMovieLinkList');
@@ -449,6 +483,76 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/plan-max-price', [Controller::class,'planMaxPrice'])->name('plan-max-price');
         Route::post('/update-plan-max-price', [Controller::class,'updatePlanMaxPrice'])->name('updatePlanMaxPrice');
 
+        // Kids channel
+        Route::get('/kids-channel', [ManageKidsChannel::class, 'index'])->name('admin.kidschannel');
+        Route::get('/getKidsChannelList', [ManageKidsChannel::class, 'getKidsChannelList'])->name('getKidsChannelList');
+        Route::get('/kids-channel-add', [ManageKidsChannel::class, 'add'])->name('admin.kidschannel.add');
+        Route::post('/kids-channel-save', [ManageKidsChannel::class, 'save'])->name('admin.kidschannel.save');
+        Route::get('/kids-channel-edit/{id}', [ManageKidsChannel::class, 'edit'])->name('admin.kidschannel.edit');
+        Route::post('/kids-channel-delete', [ManageKidsChannel::class, 'destroy'])->name('admin.kidschannel.destroy');
+        Route::get('/kids-channel-update-status/{id}', [ManageKidsChannel::class,'updateStatus'])->name('admin.kidschannel.update-status');        
+
+
+        // 
+
+        
+        // Kids channel shows
+        Route::get('/kids-shows/{id}', [ManageKidsShows::class, 'index'])->name('admin.kidsshows');
+        Route::get('/getKidsShowList/{id}', [ManageKidsShows::class, 'getKidsShowList'])->name('getKidsShowList');
+        Route::get('/kids-shows-add/{id}', [ManageKidsShows::class,'add'])->name('admin.kidsshows.add');
+        Route::post('/kids-shows-save', [ManageKidsShows::class,'save'])->name('admin.kidsshows.save');        
+        Route::get('/kids-shows-edit/{id}', [ManageKidsShows::class,'edit'])->name('admin.kidsshows.edit');
+        Route::get('/kids-shows-update-status/{id}', [ManageKidsShows::class,'updateStatus'])->name('admin.kidsshows.update-status');        
+        Route::post('/kids-shows-destroy', [ManageKidsShows::class,'destroy'])->name('admin.kidsshows.destroy');
+        
+        // Kid shows Seasons
+
+        Route::get('/kid-shows-season/{id}', [KidsShowSeasons::class, 'index'])->name('admin.kidshowsseason');
+        Route::get('/getKidShowsSeasonList/{id}', [KidsShowSeasons::class, 'getKidShowsSeasonList'])->name('getKidShowsSeasonList');
+        Route::get('/add-kid-shows-season/{id}', [KidsShowSeasons::class,'create'])->name('addKidShowsSeason');
+        Route::post('/addKidshowsSeason', [KidsShowSeasons::class,'save'])->name('saveKidShowsSeason');        
+        Route::get('/edit-kid-shows-season/{id}', [KidsShowSeasons::class,'edit'])->name('edit-tvshows-season');
+        Route::get('/kids-shows-season/update-status/{id}', [KidsShowSeasons::class,'updateStatus'])->name('tvshows.season.update-status');        
+
+        Route::post('/websersiseason/destroy', [KidsShowSeasons::class,'destroy'])->name('tvshows-season.destroy');
+
+        // Kid shows Episodes
+        Route::get('/kid-shows-episode/{id}', [KidsShowEpisodes::class, 'index'])->name('admin.kid-shows.episodes');
+        Route::get('/getKidsShowEpisodesList/{id}', [KidsShowEpisodes::class, 'getWebseriesEpisodeList'])->name('getKidsShowEpisodesList');
+        Route::get('/add-kid-shows-episode/{id}', [KidsShowEpisodes::class,'create'])->name('addkidshowsEpisode');
+        Route::post('/addWebseriesSeasonEpisode', [KidsShowEpisodes::class,'save'])->name('savekidshowsEpisode');        
+        Route::get('/edit-kid-shows-episode/{id}', [KidsShowEpisodes::class,'edit'])->name('kid-shows.edit');
+        Route::get('/kid-shows-episode/update-status/{id}', [KidsShowEpisodes::class,'updateStatus'])->name('kid-shows.episode.update-status');        
+        Route::post('/kid-shows-episode/destroy', [KidsShowEpisodes::class,'destroy'])->name('kid-shows-episode.destroy');
+
+
+        // Religious Channels
+        Route::get('/religious-channel', [ManageRelChannel::class, 'index'])->name('admin.RelChannel');
+        Route::get('/getRelChannelList', [ManageRelChannel::class, 'getRelChannelList'])->name('getRelChannelList');
+        Route::get('/religious-channel-add', [ManageRelChannel::class, 'add'])->name('admin.RelChannel.add');
+        Route::post('/religious-channel-save', [ManageRelChannel::class, 'save'])->name('admin.RelChannel.save');
+        Route::get('/religious-channel-edit/{id}', [ManageRelChannel::class, 'edit'])->name('admin.RelChannel.edit');
+        Route::post('/religious-channel-delete', [ManageRelChannel::class, 'destroy'])->name('admin.RelChannel.destroy');
+        Route::get('/religious-channel-update-status/{id}', [ManageRelChannel::class,'updateStatus'])->name('admin.RelChannel.update-status');        
+
+        // Religious shows 
+        
+        Route::get('/religious-shows/{id}', [ManageRelShows::class, 'index'])->name('admin.Relshows');
+        Route::get('/getRelShowList/{id}', [ManageRelShows::class, 'getRelShowList'])->name('getRelShowList');
+        Route::get('/religious-shows-add/{id}', [ManageRelShows::class,'add'])->name('admin.Relshows.add');
+        Route::post('/religious-shows-save', [ManageRelShows::class,'save'])->name('admin.Relshows.save');        
+        Route::get('/religious-shows-edit/{id}', [ManageRelShows::class,'edit'])->name('admin.Relshows.edit');
+        Route::get('/religious-shows-update-status/{id}', [ManageRelShows::class,'updateStatus'])->name('admin.Relshows.update-status');        
+        Route::post('/religious-shows-destroy', [ManageRelShows::class,'destroy'])->name('admin.Relshows.destroy');
+
+        // Religious Episodes
+        Route::get('/religious-episodes/{id}', [RelShowEpisodes::class, 'index'])->name('admin.rel_episodes.episodes');
+        Route::get('/getRelShowEpisodesList/{id}', [RelShowEpisodes::class, 'getRelShowEpisodesList'])->name('getRelShowEpisodesList');
+        Route::get('/add-religious-episode/{id}', [RelShowEpisodes::class,'create'])->name('addrel_episodes');
+        Route::post('/saveReligiousEpisode', [RelShowEpisodes::class,'save'])->name('saverel_episodes');        
+        Route::get('/edit-religious-episode/{id}', [RelShowEpisodes::class,'edit'])->name('rel_episodes.edit');
+        Route::get('/religious-episode/update-status/{id}', [RelShowEpisodes::class,'updateStatus'])->name('rel_episodes.update-status');        
+        Route::post('/religious-episode/destroy', [RelShowEpisodes::class,'destroy'])->name('rel_episodes.destroy');
 
     });
      /*admin forgot password*/

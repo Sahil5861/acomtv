@@ -3,26 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Movie;
+use App\Models\AdultMovie;
 use App\Models\MovieLink;
 use App\Models\Genre;
 use App\Models\MovieGenre;
 use App\Models\ContentNetwork;
-use App\Models\MovieContentNetwork;
+use App\Models\Above18MovieContentNetwork;
 use Illuminate\Support\Facades\DB;
 
 
 
 
-class Movies extends Controller
+class AdultMovies extends Controller
 {
     public function index()
     {
-        return view('admin.movie.index');
+        return view('admin.adultmovie.index');
     }
-
+    
     public function deletedChannel(){
-        return view('admin.movie.deleted');
+        return view('admin.adultmovie.deleted');
     }
 
     public function getChannelOrderList()
@@ -53,7 +53,7 @@ class Movies extends Controller
     }
 
     /* Process ajax request */
-    public function getMoviesList(Request $request)
+    public function getAdultMoviesList(Request $request)
     {
         $draw = $request->get('draw');
         $start = $request->get("start");
@@ -71,27 +71,27 @@ class Movies extends Controller
 
         // Total records
         // Total records
-        $totalRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->count();
-        $inactiveRecords = Movie::select('count(*) as allcount')->where('status','0')->whereNull('movies.deleted_at')->count();
-        $activeRecords = Movie::select('count(*) as allcount')->where('status','1')->whereNull('movies.deleted_at')->count();
-        $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at')->count();
+        $totalRecords = AdultMovie::select('count(*) as allcount')->whereNull('adult_movies.deleted_at')->count();
+        $inactiveRecords = AdultMovie::select('count(*) as allcount')->where('status','0')->whereNull('adult_movies.deleted_at')->count();
+        $activeRecords = AdultMovie::select('count(*) as allcount')->where('status','1')->whereNull('adult_movies.deleted_at')->count();
+        $deletedRecords = AdultMovie::select('count(*) as allcount')->whereNotNull('adult_movies.deleted_at')->count();
 
 
-        $totalRecordswithFilter = Movie::select('count(*) as allcount')
+        $totalRecordswithFilter = AdultMovie::select('count(*) as allcount')
         ->where('name', 'like', '%' . $searchValue . '%')
         // ->where('channels.status', '=', 1)
-        ->whereNull('movies.deleted_at')
+        ->whereNull('adult_movies.deleted_at')
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = Movie::orderBy($columnName, $columnSortOrder)
+        $records = AdultMovie::orderBy($columnName, $columnSortOrder)
             // ->where('channels.status', '=', 1)
-            ->whereNull('movies.deleted_at')
-            ->where('movies.name', 'like', '%' . $searchValue . '%')
+            ->whereNull('adult_movies.deleted_at')
+            ->where('adult_movies.name', 'like', '%' . $searchValue . '%')
 
             // ->orWhere('channels.description', 'like', '%' . $searchValue . '%')
             // ->orWhere('channels.contact_email', 'like', '%' . $searchValue . '%')
-            ->select('movies.*')->orderBy('movies.updated_at','desc')            
+            ->select('adult_movies.*')->orderBy('adult_movies.updated_at','desc')            
             ->skip($start)
             ->take($rowperpage)
             ->get();
@@ -117,8 +117,8 @@ class Movies extends Controller
                 "banner" => '<img src="'.$record->banner.'" width="100px">',
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">
-                        <a href="edit-movie/'.base64_encode($record->id).'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>                        
-                        <a href="javascript:;" onclick="delete_item(\''.base64_encode($record->id).'\',\'movie\')">'.$del_icon.'</a>
+                        <a href="edit-above-18-movie/'.base64_encode($record->id).'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>                        
+                        <a href="javascript:;" onclick="deleteRowModal(\''.base64_encode($record->id).'\',\'movie\')">'.$del_icon.'</a>
                       </div>',
             );
         }
@@ -261,13 +261,13 @@ class Movies extends Controller
         }
     }
 
-    public function addChannel(){        
+    public function add(){        
         $this->data['genres'] = Genre::where('status',1)->get();
         $this->data['networks'] = ContentNetwork::where('deleted_at', null)->get();
-        return view('admin.movie.add',$this->data);
+        return view('admin.adultmovie.add',$this->data);
     }
 
-    public function add(Request $request){
+    public function save(Request $request){
         $request->validate([
             'name' => 'required',            
             'movie_url' => 'required',            
@@ -277,28 +277,7 @@ class Movies extends Controller
         // print_r($request->all()); exit();
         if(!empty($request->id)){
 
-            // if ($request->hasFile('image')) {
-            //     $file = $request->file('image');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/movie/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $banner = $filePath;
-            // }else{
-            //     $banner = '';
-            // }
-
-            // if ($request->hasFile('movie_poster')) {
-            //     $file = $request->file('movie_poster');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/movie/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $movie_poster = $filePath;
-            // }else{
-            //     $movie_poster = '';
-            // }
-            // print_r($request->all()); exit;
-            // echo $request->channel_description; exit;
-            $movie = Movie::firstwhere('id',$request->id);
+            $movie = AdultMovie::firstwhere('id',$request->id);
             $movie->name = $request->name;
             $movie->banner = $request->banner;                                  
             $movie->description = $request->movie_description;                        
@@ -318,15 +297,15 @@ class Movies extends Controller
                 //     $MovieGenre->save();
                 // }
 
-                MovieContentNetwork::where('movie_id',$movie->id)->delete();
+                Above18MovieContentNetwork::where('movie_id',$movie->id)->delete();
                 if ($request->has('content_network') && !empty($request->content_network)) {                    
-                    DB::table('content_network_log')->where('content_id', $movie->id)->where('content_type', $movie->content_type)->delete();                                                                
+                    DB::table('above_18_content_network_log')->where('content_id', $movie->id)->where('content_type', $movie->content_type)->delete();                                                                
                     foreach ($request->content_network as $key => $network) {
-                        $MovieNetwork = new MovieContentNetwork();
+                        $MovieNetwork = new Above18MovieContentNetwork();
                         $MovieNetwork->movie_id = $movie->id;
                         $MovieNetwork->network_id = $network;
                         if ($MovieNetwork->save()) {                           
-                            DB::table('content_network_log')->insert([
+                            DB::table('above_18_content_network_log')->insert([
                                 'content_id' => $movie->id,
                                 'network_id' => $network,
                                 'content_type' => $movie->content_type,                            
@@ -334,8 +313,6 @@ class Movies extends Controller
                         }
                     }
                 }
-
-
                 return back()->with('message','Movie updated successfully');
             }else{
                 return back()->with('message','Movie not updated successfully');
@@ -343,38 +320,8 @@ class Movies extends Controller
 
         }else{
 
-            // print_r($request->all()); exit;
 
-            // $channelNumberExists = Channel::where('channel_number',$request->channel_number)->first();
-            // $channelNameExists = Genre::where('title',$request->channel_name)->first();
-            // if($channelNumberExists){
-            //     return back()->with('error','This channel number is already exists.');
-            // }
-            // if($channelNameExists){
-            //     return back()->with('error','This channel name is not available.');
-            // }
-
-            // if ($request->hasFile('image')) {
-            //     $file = $request->file('image');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/movie/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $banner = $filePath;
-            // }else{
-            //     $banner = '';
-            // }
-
-            // if ($request->hasFile('movie_poster')) {
-            //     $file = $request->file('movie_poster');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/channel/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $movie_poster = $filePath;
-            // }else{
-            //     $movie_poster = '';
-            // }
-
-            $movie = new Movie();
+            $movie = new AdultMovie();
             $movie->name = $request->name;
             $movie->banner = $request->banner;                                  
             $movie->description = $request->movie_description ?? null;                        
@@ -385,27 +332,22 @@ class Movies extends Controller
             $movie->youtube_trailer = $request->trailer_url ?? null;
             $movie->movie_url = $request->movie_url ?? null;
             $movie->genres = implode(',', $request->movie_genre);
+            
             if($movie->save()){                
-                // foreach ($request->movie_genre as $key => $genre) {
-                //     $MovieGenre = new MovieGenre();
-                //     $MovieGenre->movie_id = $movie->id;
-                //     $MovieGenre->genre_id = $genre;
-                //     $MovieGenre->save();
-                // }
 
                 if ($request->has('content_network') && !empty($request->content_network)) {
-                    $cur_movies = Movie::where('id', $movie->id)->first();
-                    $newtworkMovies = MovieContentNetwork::where('movie_id',$movie->id)->get();
+                    $cur_movies = AdultMovie::where('id', $movie->id)->first();
+                    $newtworkMovies = Above18MovieContentNetwork::where('movie_id',$movie->id)->get();
                     if ($newtworkMovies) {
-                        MovieContentNetwork::where('movie_id',$movie->id)->delete();
+                        Above18MovieContentNetwork::where('movie_id',$movie->id)->delete();
                     }
                     foreach ($request->content_network as $key => $network) {
-                        $MovieNetwork = new MovieContentNetwork();
+                        $MovieNetwork = new Above18MovieContentNetwork();
                         $MovieNetwork->movie_id = $movie->id;
                         $MovieNetwork->network_id = $network;
                         
                         if ($MovieNetwork->save()) {
-                            DB::table('content_network_log')->insert([
+                            DB::table('above_18_content_network_log')->insert([
                                 'content_id' => $movie->id,
                                 'network_id' => $network,
                                 'content_type' => $cur_movies->content_type,                            
@@ -423,14 +365,14 @@ class Movies extends Controller
     }
 
     public function editChannel($id){  
-        $movie = Movie::where('id', base64_decode($id))->first();              
+        $movie = AdultMovie::where('id', base64_decode($id))->first();              
         $this->data['movie'] = $movie;
         $this->data['genres'] = Genre::where('status',1)->get();
         $this->data['networks'] = ContentNetwork::where('deleted_at', null)->get();
-        // $channelGenre = MovieGenre::where('movie_id',base64_decode($id))->get();
+        // $channelGenre = AdultMovieGenre::where('movie_id',base64_decode($id))->get();
 
         $this->data['channelGenre'] = explode(',', $movie->genres);
-        $movieNetwork = MovieContentNetwork::where('movie_id', base64_decode($id))->get();        
+        $movieNetwork = Above18MovieContentNetwork::where('movie_id', base64_decode($id))->get();        
         // print_r($channelGenre); exit();
         // $this->data['channelGenre'] = [];
         $this->data['movieNetwork'] = [];
@@ -446,21 +388,21 @@ class Movies extends Controller
             }
         }
         // print_r($this->data['movieNetwork']); exit;
-        return view('admin.movie.add',$this->data);
+        return view('admin.adultmovie.add',$this->data);
     }
 
     public function destroy(Request $request){
-        $movie = Movie::where('id',base64_decode($request->id))->first();
+        $movie = AdultMovie::where('id',base64_decode($request->id))->first();
 
         
         $movie->deleted_at = time();
         if($movie->save()){
 
-            MovieContentNetwork::where('movie_id',$movie->id)->delete();
-            $links = MovieLink::where('movie_id', $movie->id)->get();
-            if ($links) {
-                MovieLink::where('movie_id', $movie->id)->delete();
-            }
+            Above18MovieContentNetwork::where('movie_id',$movie->id)->delete();
+            // $links = AdultMovieLink::where('movie_id', $movie->id)->get();
+            // if ($links) {
+            //     AdultMovieLink::where('movie_id', $movie->id)->delete();
+            // }
             echo json_encode(['message','Movie deleted successfully']);
         }else{
             echo json_encode(['message','Movie not deleted successfully']);
@@ -468,7 +410,7 @@ class Movies extends Controller
     }
 
     public function updateStatus($id){
-        $movie = Movie::find(base64_decode($id));        
+        $movie = AdultMovie::find(base64_decode($id));        
         if($movie){
             $movie->status = $movie->status == '1' ? '0' : '1';
             $movie->save();

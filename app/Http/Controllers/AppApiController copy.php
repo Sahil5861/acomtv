@@ -6,8 +6,6 @@ use App\Models\AdminPlan;
 use App\Models\AdminSuperAdminPlan;
 use App\Models\Channel;
 use App\Models\Movie;
-use App\Models\AdultMovie;
-
 use App\Models\WebSeries;
 use App\Models\WebSeriesSeason;
 use App\Models\WebSeriesEpisode;
@@ -16,15 +14,6 @@ use App\Models\TvChannel;
 use App\Models\TvShow;
 use App\Models\TvShowEpisode;
 use App\Models\TvShowSeason;
-
-use App\Models\RelChannel;
-use App\Models\RelShow;
-use App\Models\RelshowsEpisode;
-
-use App\Models\SportsCategory;
-use App\Models\SportsTournament;
-use App\Models\TournamentSeason;
-use App\Models\TournamentMatches;
 
 
 use App\Models\MovieLink;
@@ -428,13 +417,7 @@ class AppApiController extends Controller
                 'channel_link as url',
                 'stream_type',
                 'genres',
-                'status')->where('status',1)->whereNull('deleted_at')->orderBy('id','desc');
-                
-        if(isset($_GET['records']) && $_GET['records'] > 0){
-            $channels = $channels->limit($_GET['records'])->get();
-        }else{
-            $channels = $channels->get();
-        }
+                'status')->where('status',1)->whereNull('deleted_at')->get();
                 
         $groupedByGenres = [];
 
@@ -980,33 +963,18 @@ class AppApiController extends Controller
     public function getAllMovies(Request $request){
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
-        $query = Movie::where('status', 1)
-                ->whereNull('deleted_at')
-                ->with('networks');
-        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
-            $page = (int) $_GET['page'];
-            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
-    
-            $movies = $query->paginate($limit, ['*'], 'page', $page);
 
-            print_r(json_encode($movies->items()));
-        } else {
-
-            if (isset($_GET['records']) && $_GET['records'] > 0) {
-                $movies = $query->limit($_GET['records'])->get();
-            } else {
-                $movies = $query->get();
-            }
-            print_r(json_encode($movies));
-            exit;
-        }
+        $movies = Movie::where('status', 1)->where('deleted_at', null)        
+        ->with('networks')
+        ->get();
 
         // print_r(json_encode(array(
         //     'status' => true,
         //     'message' => 'All active Movie.',
         //     'data' =>$movies
         // )));
-        
+        print_r(json_encode($movies));
+        exit;
     }
 
     public function getAllWebSeries(Request $request){
@@ -1014,12 +982,8 @@ class AppApiController extends Controller
         $post = json_decode(file_get_contents('php://input', 'r'));
 
         $series = WebSeries::where('status', 1)->where('deleted_at', null)        
-        ->with('networks');
-        if(isset($_GET['records']) && $_GET['records'] > 0){
-            $series = $series->limit($_GET['records'])->get();
-        }else{
-            $series = $series->get();
-        }
+        ->with('networks')
+        ->get();
 
         // print_r(json_encode(array(
         //     'status' => true,
@@ -1292,7 +1256,7 @@ class AppApiController extends Controller
 
         }
     }
-    
+
     public function getTvChannels(Request $request){
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
@@ -1369,179 +1333,6 @@ class AppApiController extends Controller
         }
         exit;
     }
-
-
-    // 30 june 2025
-
-    public function getReligiousChannel(Request $request){
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-
-        $relChannels = RelChannel::where('deleted_at', null)->where('status',1)->get();
-
-        if ($relChannels) {
-            
-            print_r(json_encode($relChannels));
-        }
-        else{
-            print_r(json_encode([]));
-        }
-        exit;
-    }
-
-    public function getReligiousShows(Request $request,$channelId = null){
-        if(!$channelId){
-            echo "channel id required ";
-            exit;
-        }
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-
-        $relShows = RelShow::where('deleted_at', null)->where('channel_id',$channelId)->where('status',1)->get();
-
-        if ($relShows) {
-            
-            print_r(json_encode($relShows));
-        }
-        else{
-            print_r(json_encode([]));
-        }
-        exit;
-    }
-
-    public function getReligiousShowsEpisodes(Request $request,$showId = null){
-        if(!$showId){
-            echo "channel id required ";
-            exit;
-        }
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-
-        $relShowepisodes = RelshowsEpisode::where('deleted_at', null)->where('show_id',$showId)->where('status',1)->get();
-
-        if ($relShowepisodes) {
-            
-            print_r(json_encode($relShowepisodes));
-        }
-        else{
-            print_r(json_encode([]));
-        }
-        exit;
-    }
-
-
-    public function getsportCategories(Request $request){
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-
-        $categories = SportsCategory::where('deleted_at', null)->where('status',1)->get();
-
-        if ($categories) {
-            
-            print_r(json_encode($categories));
-        }
-        else{
-            print_r(json_encode([]));
-        }
-        exit;
-    }
-
-    public function getsportTournament(Request $request,$cateId = null){
-        if(!$cateId){
-            echo "channel id required ";
-            exit;
-        }
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-
-        $tournaments = SportsTournament::where('deleted_at', null)->where('sports_category_id',$cateId)->where('status',1)->get();
-
-        if ($tournaments) {
-            
-            print_r(json_encode($tournaments));
-        }
-        else{
-            print_r(json_encode([]));
-        }
-        exit;
-    }
-
-
-    public function getTouranamentSeasons(Request $request,$tournamentId = null){
-        if(!$tournamentId){
-            echo "tournament id required ";
-            exit;
-        }
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-
-        $touramentSeasons = TournamentSeason::where('deleted_at', null)->where('sports_tournament_id',$tournamentId)->where('status',1)->get();
-
-        if ($touramentSeasons) {
-            
-            print_r(json_encode($touramentSeasons));
-        }
-        else{
-            print_r(json_encode([]));
-        }
-        exit;
-    }
-
-    public function getTouranamentSeasonsEvents(Request $request,$seasonId = null){
-        if(!$seasonId){
-            echo "season id required ";
-            exit;
-        }
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-
-        $touramentSeasonEvents = TournamentMatches::where('deleted_at', null)->where('tournament_season_id',$seasonId)->where('status',1)->get();
-
-        if ($touramentSeasonEvents) {
-            
-            print_r(json_encode($touramentSeasonEvents));
-        }
-        else{
-            print_r(json_encode([]));
-        }
-        exit;
-    }
-
-    public function getAllAbove18Movies(Request $request){
-        $user_id = $this->get_user_id();
-        $post = json_decode(file_get_contents('php://input', 'r'));
-        $query = AdultMovie::where('status', 1)
-                ->whereNull('deleted_at')
-                ->with('networks');
-        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
-            $page = (int) $_GET['page'];
-            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
-    
-            $movies = $query->paginate($limit, ['*'], 'page', $page);
-
-            print_r(json_encode($movies->items()));
-        } else {
-
-            if (isset($_GET['records']) && $_GET['records'] > 0) {
-                $movies = $query->limit($_GET['records'])->get();
-            } else {
-                $movies = $query->get();
-            }
-            print_r(json_encode($movies));
-            exit;
-        }
-
-        // print_r(json_encode(array(
-        //     'status' => true,
-        //     'message' => 'All active Movie.',
-        //     'data' =>$movies
-        // )));
-        
-    }
-
-
-    
-
 
 
 }

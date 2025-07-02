@@ -100,7 +100,42 @@
         </li>
 
         <li class="menu">
-            <a href="#sports" data-toggle="collapse" <?php if(request()->is('*sports*') || request()->is('*tvchannel*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+            <a href="#kidsapp" data-toggle="collapse" <?php if(request()->is('*kids-channel*') || request()->is('*kids-shows*') || request()->is('*kid-shows-season*') || request()->is('*kid-shows-episode*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+                <div class="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    <span>Manage Kids Shows</span>
+                </div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*kids-channel*') || request()->is('*kids-shows*') || request()->is('*kid-shows-season*')|| request()->is('*kid-shows-episode*') ){ echo 'show';} ?>" id="kidsapp" data-parent="#accordionExample">
+                <li class="<?php if(request()->is('*tvchannel')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.kidschannel')}}"> Channel List </a>
+                </li>                
+            </ul>
+            
+        </li>
+
+        <li class="menu">
+            <a href="#relapp" data-toggle="collapse" <?php if(request()->is('*religious-channel*') || request()->is('*religious-shows*') || request()->is('*religious-episodes*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+                <div class="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    <span>Manage Religious</span>
+                </div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*religious-channel*') || request()->is('*religious-shows*') || request()->is('*religious-episodes*')){ echo 'show';} ?>" id="relapp" data-parent="#accordionExample">
+                <li class="<?php if(request()->is('*religious-channel')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.RelChannel')}}"> Channel List </a>
+                </li>                
+            </ul>
+            
+        </li>
+        <li class="menu">
+            <a href="#sports" data-toggle="collapse" <?php if(request()->is('*sports*') || request()->is('*sports*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
                 <div class="">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                     <span>Manage Sports</span>
@@ -109,7 +144,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </a>
-            <ul class="collapse submenu list-unstyled <?php if(request()->is('*sports*') || request()->is('*tvchannel*')){ echo 'show';} ?>" id="sports" data-parent="#accordionExample">
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*sports*') || request()->is('*sports*')){ echo 'show';} ?>" id="sports" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*sports')){ echo 'active';} ?>" >
                     <a href="{{route('admin.sportscategory')}}"> Sport Category List </a>
                 </li>
@@ -175,10 +210,6 @@
                 <li class="<?php if(request()->is('*channels-order')){ echo 'active';} ?>">
                     <a href="{{route('admin.channels.order')}}"> Change Order</a>
                 </li>
-
-                {{-- <li class="<?php if(request()->is('*deleted-channel')){ echo 'active';} ?>">
-                    <a href="{{route('admin.channels.deleted')}}"> Deleted Channel</a>
-                </li> --}}
             </ul>
         </li>
 
@@ -192,10 +223,17 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </a>
-            <ul class="collapse submenu list-unstyled <?php if(request()->is('*movie*')){ echo 'show';} ?>" id="app2" data-parent="#accordionExample">
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*movie*') || request()->is('*above-18*')){ echo 'show';} ?>" id="app2" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*movies')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.movies')}}"> List </a>
+                    <a href="{{route('admin.movies')}}">Movies List </a>
                 </li>
+
+                @if (Auth::User()->email == 'above-18@gamil.com')                    
+                <li class="<?php if(request()->is('*above-18')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.adultmovies')}}"> Above 18 </a>
+                </li>
+                @endif
+
 
                 {{-- <li class="<?php if(request()->is('*channels-order')){ echo 'active';} ?>">
                     <a href="{{route('admin.channels.order')}}"> Movie Links</a>
@@ -206,6 +244,7 @@
                 </li> --}}
             </ul>
         </li>
+        
 
         <li class="menu">
             <a href="#app3" data-toggle="collapse" <?php if(request()->is('*webseries*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">

@@ -85,6 +85,17 @@
                             </div>
                         </div>
 
+
+                        <div class="col-md-6 mb-4">
+                            <label for="video_url">Video Url*</label>
+                            <input type="text" name="video_url" id="video_url" class="form-control" required value="{{old('video_url', $match->video_url ?? '')}}" placeholder="Enter Video Url">
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="thumbnail_url">Thumbnail Url</label>
+                            <input type="text" name="thumbnail_url" id="thumbnail_url" class="form-control" value="{{old('thumbnail_url', $match->thumbnail_url ?? '')}}" placeholder="Enter Thumbnail Url">
+                        </div>
+
                         <!-- Streaming Info -->
                         <div class="col-md-6 mb-4">
                             <label for="status">Match Type</label>
@@ -92,6 +103,8 @@
                                 <option value="">--Select Match Type--</option>
                                 <option value="League" @if(old('streaming_info', $match->match_type ?? '') == 'League') selected @endif>League</option>
                                 <option value="Knockout" @if(old('streaming_info', $match->match_type ?? '') == 'Knockout') selected @endif>Knockout</option>
+                                <option value="Quarter Final" @if(old('streaming_info', $match->match_type ?? '') == 'Quarter Final') selected @endif>Quarter Final</option>
+                                <option value="Semi Final" @if(old('streaming_info', $match->match_type ?? '') == 'Semi Final') selected @endif>Semi Final</option>
                                 <option value="Final" @if(old('streaming_info', $match->match_type ?? '') == 'Final') selected @endif>Final</option>
                             </select>
                             <div class="invalid-feedback">

@@ -146,6 +146,7 @@ class ManageTournamentMatches extends Controller
     {
         $request->validate([
             'match_title' => 'required',
+            'video_url' => 'required'
         ]);
 
         if (!empty($request->id)) {
@@ -162,7 +163,8 @@ class ManageTournamentMatches extends Controller
         $match->match_date  = $request->match_date;        
         $match->match_time = $request->match_time ?? null;        
         $match->streaming_info = $request->streaming_info ?? null;        
-            
+        $match->video_url = $request->video_url ?? null;                    
+        $match->thumbnail_url = $request->thumbnail_url ?? null;                    
         $match->description = $request->description;
         $match->status = $request->status;
 
