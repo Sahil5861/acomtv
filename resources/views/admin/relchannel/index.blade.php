@@ -1,6 +1,6 @@
 @extends('layout.default')
 @section('mytitle', 'Tv Channel List')
-@section('page', 'Tv Channel / List')
+@section('page', 'Relegious Channel / List')
 @section('content')
 <div class="layout-px-spacing">
     <div class="row layout-top-spacing">
@@ -16,6 +16,7 @@
                 @endif
 
                 <div class="text-right">
+                    <a href="{{url('religious-channel-order')}}" class="btn btn-primary mb-2">Order Channels</a>
                     <a href="{{ url('religious-channel-add') }}" class="btn btn-primary mb-2">Add +</a>
                 </div>
 

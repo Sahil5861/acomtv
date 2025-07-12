@@ -16,6 +16,29 @@ class KidsShowSeasons extends Controller
         return view('admin.kidshowsseason.index', compact('id'));
     }
 
+    public function getKidsShowSeasonsOrderList($id)
+    {
+        $id = base64_decode($id);
+        $this->data['kidsshowseasons'] = KidShowsSeason::whereNull('deleted_at')
+            ->where('show_id', $id)
+            ->orderBy('season_order', 'asc')
+            ->get();
+
+        $this->data['id'] = $id;
+        $allKidsShowSeasons = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['kidsshowseasons'] as $season) {
+            $allKidsShowSeasons[] = $season->season_order;
+            $dataForLoop[$season->season_order] = $season;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allKidsShowSeasons'] = $allKidsShowSeasons;
+
+        return view('admin.kidshowsseason.dragdrop', $this->data);
+    }
+
     /* Process ajax request */
     public function getKidShowsSeasonList(Request $request, $id){
         $draw = $request->get('draw');
@@ -177,6 +200,18 @@ class KidsShowSeasons extends Controller
         }else{
             echo json_encode(['message','Season not deleted successfully']);
         }
+    }
+    
+    public function saveKidsShowSeasonOrders(Request $request)
+    {
+        $ids = $request->ids;
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                KidShowsSeason::where('id', $id)->update(['season_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Seasons order updated successfully.');
     }
 
     public function updateStatus($id){

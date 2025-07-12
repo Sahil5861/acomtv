@@ -10,11 +10,32 @@ class ManageTvShowSeason extends Controller
     public function index($id)    
     {        
         $id = base64_decode($id);
-        // print_r($id);exit;
         return view('admin.tvshow_season.index', compact('id'));
     }
-
     
+    public function getShowSeasonsOrderList($id)
+    {
+        $id = base64_decode($id);
+        $this->data['tvshowseasons'] = TvShowSeason::whereNull('deleted_at')
+            ->where('show_id', $id)
+            ->orderBy('season_order', 'asc')
+            ->get();
+
+        $this->data['id'] = $id;
+        $allTvShowSeasons = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['tvshowseasons'] as $season) {
+            $allTvShowSeasons[] = $season->season_order;
+            $dataForLoop[$season->season_order] = $season;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allTvShowSeasons'] = $allTvShowSeasons;
+
+        return view('admin.tvshow_season.dragdrop', $this->data);
+    }
+
     public function getshowSeasonList(Request $request, $id){
         $draw = $request->get('draw');
         $start = $request->get("start");
@@ -176,20 +197,15 @@ class ManageTvShowSeason extends Controller
         }
     }
 
-    public function getTvShowSeasonOrderList()
-    {
-        $this->data['tvshows'] = TvShowSeason::orderBy('index', 'asc')->get();
-        return view('admin.tvshow.dragdrop', $this->data);
-    }
-
     public function saveTvShowSeasonOrders(Request $request)
     {
-        foreach ($request->numbers as $key => $id) {
-            $tvshow = TvShowSeason::find($id);
-            $tvshow->index = $key + 1;
-            $tvshow->save();
+        $ids = $request->ids;
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                TvShowSeason::where('id', $id)->update(['season_order' => $index + 1]);
+            }
         }
 
-        return back()->with('message', 'TvShowSeason ordered successfully');
+        return redirect()->back()->with('success', 'Seasons order updated successfully.');
     }
 }

@@ -15,6 +15,24 @@ class ManageTvShow extends Controller
         $id = base64_decode($id);
         return view('admin.tvshow.index', compact('id'));
     }
+    
+    public function getTvShowOrderList($id)
+    {   $id = base64_decode($id);
+        $this->data['tvshows'] = TvShow::whereNull('deleted_at')->where('tv_channel_id',$id)->orderBy('order', 'asc')->get();
+
+        $allTvShows = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['tvshows'] as $tvshow) {
+            $allTvShows[] = $tvshow->order;
+            $dataForLoop[$tvshow->order] = $tvshow;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allTvShows'] = $allTvShows;
+
+        return view('admin.tvshow.dragdrop', $this->data);
+    }
 
     // public function getTvShowList(Request $request, $id)
     // {
@@ -276,21 +294,17 @@ class ManageTvShow extends Controller
             return response()->json(['message' => 'TvShow not deleted']);
         }
     }
-
-    public function getTvShowOrderList()
+    public function saveTvshowOrder(Request $request)
     {
-        $this->data['tvshows'] = TvShow::orderBy('index', 'asc')->get();
-        return view('admin.tvshow.dragdrop', $this->data);
-    }
+        $ids = $request->ids;
 
-    public function saveTvShowOrders(Request $request)
-    {
-        foreach ($request->numbers as $key => $id) {
-            $tvshow = TvShow::find($id);
-            $tvshow->index = $key + 1;
-            $tvshow->save();
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                TvShow::where('id', $id)->update(['order' => $index + 1]);
+            }
         }
 
-        return back()->with('message', 'TvShow ordered successfully');
+        return redirect()->back()->with('success', 'Tv Show order updated successfully.');
     }
+    
 }

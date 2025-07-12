@@ -17,7 +17,26 @@ class ManageTvShowEpisode extends Controller
         return view('admin.tvshow_episode.index', compact('id', 'content_networks', 'genres'));
     }
 
-    
+    public function getTvShowEpisodesOrderList($id)
+    {
+        $id = base64_decode($id);
+        $this->data['tvshowepisode'] = TvShowEpisode::whereNull('deleted_at')->where('season_id', $id)->orderBy('episoade_order', 'asc')->get();
+
+        $this->data['id'] = $id;
+        $allTvShowEpisodes = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['tvshowepisode'] as $episode) {
+            $allTvShowEpisodes[] = $episode->episoade_order;
+            $dataForLoop[$episode->episoade_order] = $episode;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allTvShowEpisodes'] = $allTvShowEpisodes;
+
+        return view('admin.tvshow_episode.dragdrop', $this->data);
+    }
+
     public function getshowSeasonList(Request $request, $id){
         $draw = $request->get('draw');
         $start = $request->get("start");
@@ -199,6 +218,18 @@ class ManageTvShowEpisode extends Controller
         } else {
             return response()->json(['message' => 'TvShowEpisode not deleted']);
         }
+    }
+
+    public function saveTvShowEpisodesOrders(Request $request)
+    {
+        $ids = $request->ids; 
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                TvShowEpisode::where('id', $id)->update(['episoade_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Episodes order updated successfully.');
     }
 
 

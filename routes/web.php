@@ -183,24 +183,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
         Route::get('/genre/update-status/{id}', [ManageGenre::class,'updateStatus'])->name('genre.update-status');
         Route::get('/genre-order', [ManageGenre::class, 'getGenreOrderList'])->name('admin.genre.order');
-
+        
         Route::post('/save-genre-orders', [ManageGenre::class,'saveGenreOrders'])->name('saveGenreOrders');
-
-        // tvshow
-        Route::get('/tvshow/{id}', [ManageTvShow::class, 'index'])->name('admin.tvshow');
-        Route::get('/getTvShowList/{id}', [ManageTvShow::class, 'getTvShowList'])->name('getTvShowList');
-        Route::get('/add-tvshow/{id}', [ManageTvShow::class,'addTvShow'])->name('addTvShow');
-        Route::post('/addTvShow', [ManageTvShow::class,'add'])->name('saveTvShow');
-        Route::get('/edit-tvshow/{id}', [ManageTvShow::class, 'editTvShow'])->name('editTvShow');
-        Route::post('/tvshow/destroy', [ManageTvShow::class,'destroy'])->name('tvshow.destroy');
-        Route::get('/tvshow/update-status/{id}', [ManageTvShow::class,'updateStatus'])->name('tvshow.update-status');        
-
-        Route::get('/tvshow/update-status/{id}', [ManageTvShow::class,'updateStatus'])->name('tvshow.update-status');
-        Route::get('/tvshow-order', [ManageTvShow::class, 'getTvShowOrderList'])->name('admin.tvshow.order');
-
-        Route::post('/save-tvshow-orders', [ManageTvShow::class,'saveTvShowOrders'])->name('saveTvShowOrders');
-
-
+        
         // tvchannel
         Route::get('/tvchannel', [ManageTvChannel::class, 'index'])->name('admin.tvchannel');
         Route::get('/getTvChannelList', [ManageTvChannel::class, 'getTvChannelList'])->name('getTvChannelList');
@@ -212,8 +197,21 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
         Route::get('/tvchannel/update-status/{id}', [ManageTvChannel::class,'updateStatus'])->name('tvchannel.update-status');
         Route::get('/tvchannel-order', [ManageTvChannel::class, 'getTvChannelOrderList'])->name('admin.tvchannel.order');
+        Route::post('/save-tvchannel-orders', [ManageTvChannel::class,'saveTvChannelOrder'])->name('saveTvChannelOrder');
+        
+        // tvshow
+        Route::get('/tvshow/{id}', [ManageTvShow::class, 'index'])->name('admin.tvshow');
+        Route::get('/getTvShowList/{id}', [ManageTvShow::class, 'getTvShowList'])->name('getTvShowList');
+        Route::get('/add-tvshow/{id}', [ManageTvShow::class,'addTvShow'])->name('addTvShow');
+        Route::post('/addTvShow', [ManageTvShow::class,'add'])->name('saveTvShow');
+        Route::get('/edit-tvshow/{id}', [ManageTvShow::class, 'editTvShow'])->name('editTvShow');
+        Route::post('/tvshow/destroy', [ManageTvShow::class,'destroy'])->name('tvshow.destroy');
+        Route::get('/tvshow/update-status/{id}', [ManageTvShow::class,'updateStatus'])->name('tvshow.update-status');        
 
-        Route::post('/save-tvchannel-orders', [ManageTvChannel::class,'saveTvChannelOrders'])->name('saveTvChannelOrders');
+        Route::get('/tvshow/update-status/{id}', [ManageTvShow::class,'updateStatus'])->name('tvshow.update-status');
+        Route::get('/tvshow-order/{id}', [ManageTvShow::class, 'getTvShowOrderList'])->name('admin.tvshow.order');
+        Route::post('/save-tvshow-orders', [ManageTvShow::class, 'saveTvshowOrder'])->name('saveTvshowOrder');
+
 
         // TV Show seasons
         Route::get('/tvshow-season/{id}', [ManageTvShowSeason::class, 'index'])->name('admin.tvshow.season');
@@ -223,6 +221,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-tvshow-season/{id}', [ManageTvShowSeason::class, 'editTvShowSeason'])->name('editTvShowSeason');
         Route::get('/tvshow-season/update-status/{id}', [ManageTvShowSeason::class,'updateStatus'])->name('tvshowseason.update-status');        
         Route::post('/tvshows-season/destroy', [ManageTvShowSeason::class,'destroy'])->name('tvshowseason.destroy');
+        Route::get('/tvshowseason-order/{id}', [ManageTvShowSeason::class, 'getShowSeasonsOrderList'])->name('admin.tvshowseason.order');
+        Route::post('/save-tvshowseasons-orders', [ManageTvShowSeason::class,'saveTvShowSeasonOrders'])->name('saveTvShowSeasonOrders');
+
 
         // TV Show episodes
         Route::get('/tvshow-episode/{id}', [ManageTvShowEpisode::class, 'index'])->name('admin.tvshow.episode');
@@ -232,6 +233,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-tvshow-episode/{id}', [ManageTvShowEpisode::class, 'editTvShowEpisode'])->name('editTvShowEpisode');
         Route::get('/tvshow-episode/update-status/{id}', [ManageTvShowEpisode::class,'updateStatus'])->name('tvshowepisode.update-status');        
         Route::post('/tvshows-episode/destroy', [ManageTvShowEpisode::class,'destroy'])->name('tvshowepisode.destroy');
+        
+        Route::get('/tvshowepisode-order/{id}', [ManageTvShowEpisode::class, 'getTvShowEpisodesOrderList'])->name('admin.tvshowepisode.order');
+        Route::post('/save-tvshowepisode-orders', [ManageTvShowEpisode::class,'saveTvShowEpisodesOrders'])->name('saveTvShowEpisodesOrders');
 
         Route::post('import-tvshows-episode-playlits', [ManageTvShowEpisode::class, 'importPlaylist'])->name('importtvshowsepisodeplaylits');
 
@@ -334,13 +338,13 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         //Movies
         Route::get('/movies', [Movies::class, 'index'])->name('admin.movies');
         Route::get('/getMoviesList', [Movies::class, 'getMoviesList'])->name('getMovieList');
-        Route::get('/movie-order', [Movies::class, 'getChannelOrderList'])->name('admin.movie.order');
+        Route::get('/movie-order', [Movies::class, 'getMovieOrderList'])->name('admin.movie.order');
         Route::get('/deleted-movie', [Movies::class, 'deletedChannel'])->name('admin.movie.deleted');
         Route::get('/getDeletedChannelList', [Movies::class, 'getDeletedChannelList'])->name('getDeletedMovieList');
         Route::get('/recover-channel/{id}', [Movies::class, 'recoverChannel'])->name('admin.movie.recoverMovie');
         Route::get('/add-movie', [Movies::class,'addChannel'])->name('addMovie');
         Route::post('/addMovie', [Movies::class,'add'])->name('saveMovie');
-        Route::post('/save-movie-orders', [Movies::class,'saveChannelOrders'])->name('saveMovieOrders');
+        Route::post('/save-movie-orders', [Movies::class,'saveMovieOrder'])->name('saveMovieOrder');
         Route::get('/edit-movie/{id}', [Movies::class,'editChannel'])->name('edit-movie');
         Route::post('/movie/destroy', [Movies::class,'destroy'])->name('movie.destroy');
         Route::get('/movie/update-status/{id}', [Movies::class,'updateStatus'])->name('movie.update-status');
@@ -389,6 +393,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/add-webseries', [Webserieses::class,'create'])->name('addWebseries');
         Route::post('/addWebseries', [Webserieses::class,'save'])->name('saveWebseries');        
         Route::get('/edit-webseries/{id}', [Webserieses::class,'edit'])->name('edit-movie');
+        Route::get('/webseries-order', [Webserieses::class, 'getWebseriesOrderList'])->name('admin.webseries.order');       
+        Route::post('/save-webseries-orders', [Webserieses::class, 'saveWebseriesOrder'])->name('saveWebseriesOrder');
         Route::post('/web-seies/destroy', [Webserieses::class,'destroy'])->name('webseries.destroy');
         Route::get('/web-seies/update-status/{id}', [Webserieses::class,'updateStatus'])->name('movie.update-status');        
 
@@ -403,6 +409,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/web-seies-season/update-status/{id}', [WebseriesSeasons::class,'updateStatus'])->name('webseries.season.update-status');        
 
         Route::post('/websersiseason-destroy', [WebseriesSeasons::class,'destroy'])->name('webseries-season.destroy');
+        Route::get('/webseriesseasons-order/{id}', [WebseriesSeasons::class, 'getWebseriesSeasonsOrderList'])->name('admin.webseriesseason.order');
+        Route::post('/save-webseriesseasons-orders', [WebseriesSeasons::class,'saveWebseriesSeasonsOrder'])->name('saveWebseriesSeasonsOrder');
+
 
 
         // Web series Episodes
@@ -414,6 +423,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-episode/{id}', [WebseriesEpisodes::class,'edit'])->name('episode.edit');
         Route::get('/web-seies-episode/update-status/{id}', [WebseriesEpisodes::class,'updateStatus'])->name('webseries.episode.update-status');        
         Route::post('/websersiepisode/destroy', [WebseriesEpisodes::class,'destroy'])->name('webseries-episode.destroy');
+        Route::get('/webseriesepisodes-order/{id}', [WebseriesEpisodes::class, 'getWebseriesEpisodesOrderList'])->name('admin.webseriesepisode.order');
+        Route::post('/save-webseriesepisodes-orders', [WebseriesEpisodes::class,'saveWebseriesEpisodesOrder'])->name('saveWebseriesEpisodesOrder');
+
 
 
         // 11 june
@@ -505,7 +517,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/kids-channel-save', [ManageKidsChannel::class, 'save'])->name('admin.kidschannel.save');
         Route::get('/kids-channel-edit/{id}', [ManageKidsChannel::class, 'edit'])->name('admin.kidschannel.edit');
         Route::post('/kids-channel-delete', [ManageKidsChannel::class, 'destroy'])->name('admin.kidschannel.destroy');
-        Route::get('/kids-channel-update-status/{id}', [ManageKidsChannel::class,'updateStatus'])->name('admin.kidschannel.update-status');        
+        Route::get('/kids-channel-update-status/{id}', [ManageKidsChannel::class,'updateStatus'])->name('admin.kidschannel.update-status');
+        Route::get('/kids-channel-order', [ManageKidsChannel::class, 'getKidsChannelOrderList'])->name('admin.kidschannel.order');
+        Route::post('/save-kidschannel-orders', [ManageKidsChannel::class,'saveKidsChannelOrder'])->name('saveKidsChannelOrder');
+        
 
 
         // 
@@ -519,6 +534,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/kids-shows-edit/{id}', [ManageKidsShows::class,'edit'])->name('admin.kidsshows.edit');
         Route::get('/kids-shows-update-status/{id}', [ManageKidsShows::class,'updateStatus'])->name('admin.kidsshows.update-status');        
         Route::post('/kids-shows-destroy', [ManageKidsShows::class,'destroy'])->name('admin.kidsshows.destroy');
+        Route::get('/kids-show-order/{id}', [ManageKidsShows::class, 'getKidsShowOrderList'])->name('admin.kidsshow.order');
+        Route::post('/save-kids-show-orders', [ManageKidsShows::class, 'saveKidsShowOrder'])->name('saveKidsShowOrder');
+
         
         // Kid shows Seasons
 
@@ -530,6 +548,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/kids-shows-season/update-status/{id}', [KidsShowSeasons::class,'updateStatus'])->name('tvshows.season.update-status');        
 
         Route::post('/websersiseason/destroy', [KidsShowSeasons::class,'destroy'])->name('tvshows-season.destroy');
+        Route::get('/kids-showseason-order/{id}', [KidsShowSeasons::class, 'getKidsShowSeasonsOrderList'])->name('admin.kidsshowseason.order');
+        Route::post('/save-kids-showseasons-orders', [KidsShowSeasons::class,'saveKidsShowSeasonOrders'])->name('saveKidsShowSeasonOrders');
+
 
         // Kid shows Episodes
         Route::get('/kid-shows-episode/{id}', [KidsShowEpisodes::class, 'index'])->name('admin.kid-shows.episodes');
@@ -539,6 +560,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-kid-shows-episode/{id}', [KidsShowEpisodes::class,'edit'])->name('kid-shows.edit');
         Route::get('/kid-shows-episode/update-status/{id}', [KidsShowEpisodes::class,'updateStatus'])->name('kid-shows.episode.update-status');        
         Route::post('/kid-shows-episode/destroy', [KidsShowEpisodes::class,'destroy'])->name('kid-shows-episode.destroy');
+        Route::get('/kids-showepisode-order/{id}', [KidsShowEpisodes::class, 'getKidsShowEpisodesOrderList'])->name('admin.kidsshowepisode.order');
+        Route::post('/save-kids-showepisode-orders', [KidsShowEpisodes::class,'saveKidsShowEpisodesOrders'])->name('saveKidsShowEpisodesOrders');
 
 
         // Religious Channels
@@ -548,7 +571,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/religious-channel-save', [ManageRelChannel::class, 'save'])->name('admin.RelChannel.save');
         Route::get('/religious-channel-edit/{id}', [ManageRelChannel::class, 'edit'])->name('admin.RelChannel.edit');
         Route::post('/religious-channel-delete', [ManageRelChannel::class, 'destroy'])->name('admin.RelChannel.destroy');
-        Route::get('/religious-channel-update-status/{id}', [ManageRelChannel::class,'updateStatus'])->name('admin.RelChannel.update-status');        
+        Route::get('/religious-channel-update-status/{id}', [ManageRelChannel::class,'updateStatus'])->name('admin.RelChannel.update-status');
+        Route::get('/religious-channel-order', [ManageRelChannel::class, 'getRelChannelOrderList'])->name('admin.relchannel.order');
+        Route::post('/save-religious-channel-orders', [ManageRelChannel::class,'saveRelChannelOrder'])->name('saveRelChannelOrder');
+                
 
         // Religious shows 
         

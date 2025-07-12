@@ -59,7 +59,10 @@
             </a>
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*movie*') || request()->is('*above-18*')){ echo 'show';} ?>" id="app2" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*movies')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.movies')}}">Movies List </a>
+                    <a href="{{route('admin.movies')}}">List </a>
+                </li>
+                <li class="<?php if(request()->is('*movies-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.movie.order')}}">Order</a>
                 </li>
 
                 @if (Auth::User()->email == 'above-18@gamil.com')                    
@@ -91,7 +94,10 @@
             </a>
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*tvshow*') || request()->is('*tvchannel*')){ echo 'show';} ?>" id="tvapp" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*tvchannel')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.tvchannel')}}"> Channel List </a>
+                    <a href="{{route('admin.tvchannel')}}"> Channels List </a>
+                </li>
+                <li class="<?php if(request()->is('*tvchannel-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.tvchannel.order')}}"> Channels Order </a>
                 </li>
                 {{-- <li class="<?php if(request()->is('*tvshow')){ echo 'active';} ?>" >
                     <a href="{{route('admin.tvshow')}}"> Show List </a>
@@ -112,9 +118,12 @@
                 </div>
             </a>
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*kids-channel*') || request()->is('*kids-shows*') || request()->is('*kid-shows-season*')|| request()->is('*kid-shows-episode*') ){ echo 'show';} ?>" id="kidsapp" data-parent="#accordionExample">
-                <li class="<?php if(request()->is('*tvchannel')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.kidschannel')}}"> Channel List </a>
-                </li>                
+                <li class="<?php if(request()->is('*kids-channel')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.kidschannel')}}"> Channels List </a>
+                </li>       
+                <li class="<?php if(request()->is('*kids-channel-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.kidschannel.order')}}"> Channels Order </a>
+                </li>         
             </ul>
             
         </li>
@@ -133,8 +142,11 @@
             </a>
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*religious-channel*') || request()->is('*religious-shows*') || request()->is('*religious-episodes*')){ echo 'show';} ?>" id="relapp" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*religious-channel')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.RelChannel')}}"> Channel List </a>
+                    <a href="{{route('admin.RelChannel')}}"> Channels List </a>
                 </li>                
+                <li class="<?php if(request()->is('*religious-channel-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.relchannel.order')}}"> Channels Order </a>
+                </li>      
             </ul>
             
         </li>
@@ -176,6 +188,9 @@
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*webseries*')){ echo 'show';} ?>" id="app3" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*webseries')){ echo 'active';} ?>" >
                     <a href="{{route('admin.webseries')}}"> List </a>
+                </li>
+                 <li class="{{ request()->routeIs('admin.webseries.order') ? 'active' : '' }}">
+                    <a href="{{ route('admin.webseries.order') }}"> Order </a>
                 </li>
             </ul>
         </li>

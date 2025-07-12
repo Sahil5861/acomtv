@@ -1,9 +1,9 @@
 @extends('layout.default')
 @section('mytitle', 'Manage TvShow')
 @if(isset($tvchannel))
-@section('page', 'TvShow / Update')
+@section('page', 'Tv Channel / Update')
 @else
-@section('page', 'TvShow / Add')
+@section('page', 'Tv Channel / Add')
 @endif
 
 @section('content')

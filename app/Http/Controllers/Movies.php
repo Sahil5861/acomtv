@@ -25,7 +25,23 @@ class Movies extends Controller
         $playlist_ids = Movie::where('playlist_id', '!=', null)->pluck('playlist_id')->unique()->values();        
         return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
+    public function getMovieOrderList()
+    {
+        $this->data['movies'] = Movie::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
+// echo count($this->data['movies']); exit;
+        $allMovies = [];
+        $dataForLoop = [];
 
+        foreach ($this->data['movies'] as $movie) {
+            $allMovies[] = $movie->movie_order;
+            $dataForLoop[$movie->movie_order] = $movie;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allMovies'] = $allMovies;
+
+        return view('admin.movie.dragdrop', $this->data);
+    }
     public function deletedChannel(){
         return view('admin.movie.deleted');
     }
@@ -501,7 +517,17 @@ class Movies extends Controller
             echo json_encode(['message','Movie not deleted successfully']);
         }
     }
+    public function saveMovieOrder(Request $request)
+    {
+        $ids = $request->ids;
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                Movie::where('id', $id)->update(['movie_order' => $index + 1]);
+            }
+        }
 
+        return redirect()->back()->with('success', 'Movie order updated successfully.');
+    }
     public function updateStatus($id){
         $movie = Movie::find(base64_decode($id));        
         if($movie){

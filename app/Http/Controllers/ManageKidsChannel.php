@@ -13,7 +13,23 @@ class ManageKidsChannel extends Controller
     {
         return view('admin.kidschannel.index');
     }
+    public function getKidsChannelOrderList()
+    {
+        $this->data['kidschannels'] = KidsChannel::whereNull('deleted_at')->orderBy('order', 'asc')->get();
 
+        $allKidsChannels = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['kidschannels'] as $kidschannel) {
+            $allKidsChannels[] = $kidschannel->order;
+            $dataForLoop[$kidschannel->order] = $kidschannel;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allKidsChannels'] = $allKidsChannels;
+
+        return view('admin.kidschannel.dragdrop', $this->data);
+    }
     public function getKidsChannelList(Request $request)
     {
         $columns = [
@@ -175,5 +191,17 @@ class ManageKidsChannel extends Controller
         } else {
             return response()->json(['message' => 'KidsChannel not deleted']);
         }
+    }
+    public function saveKidsChannelOrder(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                KidsChannel::where('id', $id)->update(['order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Kids Channel order updated successfully.');
     }
 }
