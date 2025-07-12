@@ -217,61 +217,68 @@ class RelShowEpisodes extends Controller
         $playlistId = $request->input('playlist_id');        
 
         $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
-        $url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=500&playlistId={$playlistId}&key={$apiKey}";
+        $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
+        $nextPageToken = null;
 
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $response = curl_exec($ch);
-
-        if(curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            curl_close($ch);
-            return response()->json(['success' => false, 'error' => $error_msg], 500);
-        }
-        curl_close($ch);
-        
-        $data = json_decode($response, true);
-        $snippet = $data['items'][0];
-        
-             
-                            
-
-        foreach ($data['items'] as $key => $item) {    
-            $snippet = $item['snippet'];
-            $title = $snippet['title'] ?? null;
-            $url = $snippet['resourceId']['videoId'] ?? null;
-
-            if ($this->checkIsExist($title, $url)) {
-                continue;
+        do {
+            $url = $baseurl;
+            if ($nextPageToken) {
+                $url .= "&pageToken=" . $nextPageToken;
             }
 
-            $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
-            $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
-                    
-            $channel_number = RelshowsEpisode::whereNull('deleted_at')->where('show_id', $request->show_id)->count();
-            $formated_number = $channel_number + 1;   
+            $ch = curl_init($url);
 
-            $episode = new RelshowsEpisode();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
-            $episode->title = $title;            
-            $episode->show_id = $request->show_id;            
-            $episode->episode_order = $formated_number ?? null;            
-            $episode->episode_image = $cleanBannerUrl;            
-            $episode->episode_description = $snippet['description'] ?? null;
-            $episode->url = $url;                        
-            $episode->downloadable = 0;            
-            $episode->status = 0;            
-            $episode->type = 0;                                  
-            $episode->playlist_id = $playlistId;                                  
-            $episode->source = 'youtube'; 
+            $response = curl_exec($ch);
 
-            if ($episode->save()) {
+            if(curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return response()->json(['success' => false, 'error' => $error_msg], 500);
+            }
+            curl_close($ch);
 
-            }            
-        }
+            $data = json_decode($response, true);
+            if (!isset($data['items'])) break;
+
+            foreach ($data['items'] as $key => $item) {    
+                $snippet = $item['snippet'];
+                $title = $snippet['title'] ?? null;
+                $url = $snippet['resourceId']['videoId'] ?? null;
+    
+                if ($this->checkIsExist($title, $url)) {
+                    continue;
+                }
+    
+                $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+                $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                        
+                $channel_number = RelshowsEpisode::whereNull('deleted_at')->where('show_id', $request->show_id)->count();
+                $formated_number = $channel_number + 1;   
+    
+                $episode = new RelshowsEpisode();
+    
+                $episode->title = $title;            
+                $episode->show_id = $request->show_id;            
+                $episode->episode_order = $formated_number ?? null;            
+                $episode->episode_image = $cleanBannerUrl;            
+                $episode->episode_description = $snippet['description'] ?? null;
+                $episode->url = $url;                        
+                $episode->downloadable = 0;            
+                $episode->status = 0;            
+                $episode->type = 0;                                  
+                $episode->playlist_id = $playlistId;                                  
+                $episode->source = 'youtube'; 
+                $episode->save();       
+            }
+
+            $nextPageToken = $data['nextPageToken'] ?? null;
+            // print_r($nextPageToken); exit;
+            
+        } while ($nextPageToken);              
+
 
         return back()->with('message','Playlist Uploaded successfully');
 

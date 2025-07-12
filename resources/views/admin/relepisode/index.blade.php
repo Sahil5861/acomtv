@@ -278,7 +278,7 @@
          order: [[0, 'asc']],
          ajax: "{{route('getRelShowEpisodesList', $id)}}",
          columns: [
-            { data: 'title' },                        
+            { data: 'title', width: '400px'},                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
             { data: 'source' },            

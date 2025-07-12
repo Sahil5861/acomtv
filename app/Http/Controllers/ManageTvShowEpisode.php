@@ -206,61 +206,68 @@ class ManageTvShowEpisode extends Controller
         $playlistId = $request->input('playlist_id');        
 
         $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
-        $url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=500&playlistId={$playlistId}&key={$apiKey}";
-
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $response = curl_exec($ch);
-
-        if(curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            curl_close($ch);
-            return response()->json(['success' => false, 'error' => $error_msg], 500);
-        }
-        curl_close($ch);
-        
-        $data = json_decode($response, true);
-        $snippet = $data['items'][0];
-        
-        
-        // print_r($data['items'][0]['snippet']); exit;
-
+        $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
+        $nextPageToken = null;
         $season_id = $request->id;
-                            
 
-        foreach ($data['items'] as $key => $item) {    
-            $snippet = $item['snippet'];
-            $title = $snippet['title'] ?? null;
-            $url = $snippet['resourceId']['videoId'] ?? null;
-
-            if ($this->checkIsExist($title, $url, $season_id)) {
-                continue;
+        do {
+            $url = $baseurl;
+            if ($nextPageToken) {
+                $url .= "&pageToken=" . $nextPageToken;
             }
 
-            $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
-            $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
-                    
-            $episode = new TvShowEpisode();
+            $ch = curl_init($url);
 
-            $count = TvShowEpisode::whereNull('deleted_at')->where('season_id', $season_id)->count();
-            $count = $count + 1;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
-            $episode->title = $title;
-            $episode->episode_number = $count;
-            $episode->season_id = $season_id;
-            $episode->video_url = $url;
-            $episode->status = 0;
-            $episode->streaming_type = 'youtube';
-            $episode->description = $snippet['description'] ?? null;
-            $episode->thumbnail = $cleanBannerUrl;        
-            $episode->duration = 0;
-            $episode->playlist_id = $playlistId;
-            $episode->release_date = '';
-            $episode->save();            
-        }
+            $response = curl_exec($ch);
+
+            if(curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return response()->json(['success' => false, 'error' => $error_msg], 500);
+            }
+            curl_close($ch);
+            
+            $data = json_decode($response, true);
+            $snippet = $data['items'][0];
+                                                
+            foreach ($data['items'] as $key => $item) {    
+                $snippet = $item['snippet'];
+                $title = $snippet['title'] ?? null;
+                $url = $snippet['resourceId']['videoId'] ?? null;
+
+                if ($this->checkIsExist($title, $url, $season_id)) {
+                    continue;
+                }
+
+                $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+                $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                        
+                $episode = new TvShowEpisode();
+
+                $count = TvShowEpisode::whereNull('deleted_at')->where('season_id', $season_id)->count();
+                $count = $count + 1;
+
+                $episode->title = $title;
+                $episode->episode_number = $count;
+                $episode->season_id = $season_id;
+                $episode->video_url = $url;
+                $episode->status = 0;
+                $episode->streaming_type = 'youtube';
+                $episode->description = $snippet['description'] ?? null;
+                $episode->thumbnail = $cleanBannerUrl;        
+                $episode->duration = 0;
+                $episode->playlist_id = $playlistId;
+                $episode->release_date = '';
+                $episode->save();            
+            }            
+            $nextPageToken = $data['nextPageToken'] ?? null;                    
+        } while ($nextPageToken);  
+
+
+        
 
         return back()->with('message','Playlist Uploaded successfully');
 

@@ -120,7 +120,6 @@ class Movies extends Controller
     public function getMoviesList(Request $request)
     {
         
-        
         $draw = $request->get('draw');
         $start = $request->get("start");
         $rowperpage = $request->get("length"); // total number of rows per page
@@ -519,80 +518,86 @@ class Movies extends Controller
         $genres = implode(',', $request->genre) ?? '';
 
         $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
-        $url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=500&playlistId={$playlistId}&key={$apiKey}";
+        $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
+        $nextPageToken = null;
 
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $response = curl_exec($ch);
-
-        if(curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            curl_close($ch);
-            return response()->json(['success' => false, 'error' => $error_msg], 500);
-        }
-        curl_close($ch);
-        
-        $data = json_decode($response, true);
-        $snippet = $data['items'][0];
-        
-             
-                            
-
-        foreach ($data['items'] as $key => $item) {    
-            $snippet = $item['snippet'];
-            $movieName = $snippet['title'] ?? null;
-            $movie_url = $snippet['resourceId']['videoId'] ?? null;
-
-            if ($this->checkIsExist($movieName, $movie_url)) {
-                continue;
+        do {
+            $url = $baseurl;
+            if ($nextPageToken) {
+                $url .= "&pageToken=" . $nextPageToken;
             }
 
-            $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
-            $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
-                    
-            $movie = new Movie();
-
-            $channel_number = Movie::whereNull('deleted_at')->count();
-            $formated_number = $channel_number + 1;   
-
-            $movie->name = $movieName;
-            $movie->description = $snippet['description'] ?? null;
+            $ch = curl_init($url);
+    
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+            $response = curl_exec($ch);
+    
+            if(curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return response()->json(['success' => false, 'error' => $error_msg], 500);
+            }
+            curl_close($ch);
             
-            $movie->banner = $cleanBannerUrl;
-            $movie->status = 0;
-            $movie->source_type = 'YoutubeLive';            
-            $movie->youtube_trailer = '' ?? null;
-            $movie->movie_url = $movie_url;
-            $movie->genres = $genres;
-            $movie->index = $formated_number;
-            $movie->playlist_id = $playlistId;
+            $data = json_decode($response, true);        
 
-            if ($movie->save()) {
-                if ($request->has('content_network') && !empty($request->content_network)) {
-                    $cur_movies = Movie::where('id', $movie->id)->first();
-                    $newtworkMovies = MovieContentNetwork::where('movie_id',$movie->id)->get();
-                    if ($newtworkMovies) {
-                        MovieContentNetwork::where('movie_id',$movie->id)->delete();
-                    }
-                    foreach ($request->content_network as $key => $network) {
-                        $MovieNetwork = new MovieContentNetwork();
-                        $MovieNetwork->movie_id = $movie->id;
-                        $MovieNetwork->network_id = $network;
+            if (!isset($data['items'])) break;
+
+            foreach ($data['items'] as $key => $item) {    
+                $snippet = $item['snippet'];
+                $movieName = $snippet['title'] ?? null;
+                $movie_url = $snippet['resourceId']['videoId'] ?? null;
+
+                if ($this->checkIsExist($movieName, $movie_url)) {
+                    continue;
+                }
+
+                $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+                $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
                         
-                        if ($MovieNetwork->save()) {
-                            DB::table('content_network_log')->insert([
-                                'content_id' => $movie->id,
-                                'network_id' => $network,
-                                'content_type' => $cur_movies->content_type,                            
-                            ]);
+                $movie = new Movie();
+
+                $channel_number = Movie::whereNull('deleted_at')->count();
+                $formated_number = $channel_number + 1;   
+
+                $movie->name = $movieName;
+                $movie->description = $snippet['description'] ?? null;
+                
+                $movie->banner = $cleanBannerUrl;
+                $movie->status = 0;
+                $movie->source_type = 'YoutubeLive';            
+                $movie->youtube_trailer = '' ?? null;
+                $movie->movie_url = $movie_url;
+                $movie->genres = $genres;
+                $movie->index = $formated_number;
+                $movie->playlist_id = $playlistId;
+
+                if ($movie->save()) {
+                    if ($request->has('content_network') && !empty($request->content_network)) {
+                        $cur_movies = Movie::where('id', $movie->id)->first();                        
+                        foreach ($request->content_network as $key => $network) {
+                            $MovieNetwork = new MovieContentNetwork();
+                            $MovieNetwork->movie_id = $movie->id;
+                            $MovieNetwork->network_id = $network;
+                            
+                            if ($MovieNetwork->save()) {
+                                DB::table('content_network_log')->insert([
+                                    'content_id' => $movie->id,
+                                    'network_id' => $network,
+                                    'content_type' => $cur_movies->content_type,                            
+                                ]);
+                            }
                         }
                     }
-                }
-            }            
-        }
+                }            
+            }
+            
+            $nextPageToken = $data['nextPageToken'] ?? null;                    
+        } while ($nextPageToken);  
+
+        
 
         return back()->with('message','Playlist Uploaded successfully');
 
