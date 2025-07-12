@@ -16,6 +16,23 @@ class ManageKidsShows extends Controller
         return view('admin.kidsshows.index', compact('id'));
     }
 
+    public function getKidsShowOrderList($id)
+    {   $id = base64_decode($id);
+        $this->data['kidsshows'] = KidsShow::whereNull('deleted_at')->where('kid_channel_id',$id)->orderBy('order', 'asc')->get();
+
+        $allKidsShows = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['kidsshows'] as $kidsshow) {
+            $allKidsShows[] = $kidsshow->order;
+            $dataForLoop[$kidsshow->order] = $kidsshow;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allKidsShows'] = $allKidsShows;
+
+        return view('admin.kidsshows.dragdrop', $this->data);
+    }
 
     public function getKidsShowList(Request $request, $id){
         $draw = $request->get('draw');
@@ -188,20 +205,17 @@ class ManageKidsShows extends Controller
         }
     }
 
-    public function getKidsShowOrderList()
-    {
-        $this->data['kidsshowss'] = KidsShow::orderBy('index', 'asc')->get();
-        return view('admin.kidsshows.dragdrop', $this->data);
-    }
 
-    public function saveKidsShowOrders(Request $request)
+    public function saveKidsShowOrder(Request $request)
     {
-        foreach ($request->numbers as $key => $id) {
-            $kidsshows = KidsShow::find($id);
-            $kidsshows->index = $key + 1;
-            $kidsshows->save();
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                KidsShow::where('id', $id)->update(['order' => $index + 1]);
+            }
         }
 
-        return back()->with('message', 'KidsShow ordered successfully');
+        return redirect()->back()->with('success', 'Kids Show order updated successfully.');
     }
 }

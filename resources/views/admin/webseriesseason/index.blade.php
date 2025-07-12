@@ -102,6 +102,7 @@
                     </p>
                 </div>
                 <div class="text-right">
+                    <a href="{{url('webseriesseasons-order/'.base64_encode($id))}}" class="btn btn-primary mb-2">Order Seasons</a>
                     <a href="{{url('add-web-series-season/'.base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">

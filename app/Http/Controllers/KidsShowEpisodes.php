@@ -20,6 +20,26 @@ class KidsShowEpisodes extends Controller
         return view('admin.kidshowsepisode.index', compact('id', 'season', 'tvshow'));
     }
 
+    public function getKidsShowEpisodesOrderList($id)
+    {
+        $id = base64_decode($id);
+        $this->data['kidsshowepisode'] = KidshowsEpisode::whereNull('deleted_at')->where('season_id', $id)->orderBy('episoade_order', 'asc')->get();
+
+        $this->data['id'] = $id;
+        $allKidsShowEpisodes = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['kidsshowepisode'] as $episode) {
+            $allKidsShowEpisodes[] = $episode->episoade_order;
+            $dataForLoop[$episode->episoade_order] = $episode;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allKidsShowEpisodes'] = $allKidsShowEpisodes;
+
+        return view('admin.kidshowsepisode.dragdrop', $this->data);
+    }
+
     /* Process ajax request */
     public function getWebseriesEpisodeList(Request $request, $id){
         $draw = $request->get('draw');
@@ -192,6 +212,18 @@ class KidsShowEpisodes extends Controller
         }else{
             echo json_encode(['message','Episode not deleted successfully']);
         }
+    }
+
+    public function saveKidsShowEpisodesOrders(Request $request)
+    {
+        $ids = $request->ids; 
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                KidshowsEpisode::where('id', $id)->update(['episoade_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Episodes order updated successfully.');
     }
 
     public function updateStatus($id){

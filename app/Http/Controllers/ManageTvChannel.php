@@ -13,6 +13,24 @@ class ManageTvChannel extends Controller
         return view('admin.tvchannel.index');
     }
 
+    public function getTvChannelOrderList()
+    {
+        $this->data['tvchannels'] = TvChannel::whereNull('deleted_at')->orderBy('order', 'asc')->get();
+
+        $allTvChannels = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['tvchannels'] as $tvchannel) {
+            $allTvChannels[] = $tvchannel->order;
+            $dataForLoop[$tvchannel->order] = $tvchannel;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allTvChannels'] = $allTvChannels;
+
+        return view('admin.tvchannel.dragdrop', $this->data);
+    }
+
     public function getTvChannelList(Request $request)
     {
         $columns = [
@@ -171,5 +189,17 @@ class ManageTvChannel extends Controller
         } else {
             return response()->json(['message' => 'TvChannel not deleted']);
         }
+    }
+    public function saveTvChannelOrder(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                TvChannel::where('id', $id)->update(['order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Tv Channel order updated successfully.');
     }
 }

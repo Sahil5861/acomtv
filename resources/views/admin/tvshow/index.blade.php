@@ -1,6 +1,6 @@
 @extends('layout.default')
 @section('mytitle', 'Admin List')
-@section('page', 'Channels  /  List')
+@section('page', 'Shows  /  List')
 
 @section('content')
 <div class="layout-px-spacing">
@@ -108,6 +108,7 @@
                 </div>
                 
                 <div class="text-right">
+                    <a href="{{url('tvshow-order',base64_encode($id))}}" class="btn btn-primary mb-2">Order Shows</a>
                     <a href="{{route('addTvShow', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>                    
                 </div>
                 <div class="table-responsive mb-4 mt-4">

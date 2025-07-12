@@ -13,6 +13,24 @@ class ManageRelChannel extends Controller
     {
         return view('admin.relchannel.index');
     }
+    
+    public function getRelChannelOrderList()
+    {
+        $this->data['relchannels'] = RelChannel::whereNull('deleted_at')->orderBy('rel_order', 'asc')->get();
+
+        $allRelChannels = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['relchannels'] as $relchannel) {
+            $allRelChannels[] = $relchannel->rel_order;
+            $dataForLoop[$relchannel->rel_order] = $relchannel;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allRelChannels'] = $allRelChannels;
+
+        return view('admin.relchannel.dragdrop', $this->data);
+    }
 
     public function getRelChannelList(Request $request)
     {
@@ -173,5 +191,17 @@ class ManageRelChannel extends Controller
         } else {
             return response()->json(['message' => 'RelChannel not deleted']);
         }
+    }
+    public function saveRelChannelOrder(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                RelChannel::where('id', $id)->update(['rel_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Relegious Channel order updated successfully.');
     }
 }

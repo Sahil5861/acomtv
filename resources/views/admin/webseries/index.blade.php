@@ -93,6 +93,7 @@
                     </div>
                 @endif
                 <div class="text-right">
+                    <a href="{{url('webseries-order')}}" class="btn btn-primary mb-2">Order Webseries</a>
                     <a href="{{url('add-webseries')}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">

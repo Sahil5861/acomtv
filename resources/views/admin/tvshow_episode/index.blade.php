@@ -1,6 +1,6 @@
 @extends('layout.default')
 @section('mytitle', 'Admin List')
-@section('page', 'Channels  /  List')
+@section('page', 'Show Episodes  /  List')
 
 @section('content')
 <div class="layout-px-spacing">
@@ -118,7 +118,8 @@
                     </p>
                 </div>
                 
-                <div class="text-right" style="display: flex; justify-content:flex-end;align-items:center; gap:10px;">
+                <div class="text-right" style="display: flex; justify-content:flex-end;align-items:center; gap:10px;">                    
+                    <a href="{{ route('admin.tvshowepisode.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
                     <a href="{{route('addTvShowEpisode', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                     <div class="text-left">
                         <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">

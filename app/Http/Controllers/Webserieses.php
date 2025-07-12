@@ -17,6 +17,24 @@ class Webserieses extends Controller
     public function index(){
         return view('admin.webseries.index');
     }
+    
+    public function getWebseriesOrderList()
+    {
+        $this->data['webseries'] = WebSeries::whereNull('deleted_at')->orderBy('series_order', 'asc')->get();
+
+        $allWebseries = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['webseries'] as $webseries) {
+            $allWebseries[] = $webseries->series_order;
+            $dataForLoop[$webseries->series_order] = $webseries;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allWebseries'] = $allWebseries;
+
+        return view('admin.Webseries.dragdrop', $this->data);
+    }
 
     /* Process ajax request */
     public function getWebseriesList(Request $request){
@@ -245,6 +263,19 @@ class Webserieses extends Controller
         }else{
             echo json_encode(['message','Webseries not deleted successfully']);
         }
+    }
+
+    public function saveWebseriesOrder(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                WebSeries::where('id', $id)->update(['series_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Webseries order updated successfully.');
     }
 
     public function updateStatus($id){

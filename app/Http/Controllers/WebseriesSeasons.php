@@ -13,6 +13,28 @@ class WebseriesSeasons extends Controller
         $id = base64_decode($id);        
         return view('admin.webseriesseason.index', compact('id'));
     }
+    public function getWebseriesSeasonsOrderList($id)
+    {
+        $id = base64_decode($id);
+        $this->data['webseriesseasons'] = WebSeriesSeason::whereNull('deleted_at')
+            ->where('web_series_id', $id)
+            ->orderBy('season_order', 'asc')
+            ->get();
+
+        $this->data['id'] = $id;
+        $allWebseriesSeason = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['webseriesseasons'] as $season) {
+            $allWebseriesSeason[] = $season->season_order;
+            $dataForLoop[$season->season_order] = $season;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allWebseriesSeason'] = $allWebseriesSeason;
+
+        return view('admin.webseriesseason.dragdrop', $this->data);
+    }
 
     /* Process ajax request */
     public function getWebseriesSeasonList(Request $request, $id){
@@ -176,6 +198,18 @@ class WebseriesSeasons extends Controller
         }
     }
 
+    public function saveWebseriesSeasonsOrder(Request $request)
+    {
+        $ids = $request->ids;
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                WebSeriesSeason::where('id', $id)->update(['season_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Seasons order updated successfully.');
+    }
+    
     public function updateStatus($id){
         $season = WebSeriesSeason::find(base64_decode($id));        
         if($season){

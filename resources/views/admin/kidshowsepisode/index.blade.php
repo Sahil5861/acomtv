@@ -107,7 +107,8 @@
                         <a href="{{route('admin.kid-shows.episodes', base64_encode($season->id))}}">{{strtoupper($season->season_name)}}</a>&nbsp; &gt;                        
                     </p>
                 </div>
-                <div class="text-right">
+                <div class="text-right"> 
+                    <a href="{{ route('admin.kidsshowepisode.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
                     <a href="{{url('add-kid-shows-episode/'.base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
