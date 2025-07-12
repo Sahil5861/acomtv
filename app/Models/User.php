@@ -59,6 +59,30 @@ class User extends Authenticatable
         return $number;
     }
 
+    public static function generateLoginAppPin() {
+        $number = mt_rand(1000000000, 9999999999); // better than rand()
+
+        // call the same function if the barcode exists already
+        // if (self::loginPinExists($number)) {
+        //     return self::generateLoginPin();
+        // }
+
+        // otherwise, it's valid and can be used
+        return $number;
+    }
+
+    public static function generateOver18Pin() {
+        $number = mt_rand(1000000000, 9999999999); // better than rand()
+
+        // call the same function if the barcode exists already
+        // if (self::loginPinExists($number)) {
+        //     return self::generateLoginPin();
+        // }
+
+        // otherwise, it's valid and can be used
+        return $number;
+    }
+
     public static function loginPinExists($number) {
         // query the database and return a boolean
         // for instance, it might look like this in Laravel

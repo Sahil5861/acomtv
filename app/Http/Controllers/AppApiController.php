@@ -131,7 +131,8 @@ class AppApiController extends Controller
 
     
     
-    public function loginAccessUser($userData){
+    
+      public function loginAccessUser($userData, $type){
         $browser = $this->getBrowser();
 
         $ipaddress = '';
@@ -144,8 +145,8 @@ class AppApiController extends Controller
         // else if (getenv('REMOTE_ADDR')) $ipaddress = getenv('REMOTE_ADDR');
         // else $ipaddress = 'UNKNOWN';
 
-        // $json = file_get_contents("http://ipinfo.io/{$ipaddress}");
-        $json = file_get_contents("http://ip-api.com/json/{$ipaddress}");
+        $json = file_get_contents("http://ipinfo.io/{$ipaddress}");
+        // $json = file_get_contents("http://ip-api.com/json/{$ipaddress}");
         // http://ip-api.com/json/
         $details = json_decode($json);
 
@@ -157,12 +158,22 @@ class AppApiController extends Controller
 
         $userauth->auth_key = $auth_key;
         $userauth->user_id = $userData->id;
-        $userauth->ip_address = $details->query;
+        $userauth->ip_address = $details->ip;
         $userauth->browser = $browser;
         $userauth->city = @$details->city;
         $userauth->country = @$details->country;
         $userauth->postal = @$details->postal;
-        $userauth->mac_address = $userData->mac_address;
+
+        if ($type == 'tv') {
+            $userauth->login_pin = $userData->login_pin;
+            $userauth->mac_address = $userData->mac_address;
+        }
+        elseif ($type == 'app') {
+            $userauth->login_pin = $userData->login_pin_app;
+            $userauth->mac_address = $userData->mac_address_app;
+        }
+
+        $userauth->type = $type;
 
         $userauth->save();
 
@@ -221,7 +232,7 @@ class AppApiController extends Controller
                         )));
                         exit;
                     }else{
-                        $this->loginAccessUser($data_user);
+                        $this->loginAccessUser($data_user, 'tv');
                     }
                 }else if($data_user->mac_address == $mac_address){
                     if($data_user->status=='2'){
@@ -239,7 +250,96 @@ class AppApiController extends Controller
                         )));
                         exit;
                     }else{
-                        $this->loginAccessUser($data_user);
+                        $this->loginAccessUser($data_user, 'tv');
+                    }
+                }else{
+                    print_r(json_encode(array(
+                        "status" => false,
+                        "msg" => "Mac address not matched.",
+                    )));
+                    exit;
+                }
+            }else{
+                print_r(json_encode(array(
+                    "status" => false,
+                    "msg" => "You entered invalid pin."
+                )));
+                exit;
+            }
+
+        }
+        else
+        {
+            print_r(json_encode(array(
+                "status" => false,
+                "msg" => "Please enter login pin."
+            )));
+            exit;
+        }
+    }
+
+    function login_pin_app(Request $req) {
+
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        if (isset($post->login_pin_app) && $post->login_pin_app != '' && ((isset($post->mac_address_app) && $post->mac_address_app != '') || (isset($post->device_id) && $post->device_id != '')))
+        {
+
+            $login_pin_app = $post->login_pin_app;
+            $mac_address_app = isset($post->mac_address_app) ? $post->mac_address_app : $post->device_id;
+            // $password = md5($post->password);
+
+            $data_user = ClientUser::where('login_pin_app','=',$login_pin_app)->first();
+
+            if ($data_user)
+            {
+                $plans = UserPlanDetails::where(['user_id'=>$data_user->id,'status'=>1])->whereDate('plan_end_date','>=',date('Y-m-d'))->orderBy('id','desc')->get();
+
+                if(count($plans) == 0){
+                    print_r(json_encode(array(
+                        'status' => false,
+                        'msg' => 'You have not active plan. Kindly recharge your account.s'
+                    )));
+                    exit;
+                }
+                if($data_user->mac_address_app == '' || $data_user->mac_address_app == null){
+                    $data_user->fcm_token = $post->token;
+                    $data_user->mac_address_app = $mac_address_app;
+                    $data_user->save();
+                    if($data_user->status=='2'){
+                        print_r(json_encode(array(
+                            "status" => false,
+                            "msg" => "Your account is deactivated.",
+                            'otp' => false
+                        )));
+                        exit;
+                    }elseif($data_user->status=='3'){
+                        print_r(json_encode(array(
+                            "status" => false,
+                            "msg" => "Your account blocked by admin.",
+                            'otp' => false
+                        )));
+                        exit;
+                    }else{
+                        $this->loginAccessUser($data_user, 'app');
+                    }
+                }else if($data_user->mac_app_address == $mac_app_address){
+                    if($data_user->status=='2'){
+                        print_r(json_encode(array(
+                            "status" => false,
+                            "msg" => "Your account is deactivated.",
+                            'otp' => false
+                        )));
+                        exit;
+                    }elseif($data_user->status=='3'){
+                        print_r(json_encode(array(
+                            "status" => false,
+                            "msg" => "Your account blocked by admin.",
+                            'otp' => false
+                        )));
+                        exit;
+                    }else{
+                        $this->loginAccessUser($data_user, 'app');
                     }
                 }else{
                     print_r(json_encode(array(
@@ -428,7 +528,7 @@ class AppApiController extends Controller
                 'channel_link as url',
                 'stream_type',
                 'genres',
-                'status')->where('status',1)->whereNull('deleted_at')->orderBy('id','desc');
+                'status')->where('status',1)->whereNull('deleted_at')->orderBy('channel_number','asc');
                 
         if(isset($_GET['records']) && $_GET['records'] > 0){
             $channels = $channels->limit($_GET['records'])->get();
@@ -1507,7 +1607,14 @@ class AppApiController extends Controller
         exit;
     }
 
-    public function getAllAbove18Movies(Request $request){
+    public function getAllAbove18Movies(Request $request, $pin){
+        if ($pin != '589983') {
+            print_r(json_encode([
+                'status' => false,
+                'message' => 'Invalid Pin'
+            ]));
+            exit;
+        }
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
         $query = AdultMovie::where('status', 1)
@@ -1538,10 +1645,4 @@ class AppApiController extends Controller
         // )));
         
     }
-
-
-    
-
-
-
 }

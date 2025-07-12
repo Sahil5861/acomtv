@@ -57,7 +57,7 @@
                                 <select name="plan_type" id="plan_type" class="form-control select">
                                     <option> select plan type</option>
                                     <option value="1" @if(isset($plan) && $plan->plan_type == 1){{'selected'}}@endif>Paid</option>
-                                    <option value="0" @if(isset($plan) && $plan->plan_type == 0){{'selected'}}@endif>Free</option>
+                                    <option value="0" @if(isset($plan) && $plan->plan_type == 0){{'selected'}}@endif>Trial</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     @error('plan_type') {{ $message }} @enderror
@@ -86,13 +86,13 @@
                             @else
                                 @php $style = 'display:none;' @endphp
                             @endif
-                            <div class="col-md-6 mb-4 netadminprice" style="{{$style}}">
+                            {{-- <div class="col-md-6 mb-4 netadminprice" style="{{$style}}">
                                 <label for="fullName">Net Admin Price*</label>
                                 <input type="text" class="form-control" id="price" name="net_admin_price" placeholder="Net Admin Price" value="{{old('net_admin_price')}}@if(isset($plan)){{$plan->net_admin_price}}@endif" required>
                                 <div class="invalid-feedback">
                                     @error('net_admin_price') {{ $message }} @enderror
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <!-- <div class="col-md-6 mb-4">
                                 <label for="fullName">Discount Type</label>
@@ -144,14 +144,13 @@
                                 </div>
                             </div>  -->
 
-                            <div class="col-md-6 mb-4">
-                                <label for="description">Description*</label>
-                                <textarea type="text" class="form-control" id="description" name="description" placeholder="Description" required>{{old('description')}}@if(isset($plan)){{$plan->description}}@endif</textarea>
-                                <div class="invalid-feedback">
-                                    @error('description') {{ $message }} @enderror
-                                </div>
-                            </div>
+                            
+                            
 
+                            <div class="col-md-6 mb-4">
+                                <label for="fullName">Plan Validity <small id="default_validity">(Default 30 days)</small></label>
+                                <input type="number" class="form-control" id="plan_validity" name="plan_validity" value="{{old('plan_validity')}}@if(isset($plan)){{$plan->plan_validity}}@endif">
+                            </div>
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Status</label>
                                 <select name="status" id="status" class="form-control select">
@@ -163,16 +162,21 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 mb-4">
-                                <label for="fullName">Plan Validity <small>(Default 30 days)</small></label>
-                                <input type="number" class="form-control" id="plan_validity" name="plan_validity" value="{{old('plan_validity')}}@if(isset($plan)){{$plan->plan_validity}}@endif">
+                            <div class="col-md-12 mb-4">
+                                <label for="description">Description</label>
+                                <textarea type="text" class="form-control" id="description" name="description" placeholder="Description">{{old('description')}}@if(isset($plan)){{$plan->description}}@endif</textarea>
+                                <div class="invalid-feedback">
+                                    @error('description') {{ $message }} @enderror
+                                </div>
                             </div>
+
+                            
                             <!-- <div class="col-md-6 mb-4">
                                 <label for="fullName">Plan Expire Date</label>
                                 <input type="date" class="form-control" id="plan_expire" name="plan_expire" value="{{old('plan_expire')}}@if(isset($plan)){{$plan->plan_expire}}@endif" required>
                             </div> -->
 
-                            <div class="col-md-6 mb-4">
+                            {{-- <div class="col-md-6 mb-4">
                                 <label for="fullName">Plan Max Price* </label>
                                 <input type="text" class="form-control" placeholder="Plan Max Price" id="plan_max_price" name="plan_max_price" value="{{old('plan_max_price')}}@if(isset($plan)){{$plan->plan_max_price}}@endif" required>
                                 <div class="invalid-feedback">
@@ -187,15 +191,14 @@
                                     <option value="{{$item->id}}" @if(isset($plan) && $plan->genre == $item->id){{'selected'}}@endif>{{$item->title}}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> --}}
                         </div>
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-12">
                                 <label for="fullName">Channels*</label>
                             </div>
-                        </div>
-                        <div class="row">
-
+                        </div> --}}
+                        {{-- <div class="row">
                             <div class="col-5">
                                 <select name="from" id="undo_redo" class="form-control" size="12" multiple="multiple">
                                     <?php
@@ -223,7 +226,7 @@
                             <div class="col-5">
                                 <select name="channels[]" id="undo_redo_to" class="form-control" size="12" multiple="multiple" required></select>
                             </div>
-                        </div>
+                        </div> --}}
                         @if(isset($plan))
                         <button class="btn btn-primary submit-fn mt-2" type="submit">Update</button>
                         @else
@@ -282,13 +285,27 @@
 
     $(document).ready(function(){
 
+        if ($('#plan_type').val() == 0) {
+            $('#default_validity').html('(Default 3 days)')
+            $('#plan_validity').val(3).prop('disabled', true);
+        }
+        else{
+            $('#default_validity').html('(Default 30 days)')
+            $('#plan_validity').prop('disabled', false);
+        }
+
         $('#plan_type').change(function (){
 
             if($(this).val() == 0){
                 $('#max_price').show();
-                $('.netadminprice').show();
+                $('#default_validity').html('(Default 3 days)')
+                $('#plan_validity').val(3).prop('disabled', true);
+                // $('.netadminprice').show();
             }else{
                 $('#max_price').hide();
+                $('#default_validity').html('(Default 30 days)')
+                $('#plan_validity').prop('disabled', false);
+                // $('.netadminprice').hide();
             }
 
             check_price();

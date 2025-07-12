@@ -104,10 +104,10 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Mobile</th>
-                                <th>Wallet Amount</th>
-                                <th>Mac Address</th>
-                                <th>Login Pin</th>
+                                {{-- <th>Mobile</th> --}}
+                                {{-- <th>Wallet Amount</th> --}}
+                                {{-- <th>Mac Address</th> --}}
+                                {{-- <th>Login Pin</th> --}}
                                 <!-- <th>Country</th> -->
                                 <!-- <th>Company_name</th> -->
                                 <th>Created Date</th>
@@ -122,10 +122,10 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Mobile</th>
-                                <th>Wallet Amount</th>
-                                <th>Mac Address</th>
-                                <th>Login Pin</th>
+                                {{-- <th>Mobile</th> --}}
+                                {{-- <th>Wallet Amount</th> --}}
+                                {{-- <th>Mac Address</th> --}}
+                                {{-- <th>Login Pin</th> --}}
                                 <!-- <th>Country</th>
                                 <th>Company_name</th>  -->
                                 <th>Created Date</th>
@@ -204,10 +204,10 @@
          columns: [
             { data: 'name' },
             { data: 'email' },
-            { data: 'mobile' },
-            { data: 'wallet_amount' },
-            { data: 'ip_address' },
-            { data: 'login_pin' },
+            // { data: 'mobile' },
+            // { data: 'wallet_amount' },
+            // { data: 'ip_address' },
+            // { data: 'login_pin' },
             // { data: 'city' },
             // { data: 'country' },
             // { data: 'company_name' },

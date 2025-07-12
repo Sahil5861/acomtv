@@ -19,6 +19,9 @@
                 </div>
                 @endif
 
+                
+                
+
                 @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
@@ -51,8 +54,7 @@
                             </div>
                         </div>
 
-                        <?php 
-                        
+                        <?php                         
                             $count = \App\Models\TvShowEpisode::whereNull('deleted_at')->where('season_id', $id)->count();
                             $count = $count + 1;
                         ?>

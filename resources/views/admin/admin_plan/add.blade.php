@@ -73,7 +73,7 @@
                         @csrf
                         <input type="hidden" name="id" value="@if(isset($plan)){{$plan->id}}@endif">
 
-                        <div class="form-row">
+                        <div class="form-row">                            
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Title*</label>
                                 <input type="text" class="form-control" id="title" readonly name="title" placeholder="Title" value="{{old('title')}}@if(isset($plan)){{$plan->title}}@endif" required>
@@ -81,6 +81,7 @@
                                     @error('title') {{ $message }} @enderror
                                 </div>
                             </div>
+                            
 
                             <div class="col-md-6 mb-4">
                                 <label for="description">Description</label>
@@ -89,21 +90,9 @@
                                     @error('description') {{ $message }} @enderror
                                 </div>
                             </div>
-
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">Choose Super Admin Plan*</label>
-                                <!-- <select multiple name="super_admin_plan[]" onchange="super_admin_plan1()" id="super_admin_plan" class="form-control select" required>
-                                    <?php
-                                    // foreach($super_admin_plans as $s_plan){
-                                    //     if(isset($admin_s_plan_ids) && in_array($s_plan->id,$admin_s_plan_ids)){
-                                    //         echo '<option value="'.$s_plan->id.'" selected>'.$s_plan->title.'</option>';
-                                    //     }else{
-                                    //         echo '<option value="'.$s_plan->id.'">'.$s_plan->title.'</option>';
-                                    //     }
-
-                                    // }
-                                 ?>
-                                </select> -->
+                                <label for="fullName">Choose Super Admin Plan*</label>                                
+                                </select>
                                 <div>
                                     <input type="text" id="skill-input">
                                 </div>
@@ -113,7 +102,7 @@
                                     @error('super_admin_plan') {{ $message }} @enderror
                                 </div>
                             </div>
-
+                        
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Plan Validity (In Days)*</label>
                                 <input type="text" class="form-control" readonly id="plan_validity" onkeyup="plan_validity1()" name="plan_validity" placeholder="Plan Validity" value="{{old('plan_validity')}}@if(isset($plan)){{$plan->plan_validity}}@endif" required>
@@ -261,13 +250,13 @@
                             <br><small>(INR{{$plans->price}}/- for {{$plans->plan_validity}} days)</small></h3>
                         <section>
                             <div class="action-buttons">
-                                <h4>Channels</h4>
+                                {{-- <h4>Channels</h4> --}}
                                 <button type="button" class="btn btn-dark" id="select-{{$i}}" onclick="select('{{$plans->id}}','{{$i}}', '{{$plans->title}}')">Select</button>
                                 <button type="button" style="display: none;" class="btn btn-dark" id="unselect-{{$i}}" onclick="unselect('{{$plans->id}}','{{$i}}', '{{$plans->title}}')">Unselect</button>
                             </div>
-                            @foreach($plans->getChannel as $item)
+                            {{-- @foreach($plans->getChannel as $item)
                             <li>{{$item->channel_name}}</li>
-                            @endforeach
+                            @endforeach --}}
                         </section>
                         @php $i++; @endphp
                         @endforeach
@@ -320,6 +309,10 @@
             duplicate: true
         });
         
+    });
+
+    $(document).ready(function () {        
+        $('#pill-vertical-t-0').parent('li').removeClass('done');
     });
 
     function select(plan_id, plan_no, plan_name){
@@ -395,9 +388,9 @@
                     $('#title').val(result.title);
                     $('#plan_validity').val(result.validity);
                     $('#description').val(result.description);
-                    $('#plan_max_price').val(result.plan_max_price);
-                    var total_price = parseInt(result.price) + parseInt(profit_price);
-                    // $('#total_price').val(total_price.toFixed(2));
+                    // $('#plan_max_price').val(result.plan_max_price);
+                    var total_price = parseInt(result.price) + (parseInt(profit_price) || 0);
+                    $('#total_price').val(total_price.toFixed(2));
                     $('.price-error').text('');
                  }else{
                     $('.price-error').text(result.msg);
@@ -528,14 +521,16 @@
             var plan_validity = $('#plan_validity').val();
             var plan_max_price = $('#plan_max_price').val();
 
-            var total_price = parseInt(price) + parseInt(profit_price);
+            var total_price = parseInt(price) + (parseInt(profit_price) || 0);
             $('#total_price').val(total_price.toFixed(2));
-            if(total_price > plan_max_price){
-                $('.total_price-error').html('Total price should not be greater than '+plan_max_price+'.')
-                return false;
-            }else{
-                $('.total_price-error').html('')
-            }
+            // change by me on 5 july
+            // if(total_price > plan_max_price){
+            //     $('.total_price-error').html('Total price should not be greater than '+plan_max_price+'.')
+            //     return false;
+            // }else{
+            //     $('.total_price-error').html('')
+            // }
+            // change by me on 5 july
 
             // if(super_admin_plan.length && plan_validity.trim() != ''){
             //     $.ajax({

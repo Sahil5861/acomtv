@@ -57,6 +57,18 @@
                                 </div>
                                 <div class="channel-error"></div>
                             </div>
+                            <?php 
+                                $webseries_count = \App\Models\WebSeries::whereNull('deleted_at')->count();
+                                $formated = $webseries_count + 1;                             
+                            ?>
+                            <div class="col-md-6 mb-4">
+                                <label for="order">Order</label>
+                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($season) ? $season->season_order : $formated)}}" required min="0" placeholder="Order">
+                                <div class="invalid-feedback">
+                                    @error('runtime') {{ $message }} @enderror
+                                </div>
+                                <div class="channel-error"></div>
+                            </div>
 
                             <div class="col-md-6 mb-4">
                                 <label for="release_date">Release Date</label>

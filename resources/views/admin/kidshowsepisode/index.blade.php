@@ -261,7 +261,7 @@
     });
 
     function deleteRowModal(id){ 
-        $('#d_title').text('Websereis Episode')
+        $('#d_title').text('Kid shows Episode')
         $('#d_id').val(id);
         $('#delete_modal').modal('show');        
     }
@@ -270,7 +270,7 @@
         var id = $('#d_id').val();
         $.ajax({
             type: 'POST',
-            url: "{{route('webseries-episode.destroy')}}",
+            url: "{{route('kid-shows-episode.destroy')}}",
             data: {
                 _token: '{{ csrf_token() }}',
                 id:id

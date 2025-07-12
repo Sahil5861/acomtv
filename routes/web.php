@@ -44,6 +44,14 @@ use App\Http\Controllers\KidsShowEpisodes;
 use App\Http\Controllers\ManageRelChannel;
 use App\Http\Controllers\ManageRelShows;
 use App\Http\Controllers\RelShowEpisodes;
+use App\Http\Controllers\SuperAdminAdPlan;
+use App\Http\Controllers\AdminAdPlan;
+use App\Http\Controllers\AdminAd;
+use App\Http\Controllers\ResellerAd;
+
+
+
+
 
 
 
@@ -225,6 +233,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/tvshow-episode/update-status/{id}', [ManageTvShowEpisode::class,'updateStatus'])->name('tvshowepisode.update-status');        
         Route::post('/tvshows-episode/destroy', [ManageTvShowEpisode::class,'destroy'])->name('tvshowepisode.destroy');
 
+        Route::post('import-tvshows-episode-playlits', [ManageTvShowEpisode::class, 'importPlaylist'])->name('importtvshowsepisodeplaylits');
+
 
 
         
@@ -337,6 +347,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/check-channel-name', [Movies::class,'checkChannelName'])->name('check-channel-name');
         Route::post('/check-channel-number', [Movies::class,'checkChannelNumber'])->name('check-channel-number');
 
+        Route::post('import-movie-playlits', [Movies::class, 'importmovies'])->name('importmovies');
+
+
+        Route::post('update-column', [movies::class, 'updateColumn'])->name('update-column');
+
 
         //Adult Movies
 
@@ -387,7 +402,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-web-series-season/{id}', [WebseriesSeasons::class,'edit'])->name('edit-webseries-season');
         Route::get('/web-seies-season/update-status/{id}', [WebseriesSeasons::class,'updateStatus'])->name('webseries.season.update-status');        
 
-        Route::post('/websersiseason/destroy', [WebseriesSeasons::class,'destroy'])->name('webseries-season.destroy');
+        Route::post('/websersiseason-destroy', [WebseriesSeasons::class,'destroy'])->name('webseries-season.destroy');
 
 
         // Web series Episodes
@@ -395,7 +410,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/web-series-episode/{id}', [WebseriesEpisodes::class, 'index'])->name('admin.webseries.seasons.episodes');
         Route::get('/getWebseriesEpisodesList/{id}', [WebseriesEpisodes::class, 'getWebseriesEpisodeList'])->name('getWebseriesEpisodesList');
         Route::get('/add-web-series-season-episode/{id}', [WebseriesEpisodes::class,'create'])->name('addWebseriesEpisode');
-        Route::post('/addWebseriesSeasonEpisode', [WebseriesEpisodes::class,'save'])->name('saveWebseriesEpisode');        
+        Route::post('/save-webseries-season-episode', [WebseriesEpisodes::class,'save'])->name('saveWebseriesEpisode');        
         Route::get('/edit-episode/{id}', [WebseriesEpisodes::class,'edit'])->name('episode.edit');
         Route::get('/web-seies-episode/update-status/{id}', [WebseriesEpisodes::class,'updateStatus'])->name('webseries.episode.update-status');        
         Route::post('/websersiepisode/destroy', [WebseriesEpisodes::class,'destroy'])->name('webseries-episode.destroy');
@@ -554,6 +569,60 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/religious-episode/update-status/{id}', [RelShowEpisodes::class,'updateStatus'])->name('rel_episodes.update-status');        
         Route::post('/religious-episode/destroy', [RelShowEpisodes::class,'destroy'])->name('rel_episodes.destroy');
 
+        Route::post('import-religious-episode-playlits', [RelShowEpisodes::class, 'importreligiousepisode'])->name('importreligiousepisode');
+
+
+        // Super Admin Ads
+        Route::get('/super-admin-ads', [SuperAdminAdPlan::class, 'index'])->name('admin.supreradmin.ads');
+        Route::get('/getSuperAdminAdsList', [SuperAdminAdPlan::class, 'getSuperAdminAdsList'])->name('getSuperAdminAdsList');
+        Route::get('/super-admin-ads-add', [SuperAdminAdPlan::class, 'create'])->name('admin.supreradmin.ads.add');
+        Route::get('/super-admin-ads-edit/{id}', [SuperAdminAdPlan::class, 'edit'])->name('admin.supreradmin.ads.edit');
+        Route::post('/super-admin-ads-save', [SuperAdminAdPlan::class, 'save'])->name('admin.supreradmin.ads.save');
+        Route::post('/super-admin-ads-remove', [SuperAdminAdPlan::class, 'destroy'])->name('admin.supreradmin.ads.remove');
+        Route::get('/super-admin-update-status/{id}', [SuperAdminAdPlan::class, 'updateStatus'])->name('admin.supreradmin.ads.update_status');
+
+        // Admin Ads plan
+        Route::get('/admin-ads-plan', [AdminAd::class, 'index'])->name('admin.admin.adsplan');
+        Route::get('/getAdminAdsPlanList', [AdminAd::class, 'getAdminAdsPlanList'])->name('getAdminAdsPlanList');
+        Route::get('/admin-ads-plan-add', [AdminAd::class, 'create'])->name('admin.admin.adsplan.add');
+        Route::get('/admin-ads-plan-edit/{id}', [AdminAd::class, 'edit'])->name('admin.admin.adsplan.edit');
+        Route::post('/admin-ads-plan-save', [AdminAd::class, 'save'])->name('admin.admin.adsplan.save');
+        Route::post('/admin-ads-plan-remove', [AdminAd::class, 'destroy'])->name('admin.admin.adsplan.remove');
+        Route::get('/admin-ads-plan-update-status/{id}', [AdminAd::class, 'updateStatus'])->name('admin.admin.adsplan.update_status');
+
+        // Admin adss
+        Route::get('/admin-ads', [AdminAdPlan::class, 'index'])->name('admin.admin.ads');
+        Route::get('/getAdminAdsList', [AdminAdPlan::class, 'getAdminAdsList'])->name('getAdminAdsList');
+        Route::get('/admin-ads-add', [AdminAdPlan::class, 'create'])->name('admin.admin.ad.add');
+        Route::get('/admin-ads-edit/{id}', [AdminAdPlan::class, 'edit'])->name('admin.admin.ads.edit');
+        Route::post('/admin-ads-save', [AdminAdPlan::class, 'save'])->name('admin.admin.ads.save');
+        Route::post('/admin-ads-remove', [AdminAdPlan::class, 'destroy'])->name('admin.admin.ads.remove');
+        Route::get('/admin-ads-update-status/{id}', [AdminAdPlan::class, 'updateStatus'])->name('admin.admin.ads.update_status');
+
+
+        // Admin Ads
+        // Route::get('/admin-ads', [AdminAd::class, 'index'])->name('admin.admin.ads');
+        // Route::get('/getAdminAdsList', [AdminAd::class, 'getAdminAdsList'])->name('getAdminAdsList');
+        // Route::get('/admin-ads-add', [AdminAd::class, 'create'])->name('admin.admin.ads.add');
+        // Route::get('/admin-ads-edit/{id}', [AdminAd::class, 'edit'])->name('admin.admin.ads.edit');
+        // Route::post('/admin-ads-save', [AdminAd::class, 'save'])->name('admin.admin.ads.save');
+        // Route::post('/admin-ads-remove', [AdminAd::class, 'destroy'])->name('admin.admin.ads.remove');
+        // Route::get('/admin-ads-update-status/{id}', [AdminAd::class, 'updateStatus'])->name('admin.admin.ads.update_status');
+
+        Route::get('/get-ad-details', [AdminAd::class, 'getAdDetails'])->name('get-ad-details');
+
+
+        // Reseller ads 
+        Route::get('/reseller-ads', [ResellerAd::class, 'index'])->name('admin.reseller.ads');
+        Route::get('/getResellerAdsList', [ResellerAd::class, 'getResellerAdsList'])->name('getResellerAdsList');
+        Route::get('/reseller-ads-add', [ResellerAd::class, 'create'])->name('reseller.ad.add');
+        Route::get('/reseller-ads-edit/{id}', [ResellerAd::class, 'edit'])->name('reseller.ads.edit');
+        Route::post('/reseller-ads-save', [ResellerAd::class, 'save'])->name('reseller.ads.save');
+        Route::post('/reseller-ads-remove', [ResellerAd::class, 'destroy'])->name('reseller.ads.remove');
+        Route::get('/reseller-ads-update-status/{id}', [ResellerAd::class, 'updateStatus'])->name('reseller.ads.update_status');
+        Route::get('/get-ad-details-for-reseller', [ResellerAd::class, 'getAdDetails'])->name('get-ad-details-for-reseller');
+
+        
     });
      /*admin forgot password*/
      Route::get('forget-password', [AuthAdmin::class, 'showForgetPasswordForm'])->name('forget.password.get');

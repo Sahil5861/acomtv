@@ -6,6 +6,8 @@ use App\Models\AdminPlan;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+// use Illuminate\Support\Facades\Auth;
+
 
 class ManageReseller extends Controller
 {
@@ -287,16 +289,16 @@ class ManageReseller extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
-            'mobile' => 'required',
-            'address' => 'required',
-            'password' => 'required',
-            'address' => 'required',
-            'country' => 'required',
-            'city' => 'required',
-            'hf_number' => 'required',
-            'street_number' => 'required',
-            'pincode' => 'required',
-            'landmark' => 'required',
+            // 'mobile' => 'required',
+            // 'address' => 'required',
+            // 'password' => 'required',
+            // 'address' => 'required',
+            // 'country' => 'required',
+            // 'city' => 'required',
+            // 'hf_number' => 'required',
+            // 'street_number' => 'required',
+            // 'pincode' => 'required',
+            // 'landmark' => 'required',
         ]);
 
         if(!empty($request->id)){
@@ -307,23 +309,25 @@ class ManageReseller extends Controller
             $user = User::firstwhere('id',$request->id);
 
             $real_password = $request->password;
-            $password = bcrypt($real_password);
+            if ($real_password) {                
+                $password = bcrypt($real_password);
+            }
             // $password = md5($hash_pass1);
 
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->address = $request->address;
-            $user->hf_number = $request->hf_number;
-            $user->street_number = $request->street_number;
-            $user->landmark = $request->landmark;
-            $user->country = $request->country;
-            $user->city = $request->city;
-            $user->pincode = $request->pincode;
-            $user->company_name = $request->company_name;
-            $user->password = $real_password;
-            $user->real_password = $real_password;
-            $user->role = 3;
+            $user->mobile = $request->mobile ?? null;
+            $user->address = $request->address ?? null;
+            $user->hf_number = $request->hf_number ?? null;
+            $user->street_number = $request->street_number ?? null;
+            $user->landmark = $request->landmark ?? null;
+            $user->country = $request->country ?? null;
+            $user->city = $request->city ?? null;
+            $user->pincode = $request->pincode ?? null;
+            $user->company_name = $request->company_name ?? null;
+            $user->password = $password ?? null;
+            $user->real_password = $real_password ?? null;
+            $user->role = 3;            
             $user->status = $request->status;
             if($user->save()){
                 return back()->with('message','Reseller updated successfully');
@@ -339,25 +343,27 @@ class ManageReseller extends Controller
 
             $user = new User();
             $real_password = $request->password;
-            $password = bcrypt($real_password);
+            if ($real_password) {                
+                $password = bcrypt($real_password);
+            }
             // $password = md5($hash_pass1);
-
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->created_by = \Auth::user()->id;
-            $user->address = $request->address;
-            $user->hf_number = $request->hf_number;
-            $user->street_number = $request->street_number;
-            $user->landmark = $request->landmark;
-            $user->country = $request->country;
-            $user->city = $request->city;
-            $user->pincode = $request->pincode;
-            $user->company_name = $request->company_name;
-            $user->password = $real_password;
-            $user->real_password = $real_password;
+            $user->mobile = $request->mobile ?? null;
+            $user->address = $request->address ?? null;
+            $user->hf_number = $request->hf_number ?? '';
+            $user->street_number = $request->street_number ?? '';
+            $user->landmark = $request->landmark ?? '';
+            $user->country = $request->country ?? '';
+            $user->city = $request->city ?? '';
+            $user->pincode = $request->pincode ?? '';
+            $user->company_name = $request->company_name ?? '';
+            $user->password = $password ?? '';
+            $user->real_password = $real_password ?? '';
             $user->role = 3;
+            $user->created_by = \Auth::user()->role;
             $user->status = $request->status;
+            
             if($user->save()){
                 return back()->with('message','Reseller added successfully');
             }else{

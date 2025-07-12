@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TvShowEpisode;
+use App\Models\Genre;
+use App\Models\ContentNetwork;
 
 class ManageTvShowEpisode extends Controller
 {
     public function index($id)    
     {        
-        $id = base64_decode($id);        
-        return view('admin.tvshow_episode.index', compact('id'));
+        $id = base64_decode($id);   
+        $content_networks = ContentNetwork::where('status', 1)->get();
+        $genres = Genre::where('status',1)->get();     
+        return view('admin.tvshow_episode.index', compact('id', 'content_networks', 'genres'));
     }
 
     
@@ -31,14 +35,19 @@ class ManageTvShowEpisode extends Controller
 
         // Total records
         // Total records
+        $query = TvShowEpisode::select('count(*) as allcount')->whereNull('shows_episodes.deleted_at');
+
         $totalRecords = TvShowEpisode::select('count(*) as allcount')->whereNull('shows_episodes.deleted_at')->where('season_id', $id)->count();
         $inactiveRecords = TvShowEpisode::select('count(*) as allcount')->whereNull('shows_episodes.deleted_at')->where('season_id', $id)->where('status', 0)->count();
         $activeRecords = TvShowEpisode::select('count(*) as allcount')->whereNull('shows_episodes.deleted_at')->where('season_id', $id)->where('status', 1)->count();
         $deletedRecords = TvShowEpisode::select('count(*) as allcount')->whereNotNull('shows_episodes.deleted_at')->where('season_id', $id)->count();
 
+        
 
-        $totalRecordswithFilter = TvShowEpisode::select('count(*) as allcount')
-        ->where('title', 'like', '%' . $searchValue . '%')
+        $totalRecordswithFilter = $query->where(function($query) use ($searchValue){
+                $query->where('shows_episodes.title', 'like', '%' . $searchValue . '%')
+                    ->orWhere('shows_episodes.playlist_id', 'like', '%' . $searchValue . '%');
+        }) 
         // ->where('channels.status', '=', 1)
         ->whereNull('shows_episodes.deleted_at')->where('season_id', $id)
         ->count();
@@ -47,7 +56,10 @@ class ManageTvShowEpisode extends Controller
         $records = TvShowEpisode::orderBy($columnName, $columnSortOrder)
             // ->where('channels.status', '=', 1)
             ->whereNull('shows_episodes.deleted_at')
-            ->where('shows_episodes.title', 'like', '%' . $searchValue . '%')
+            ->where(function($query) use ($searchValue){
+                $query->where('shows_episodes.title', 'like', '%' . $searchValue . '%')
+                    ->orWhere('shows_episodes.playlist_id', 'like', '%' . $searchValue . '%');
+            })        
             ->where('season_id', $id)
 
             // ->orWhere('channels.description', 'like', '%' . $searchValue . '%')
@@ -79,7 +91,9 @@ class ManageTvShowEpisode extends Controller
             $duration = $hours > 0 ?  $hours.' h '.$minutes : $minutes;
 
             $data_arr[] = array(
-                "title" => $record->title,                                                                                                           
+                "id" => $record->id,
+                "title" => $record->title,    
+                "playlist_id" => $record->playlist_id,                                                                                                       
                 "episode_number" => $record->episode_number,                                                                                                           
                 "duration" => $duration,                                                                                                           
                 "status" => $status,                                                                                                           
@@ -186,4 +200,80 @@ class ManageTvShowEpisode extends Controller
             return response()->json(['message' => 'TvShowEpisode not deleted']);
         }
     }
+
+
+    public function importPlaylist(Request $request){
+        $playlistId = $request->input('playlist_id');        
+
+        $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
+        $url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=500&playlistId={$playlistId}&key={$apiKey}";
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $response = curl_exec($ch);
+
+        if(curl_errno($ch)) {
+            $error_msg = curl_error($ch);
+            curl_close($ch);
+            return response()->json(['success' => false, 'error' => $error_msg], 500);
+        }
+        curl_close($ch);
+        
+        $data = json_decode($response, true);
+        $snippet = $data['items'][0];
+        
+        
+        // print_r($data['items'][0]['snippet']); exit;
+
+        $season_id = $request->id;
+                            
+
+        foreach ($data['items'] as $key => $item) {    
+            $snippet = $item['snippet'];
+            $title = $snippet['title'] ?? null;
+            $url = $snippet['resourceId']['videoId'] ?? null;
+
+            if ($this->checkIsExist($title, $url, $season_id)) {
+                continue;
+            }
+
+            $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+            $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                    
+            $episode = new TvShowEpisode();
+
+            $count = TvShowEpisode::whereNull('deleted_at')->where('season_id', $season_id)->count();
+            $count = $count + 1;
+
+            $episode->title = $title;
+            $episode->episode_number = $count;
+            $episode->season_id = $season_id;
+            $episode->video_url = $url;
+            $episode->status = 0;
+            $episode->streaming_type = 'youtube';
+            $episode->description = $snippet['description'] ?? null;
+            $episode->thumbnail = $cleanBannerUrl;        
+            $episode->duration = 0;
+            $episode->playlist_id = $playlistId;
+            $episode->release_date = '';
+            $episode->save();            
+        }
+
+        return back()->with('message','Playlist Uploaded successfully');
+
+    }
+
+    public function checkIsExist($movie_name, $url, $season_id){
+        return TvShowEpisode::where(function ($query) use ($movie_name, $url) {
+                $query->whereRaw('LOWER(TRIM(title)) = ?', [strtolower(trim($movie_name))])
+                    ->orWhereRaw('LOWER(TRIM(video_url)) = ?', [strtolower(trim($url))]);
+            })
+            ->whereNull('deleted_at')
+            ->where('season_id', $season_id)
+            ->first();
+    }
+
 }

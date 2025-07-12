@@ -40,7 +40,8 @@
                     <a href="{{route('admin.rel_episodes.episodes', base64_encode($id))}}" class="btn btn-primary mb-3">Back to List</a>
                   </div>
                 <!-- <div class="row"> -->                    
-                    <form id="user-form"  method="post" action="{{route('saverel_episodes', $id)}}" enctype="multipart/form-data" novalidate class="simple-example" >
+                    {{-- novalidate --}}
+                    <form id="user-form"  method="post" action="{{route('saverel_episodes', $id)}}" enctype="multipart/form-data"  class="simple-example" >
                         @csrf
                         <input type="hidden" name="id" value="@if(isset($episode)){{$episode->id}}@endif">                        
                         <input type="hidden" name="show_id" id="show_id" value="{{isset($episode) ? $episode->show_id : $id}}">
@@ -55,18 +56,24 @@
                             </div> --}}
 
                             <div class="col-md-6 mb-4">
-                                <label for="label">Episodes Name*</label>
+                                <label for="label">Episode Name*</label>
                                 <input type="text" class="form-control" id="name" onkeyup="channel(this.value)" name="name" placeholder="Episode Name" value="{{old('name')}}@if(isset($episode)){{$episode->title}}@endif" required>
                                 <div class="invalid-feedback">
                                     @error('label') {{ $message }} @enderror
                                 </div>
                                 <div class="channel-error"></div>
                             </div>
+
+
+                            <?php                         
+                                $count = \App\Models\RelshowsEpisode::whereNull('deleted_at')->where('show_id', $id)->count();
+                                $count = $count + 1;
+                            ?>
                             
 
                             <div class="col-md-6 mb-4">
                                 <label for="order">Order*</label>
-                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($episode) ? $episode->episode_order : 0)}}" placeholder="0-9999">
+                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($episode) ? $episode->episode_order : $count)}}" placeholder="0-9999">
                                 <div class="invalid-feedback">
                                     @error('order') {{ $message }} @enderror
                                 </div>

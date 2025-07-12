@@ -370,8 +370,8 @@
                     $('#plan_validity').val(result.validity);
                     $('#description').val(result.description);
                     $('#plan_max_price').val(result.plan_max_price);
-                    var total_price = parseInt(result.price) + parseInt(profit_price);
-                    // $('#total_price').val(total_price.toFixed(2));
+                    var total_price = parseInt(result.price) + (parseInt(profit_price) || 0);
+                    $('#total_price').val(total_price.toFixed(2));
                     $('.price-error').text('');
                  }else{
                     $('.price-error').text(result.msg);
@@ -430,9 +430,9 @@
             return;
         }
 
-    }
-
+    }    
     $(document).ready(function(){
+        $('#pill-vertical-t-0').parent('li').removeClass('done');
         $('#profit_percentage').keyup(function(){
             var profit_percentage = $(this).val();
             var price = $('#price').val();
@@ -517,12 +517,12 @@
         var total_price = Number(price) + Number(profit_price);
         var plan_max_price = $('#plan_max_price').val();
         $('#total_price').val(total_price.toFixed(2));
-        if(total_price > plan_max_price){
-            $('.total_price-error').html('Total price should not be greater than '+plan_max_price+'.')
-            return false;
-        }else{
-            $('.total_price-error').html('')
-        }
+        // if(total_price > plan_max_price){
+        //     $('.total_price-error').html('Total price should not be greater than '+plan_max_price+'.')
+        //     return false;
+        // }else{
+        //     $('.total_price-error').html('')
+        // }
     }
 
 

@@ -216,6 +216,7 @@ class ManageTvShow extends Controller
     {
         $request->validate([
             'name' => 'required',
+            'genre' => 'required'
         ]);
 
         if (!empty($request->id)) {

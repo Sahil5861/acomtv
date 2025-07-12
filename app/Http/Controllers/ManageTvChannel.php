@@ -172,21 +172,4 @@ class ManageTvChannel extends Controller
             return response()->json(['message' => 'TvChannel not deleted']);
         }
     }
-
-    public function getTvChannelOrderList()
-    {
-        $this->data['tvchannels'] = TvChannel::orderBy('index', 'asc')->get();
-        return view('admin.tvchannel.dragdrop', $this->data);
-    }
-
-    public function saveTvChannelOrders(Request $request)
-    {
-        foreach ($request->numbers as $key => $id) {
-            $tvchannel = TvChannel::find($id);
-            $tvchannel->index = $key + 1;
-            $tvchannel->save();
-        }
-
-        return back()->with('message', 'TvChannel ordered successfully');
-    }
 }

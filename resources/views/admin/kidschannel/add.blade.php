@@ -29,17 +29,31 @@
                 </div>
                 @endif
 
-                <form id="tvchannel-form" method="post" action="{{ route('admin.kidschannel.save') }}" enctype="multipart/form-data" novalidate>
+                <form id="tvchannel-form" method="post" action="{{ route('admin.kidschannel.save') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" value="{{ $tvchannel->id ?? '' }}">
 
                     <div class="form-row">
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
-                            <label for="name">Name</label>
+                            <label for="name">Name*</label>
                             <input type="text" class="form-control" id="name" name="name"
                                 placeholder="Name"
                                 value="{{ old('name', $tvchannel->name ?? '') }}" required>
+                            <div class="invalid-feedback">
+                                @error('name') {{ $message }} @enderror
+                            </div>
+                        </div>
+                        <?php 
+                            $kid_channel_count = \App\Models\KidsChannel::whereNull('deleted_at')->count();
+                            $formatted = $kid_channel_count + 1;                          
+                        ?>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="name">Order</label>
+                            <input type="text" class="form-control" id="order" name="order"
+                                placeholder="0-999"
+                                value="{{ old('order', $tvchannel->name ?? $formatted) }}" required>
                             <div class="invalid-feedback">
                                 @error('name') {{ $message }} @enderror
                             </div>

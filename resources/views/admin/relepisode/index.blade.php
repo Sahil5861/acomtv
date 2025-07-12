@@ -85,6 +85,16 @@
             
             <div class="widget-content widget-content-area br-6">
 
+                <div class="alert alert-success alert-block" id="alert-success" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="success-message"></strong>
+                </div>
+
+                <div class="alert alert-danger alert-block" id="alert-danger" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="error-message"></strong>
+                </div>
+
                 <div id="delete_bd_ms"></div>
                 @if(session()->has('message'))
                     <div class="alert alert-success alert-block">
@@ -108,17 +118,50 @@
 
                 <div class="text-right">
                     <a href="{{url('add-religious-episode/'.base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
+                        Import from Playlist
+                    </button> 
+                </div>
+                <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addContentModalLabel">Add Episodes From Playlist</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">                                
+                            <form id="importmoviesForm" method="POST" action="{{route('importreligiousepisode')}}">
+                            @csrf
+                                <input type="hidden" name="show_id" value="{{$id}}">
+                                <div class="form-group">
+                                    <label for="networkName">Playlits Id</label>                                    
+                                    <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
+                                </div>                                                                                           
+                            </form>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" form="importmoviesForm" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        
+                        </div>
+                    </div>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
-                    <table id="multi-column-ordering" class="table table-hover">
+                    <table id="multi-column-ordering" class="table table-hover" data-table="rel_episodes">
                         <thead>
                             <tr>
-                                <th>Name</th>                                                                                                                         
+                                <th class="editable-th" data-column="title">Title</th>                                                                                                                         
                                 <th>Thumbnail</th>
                                 <th>Status</th>
-                                <th>Source</th>
-                                <th>Url</th>
+                                <th>Source</th>                                
+                                <th>Playlist Id</th>
                                 <th>Downloadable</th>
                                 <th>Type</th>
                                 <th>Created Date</th>
@@ -130,11 +173,11 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>Name</th>                                                                                                                                
+                                <th>Title</th>                                                                                                                                
                                 <th>Thumbnail</th>
                                 <th>Status</th>
-                                <th>Source</th>
-                                <th>Url</th>
+                                <th>Source</th>                                
+                                <th>Playlist Id</th>
                                 <th>Downloadable</th>
                                 <th>Type</th>
                                 <th>Created Date</th>
@@ -238,13 +281,22 @@
             { data: 'title' },                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
-            { data: 'source' },
-            { data: 'url' },
+            { data: 'source' },            
+            { data: 'playlist_id' },
             { data: 'downloadable',orderable: false, searchable: false  },
             { data: 'type',orderable: false, searchable: false  },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
+         columnDefs: [
+            {
+                targets: 0, // index of 'name' column
+                createdCell: function(td, cellData, rowData, row, col) {
+                    // $(td).addClass('editable');
+                    $(td).attr('data-id', rowData.id); // Set data-id attribute
+                }
+            },            
+        ],
          drawCallback: function (settings) { 
             
             var response = settings.json;
@@ -254,7 +306,8 @@
             $('#deletedRecords').text(response.deletedRecords);
             console.log(response);
             $('[data-toggle="tooltip"]').tooltip();
-            updateIcon()
+            updateIcon();
+            setEditable();
         },
       });
     });
@@ -264,12 +317,23 @@
         $('#d_id').val(id);
         $('#delete_modal').modal('show');        
     }
+    function setEditable(){
+    $('#multi-column-ordering thead th').each(function (index) {            
+            
+        if ($(this).hasClass('editable-th')) {
+            console.log('hii');                
+            $('#tableItem tr').each(function () {
+                $(this).find('td').eq(index).addClass('editable');                                
+            });
+        }
+    });
+}
 
     function delete_row(){
         var id = $('#d_id').val();
         $.ajax({
             type: 'POST',
-            url: "{{route('webseries-episode.destroy')}}",
+            url: "{{route('rel_episodes.destroy')}}",
             data: {
                 _token: '{{ csrf_token() }}',
                 id:id
@@ -280,6 +344,81 @@
             }
         })
     }
+
+
+    document.addEventListener('dblclick', function (event){
+        const target = event.target
+        if (target.classList.contains('editable')) {        
+            if (target.querySelector('input')) return;
+            const currentText = target.textContent.trim();
+            const input = document.createElement('input'); 
+            const id = target.getAttribute('data-id');       
+
+            input.type = 'text';
+            input.value = currentText;
+            input.style.width = '100%';
+            input.classList.add('form-control');
+            input.setAttribute('data-id', id);
+
+            target.textContent = '';
+            target.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', function () {
+                const newValue = input.value.trim();
+                target.textContent = newValue || currentText; // fallback to old value if empty
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    input.blur(); // triggers blur above
+                    const table = document.getElementById('multi-column-ordering').getAttribute('data-table');                
+                    const td = input.closest('td');
+
+
+                    const column = document.querySelector('.editable-th').getAttribute('data-column');
+                    let id = input.getAttribute('data-id');
+
+                    console.log(id, table, column);
+                    // return false;
+                    
+
+                    $.ajax({
+                        method : 'POST',
+                        url : "{{route('update-column')}}",                    
+                        data: {
+                            id : id,                        
+                            table : table,
+                            column : column,  
+                            value : input.value, 
+                            _token: "{{ csrf_token() }}" // ✅ Add this line                     
+                        },
+                        success: function(response){
+                            if (response.success) {
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.success-message').html(`${capitalizedColumn} updated successfully !`);
+                                $('#alert-success').show();
+                                setTimeout(() => {
+                                    $('#alert-success').hide();
+                                }, 2000);
+                            }
+                            else{
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.error-message').html(response.message);
+                                $('#alert-danger').show();
+                                setTimeout(() => {
+                                    $('#alert-danger').hide();
+                                }, 2000);
+                                target.textContent = currentText;
+                                // $('#multi-column-ordering').DataTable().ajax.reload();
+                            }
+                        }
+                    })
+                    
+                }
+            });    
+        }
+    })
     </script>
 
    

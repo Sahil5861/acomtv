@@ -121,7 +121,7 @@ class AdminPlans extends Controller
             'title' => 'required',
             'price' => 'required',
             // 'description' => 'required',
-            'super_admin_plan' => 'required',
+            // 'super_admin_plan' => 'required',
             'plan_validity' => 'required',
             // 'discount' =>'required'
         ]);
@@ -142,9 +142,9 @@ class AdminPlans extends Controller
         //     return back()->with('message',"Profit price should not be less than ".'INR'.$minvalue);
         // }
 
-        if(($request->total_price > $Plans->plan_max_price) || ($request->price + $request->profit_price) > $Plans->plan_max_price){
-            return back()->with('message',"Total price should not be grater than ".$Plans->plan_max_price.".");
-        }
+        // if(($request->total_price > $Plans->plan_max_price) || ($request->price + $request->profit_price) > $Plans->plan_max_price){
+        //     return back()->with('message',"Total price should not be grater than ".$Plans->plan_max_price.".");
+        // }
 
         if(!empty($request->id)){
             // if(\Auth::user()->current_amount < $request->price){
@@ -171,16 +171,15 @@ class AdminPlans extends Controller
             if($plan->save()){
                 AdminSuperAdminPlan::where('admin_plan_id',$plan->id)->delete();
                 // print_r($request->super_admin_plan); exit;
-                foreach ($super_admin_plan as $key => $s_plan) {
-                    $super_admin_plan = SadminPlan::find($s_plan);
-                    $adminSuperAdminPlan = new AdminSuperAdminPlan();
-                    $adminSuperAdminPlan->super_admin_plan_id = $s_plan;
-                    $adminSuperAdminPlan->admin_plan_id = $plan->id;
-                    $adminSuperAdminPlan->super_admin_plan_price = $super_admin_plan->price;
-                    $adminSuperAdminPlan->save();
-
-                    // echo $adminSuperAdminPlan->id; exit;
-                }
+                // foreach ($super_admin_plan as $key => $s_plan) {
+                //     $super_admin_plan = SadminPlan::find($s_plan);
+                //     $adminSuperAdminPlan = new AdminSuperAdminPlan();
+                //     $adminSuperAdminPlan->super_admin_plan_id = $s_plan;
+                //     $adminSuperAdminPlan->admin_plan_id = $plan->id;
+                //     $adminSuperAdminPlan->super_admin_plan_price = $super_admin_plan->price;
+                //     $adminSuperAdminPlan->save();
+                
+                // }
 
 
                 return back()->with('message','Plan updated successfully');
@@ -213,14 +212,14 @@ class AdminPlans extends Controller
             if($plan->save()){
                 // PackageChannel::where('plan_id',$plan->id)->delete();
                 // $super_admin_plan = explode(',',$request->super_admin_plan);
-                foreach ($super_admin_plan as $key => $s_plan) {
-                    $super_admin_plan = SadminPlan::find($s_plan);
-                    $adminSuperAdminPlan = new AdminSuperAdminPlan();
-                    $adminSuperAdminPlan->super_admin_plan_id = $s_plan;
-                    $adminSuperAdminPlan->admin_plan_id = $plan->id;
-                    $adminSuperAdminPlan->super_admin_plan_price = $super_admin_plan->price;
-                    $adminSuperAdminPlan->save();
-                }
+                // foreach ($super_admin_plan as $key => $s_plan) {
+                //     $super_admin_plan = SadminPlan::find($s_plan);
+                //     $adminSuperAdminPlan = new AdminSuperAdminPlan();
+                //     $adminSuperAdminPlan->super_admin_plan_id = $s_plan;
+                //     $adminSuperAdminPlan->admin_plan_id = $plan->id;
+                //     $adminSuperAdminPlan->super_admin_plan_price = $super_admin_plan->price;
+                //     $adminSuperAdminPlan->save();
+                // }
                 return back()->with('message','Plan added successfully');
             }else{
                 return back()->with('message','Plan not added successfully');

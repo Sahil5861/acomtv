@@ -34,6 +34,9 @@
                         @csrf
                         <input type="hidden" name="id" value="@if(isset($user)){{$user->id}}@endif">
                         <div class="form-row">
+                            <div class="col-md-12">
+                                <h4>Basic Info</h4>
+                            </div>
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Name*</label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{{old('name')}}@if(isset($user)){{$user->name}}@endif" required>
@@ -82,19 +85,21 @@
 
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Mobile*</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobile" value="{{old('mobile')}}@if(isset($user)){{$user->mobile}}@endif" required>
+                                <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="Mobile" value="{{old('mobile')}}@if(isset($user)){{$user->mobile}}@endif" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="10" autocomplete="new-password">
+                                {{-- <div class="input-group">
                                     <div class="input-group-prepend">
                                         <button type="button" class="btn btn-sm btn-dark sendOTP" onclick="sendOTP()">Send OTP</button>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="invalid-feedback">
                                     @error('mobile') {{ $message }} @enderror
                                 </div>
                                 <div class="mobileError"></div>
                             </div>
 
-                            <div class="col-md-6 mb-4 verifyOTPDiv" style="display: none;">
+                            
+
+                            {{-- <div class="col-md-6 mb-4 verifyOTPDiv" style="display: none;">
                                 <label for="fullName">Verify OTP*</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="otp" name="otp" placeholder="OTP">
@@ -103,6 +108,10 @@
                                     </div>
                                 </div>
                                 <div class="otpError"></div>
+                            </div> --}}
+
+                            <div class="col-md-12">
+                                <h4>Address Info</h4>
                             </div>
 
                             <div class="col-md-6 mb-4">

@@ -67,4 +67,4 @@ Route::get('/getReligiousChannels', [AppApiController::class, 'getReligiousChann
 Route::get('/getReligiousShows/{id}', [AppApiController::class, 'getReligiousShows']);
 Route::get('/getReligiousShowsEpisodes/{id}', [AppApiController::class, 'getReligiousShowsEpisodes']);
 
-Route::get('/getAllAbove18Movies', [AppApiController::class, 'getAllAbove18Movies']);
+Route::get('/getAllAbove18Movies/{pin}', [AppApiController::class, 'getAllAbove18Movies']);

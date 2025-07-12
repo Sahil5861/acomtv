@@ -30,7 +30,7 @@ kidsshows
                 </div>
                 @endif
 
-                <form id="kidsshow-form" method="post" action="{{ route('admin.kidsshows.save') }}" enctype="multipart/form-data" novalidate>
+                <form id="kidsshow-form" method="post" action="{{ route('admin.kidsshows.save') }}" enctype="multipart/form-data">
                     @csrf
                     @if (isset($kidsshow))                        
                         <input type="hidden" name="id" value="{{isset($kidsshow) ? $kidsshow->id : ''}}">
@@ -41,7 +41,7 @@ kidsshows
                     <div class="form-row">
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
-                            <label for="name">Name</label>
+                            <label for="name">Name*</label>
                             <input type="text" class="form-control" id="name" name="name"
                                 placeholder="Name"
                                 value="{{ old('name', $kidsshow->name ?? '') }}" required>
@@ -79,7 +79,7 @@ kidsshows
                         <div class="col-md-6 mb-4">
                             <label for="genre">Genre</label>
                             {{-- <input type="text" class="form-control" id="genre" name="genre"placeholder="Genre"value="{{ old('genre', $kidsshow->genre ?? '') }}" required> --}}
-                            <select name="genre[]" id="genre" class="form-control select" multiple>
+                            <select name="genre[]" id="genre" class="form-control select" multiple required>
                                 @foreach ($genres as $genre)
                                     <option value="{{$genre->title}}"
                                         @if (isset($kidsshow) && in_array($genre->title, $currentGenres)) selected @endif>

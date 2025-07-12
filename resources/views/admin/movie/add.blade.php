@@ -28,16 +28,17 @@
                   @endif
                    @if ($errors->any())
                       <div class="alert alert-danger">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
                           <ul>
                               @foreach ($errors->all() as $error)
-                                  <li>{{ $error }}</li>
+                                  <li style="list-style: none;">{{ $error }}</li>
                               @endforeach
                           </ul>
                       </div>
                   @endif
                 <!-- <div class="row"> -->
                     <a href="{{route('admin.movies')}}" class="btn btn-primary mb-3">Back to List</a>
-                    <form id="user-form"  method="post" action="{{route('saveMovie')}}" enctype="multipart/form-data" novalidate class="simple-example" >
+                    <form id="user-form" method="post" action="{{route('saveMovie')}}" enctype="multipart/form-data" novalidate class="simple-example" >
                         @csrf
                         <input type="hidden" name="id" value="@if(isset($movie)){{$movie->id}}@endif">
                         <input type="hidden" name="channel_logo_old" value="@if(isset($channel)){{$channel->channel_logo}}@endif">
@@ -51,8 +52,7 @@
                                 <div class="channel-number-error"></div>
                             </div> --}}
 
-                            <?php 
-                            
+                            <?php                             
                                 $channel_number = \App\Models\Movie::whereNull('deleted_at')->count();
                                 $formated_number = $channel_number + 1;
                             ?>

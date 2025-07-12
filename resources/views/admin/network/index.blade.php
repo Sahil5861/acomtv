@@ -102,6 +102,12 @@
                         Add +
                     </button>
                 </div>
+
+                <?php 
+                
+                    $network_count = \App\Models\ContentNetwork::whereNull('deleted_at')->count();
+                    $formatted = $network_count + 1;
+                ?>
                 {{-- add modal --}}
                 <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
@@ -130,7 +136,7 @@
 
                             <div class="form-group">
                                 <label for="networOrder">Network Order</label>
-                                <input type="number" class="form-control" name="networOrder" id="networOrder" required>
+                                <input type="number" class="form-control" name="networOrder" id="networOrder" value="{{$formatted}}" required>
                             </div>
                             <div class="form-group">
                                 <label for="status">Status</label>
@@ -172,7 +178,7 @@
                             <form id="editContentForm" method="POST" action="{{route('savecontentnetwork')}}">
                             @csrf
 
-                            <input type="tes" name="id" id="networkId">
+                            <input type="hidden" name="id" id="networkId">
                             <div class="form-group">
                                 <label for="networkName">Network Name</label>
                                 <input type="text" class="form-control" name="networkName" id="networkName1" required>

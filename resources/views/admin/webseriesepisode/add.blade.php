@@ -36,7 +36,7 @@
                       </div>
                   @endif
                 <!-- <div class="row"> -->                    
-                    <form id="user-form"  method="post" action="{{route('saveWebseriesEpisode', $id)}}" enctype="multipart/form-data" novalidate class="simple-example" >
+                    <form id="user-form"  method="post" action="{{route('saveWebseriesEpisode')}}" enctype="multipart/form-data" novalidate class="simple-example" >
                         @csrf
                         <input type="hidden" name="id" value="@if(isset($episode)){{$episode->id}}@endif">                        
                         <input type="hidden" name="season_id" id="season_id" value="{{isset($episode) ? $episode->season_id : $id}}">
@@ -58,11 +58,16 @@
                                 </div>
                                 <div class="channel-error"></div>
                             </div>
+
+                            <?php 
+                                $episodes_count = \App\Models\WebSeriesEpisode::whereNull('deleted_at')->where('season_id', $id)->count();
+                                $formatted = $episodes_count + 1;
+                            ?>
                             
 
                             <div class="col-md-6 mb-4">
                                 <label for="order">Order*</label>
-                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($episode) ? $episode->episoade_order : 0)}}" placeholder="0-9999">
+                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($episode) ? $episode->episoade_order : $formatted)}}" placeholder="0-9999">
                                 <div class="invalid-feedback">
                                     @error('order') {{ $message }} @enderror
                                 </div>

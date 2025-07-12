@@ -37,15 +37,21 @@ class RelShowEpisodes extends Controller
 
         // Total records
         // Total records
+
+        $query = RelshowsEpisode::select('count(*) as allcount')->whereNull('rel_episodes.deleted_at');
+
         $totalRecords = RelshowsEpisode::select('count(*) as allcount')->whereNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
         $inactiveRecords = RelshowsEpisode::select('count(*) as allcount')->where('status','0')->whereNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
         $activeRecords = RelshowsEpisode::select('count(*) as allcount')->where('status','1')->whereNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
         $deletedRecords = RelshowsEpisode::select('count(*) as allcount')->whereNotNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
 
 
+
         $totalRecordswithFilter = RelshowsEpisode::select('count(*) as allcount')
-        ->where('title', 'like', '%' . $searchValue . '%')
-        // ->where('channels.status', '=', 1)
+        ->where(function ($query) use ($searchValue){
+                $query->where('rel_episodes.title', 'like', '%' . $searchValue . '%')
+                ->orWhere('rel_episodes.playlist_id', 'like', '%' . $searchValue . '%');
+        })        
         ->whereNull('rel_episodes.deleted_at')->where('show_id', $id)
         ->count();
 
@@ -53,7 +59,10 @@ class RelShowEpisodes extends Controller
         $records = RelshowsEpisode::orderBy($columnName, $columnSortOrder)
             // ->where('channels.status', '=', 1)
             ->whereNull('rel_episodes.deleted_at')
-            ->where('rel_episodes.title', 'like', '%' . $searchValue . '%')
+            ->where(function ($query) use ($searchValue){
+                $query->where('rel_episodes.title', 'like', '%' . $searchValue . '%')
+                        ->orWhere('rel_episodes.playlist_id', 'like', '%' . $searchValue . '%');
+            })
             ->where('show_id', $id)
 
             // ->orWhere('channels.description', 'like', '%' . $searchValue . '%')
@@ -82,7 +91,9 @@ class RelShowEpisodes extends Controller
             $downloadable = $record->downloadable == 1 ? 'Yes' : 'No';
 
             $data_arr[] = array(
+                "id" => $record->id,
                 "title" => $record->title,                                                            
+                "playlist_id" => $record->playlist_id,
                 "status" => $status,                
                 "image" => '<img src="'.$record->episode_image.'" width="100px;">',                
                 "source" => $record->source,                
@@ -140,8 +151,6 @@ class RelShowEpisodes extends Controller
         
         if(!empty($request->id)){
             $episode = RelshowsEpisode::firstwhere('id',$request->id);  
-            
-            
 
             $episode->title = $request->name;            
             $episode->show_id = $request->show_id;            
@@ -202,5 +211,79 @@ class RelShowEpisodes extends Controller
         }else{
             echo json_encode(['message','Something went wrong!!']);
         }
+    }
+
+    public function importreligiousepisode(Request $request){
+        $playlistId = $request->input('playlist_id');        
+
+        $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
+        $url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=500&playlistId={$playlistId}&key={$apiKey}";
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $response = curl_exec($ch);
+
+        if(curl_errno($ch)) {
+            $error_msg = curl_error($ch);
+            curl_close($ch);
+            return response()->json(['success' => false, 'error' => $error_msg], 500);
+        }
+        curl_close($ch);
+        
+        $data = json_decode($response, true);
+        $snippet = $data['items'][0];
+        
+             
+                            
+
+        foreach ($data['items'] as $key => $item) {    
+            $snippet = $item['snippet'];
+            $title = $snippet['title'] ?? null;
+            $url = $snippet['resourceId']['videoId'] ?? null;
+
+            if ($this->checkIsExist($title, $url)) {
+                continue;
+            }
+
+            $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+            $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                    
+            $channel_number = RelshowsEpisode::whereNull('deleted_at')->where('show_id', $request->show_id)->count();
+            $formated_number = $channel_number + 1;   
+
+            $episode = new RelshowsEpisode();
+
+            $episode->title = $title;            
+            $episode->show_id = $request->show_id;            
+            $episode->episode_order = $formated_number ?? null;            
+            $episode->episode_image = $cleanBannerUrl;            
+            $episode->episode_description = $snippet['description'] ?? null;
+            $episode->url = $url;                        
+            $episode->downloadable = 0;            
+            $episode->status = 0;            
+            $episode->type = 0;                                  
+            $episode->playlist_id = $playlistId;                                  
+            $episode->source = 'youtube'; 
+
+            if ($episode->save()) {
+
+            }            
+        }
+
+        return back()->with('message','Playlist Uploaded successfully');
+
+    }
+    
+    
+    public function checkIsExist($movie_name, $url){
+        return RelshowsEpisode::where(function ($query) use ($movie_name, $url){
+            $query->whereRaw('LOWER(TRIM(title)) = ?', [strtolower(trim($movie_name))])
+                    ->orWhereRaw('LOWER(TRIM(url)) = ?', [strtolower(trim($url))]);
+        })
+        ->whereNull('deleted_at')
+        ->first();
     }
 }

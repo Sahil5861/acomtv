@@ -38,6 +38,9 @@
                 <!-- <div class="row"> -->
                     <?php 
                         $webseriesName = \App\Models\WebSeries::where('id', $id)->first()->name;
+
+                        $seasons_count = \App\Models\WebSeriesSeason::whereNull('deleted_at')->where('web_series_id', $id)->count();
+                        $formated = $seasons_count + 1;
                     ?>
                     <h3 class="text-primary mb-3">Add Seasons for {{$webseriesName}}</h3>
                     <form id="user-form"  method="post" action="{{route('saveWebseriesSeason')}}" enctype="multipart/form-data" novalidate class="simple-example" >
@@ -63,10 +66,12 @@
                                 <div class="channel-error"></div>
                             </div>
 
+                            
+
 
                             <div class="col-md-6 mb-4">
                                 <label for="order">Order *</label>
-                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($season) ? $season->season_order : 0)}}" required min="0" placeholder="Order">
+                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($season) ? $season->season_order : $formated)}}" required min="0" placeholder="Order">
                                 <div class="invalid-feedback">
                                     @error('runtime') {{ $message }} @enderror
                                 </div>

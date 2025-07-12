@@ -59,49 +59,78 @@
             </div>
         </div>
         <div class="col-xl-8 col-lg-6 col-md-7 col-sm-12  layout-top-spacing">
-            <div class="widget-content widget-content-area br-6">
-                <div class="d-flex justify-content-between">
-                    <h3 class="">Plan History</h3>
-                </div>
-                <div class="table-responsive mb-4 mt-4">
-                    <table id="multi-column-ordering" class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Plan</th>
-                                <th>Purchased By</th>
-                                <th>Price</th>
-                                <th>Purchased Date</th>
-                                <th>Expire Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableItem">
-                            @foreach($user_plan_details as $item)
-                            <tr>
-                                <td>{{$item['plan']}}</td>
-                                <td>{{$item['plan_purchased_by']}}</td>
-                                <td>{{$item['plan_purchase_price']}}</td>
-                                <td>{{date('j M Y',strtotime($item['plan_purchased_date']))}}</td>
-                                <td>{{date('j M Y',strtotime($item['plan_end_date']))}}</td>
-                                <td>{!! $item['status'] !!}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Plan</th>
-                                <th>Purchased By</th>
-                                <th>Price</th>
-                                <th>Purchased Date</th>
-                                <th>Expire Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </tfoot>
-                    </table>
+            <div class="col-xl-12 col-lg-12 mb-3">
+                <div class="widget-content  br-6">
+                    <div class="d-flex justify-content-between">
+                        <h3 class="">User Additional Info</h3>
+                    </div>  
+                    <div class="table-responsive my-4">
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="width: 30%; color:#009688;">Login Pin</th>
+                                    <td>{{ $user->login_pin ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="color: #009688;" scope="row">Login Pin App</th>
+                                    <td>{{ $user->login_pin_app ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th style="color: #009688;" scope="row">Over 18 Pin</th>
+                                    <td>{{ $user->over18_pin ?? 'N/A' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div> 
+            </div>
+            <div class="col-xl-12 col-lg-12 mb-3">
+                <div class="widget-content widget-content-area br-6">
+                    <div class="d-flex justify-content-between">
+                        <h3 class="">Plan History</h3>
+                    </div>
+                    <div class="table-responsive mb-4 mt-4">
+                        <table id="multi-column-ordering" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Plan</th>
+                                    <th>Purchased By</th>
+                                    <th>Price</th>
+                                    <th>Purchased Date</th>
+                                    <th>Expire Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableItem">
+                                @foreach($user_plan_details as $item)
+                                <tr>
+                                    <td>{{$item['plan']}}</td>
+                                    <td>{{$item['plan_purchased_by']}}</td>
+                                    <td>{{$item['plan_purchase_price']}}</td>
+                                    <td>{{date('j M Y',strtotime($item['plan_purchased_date']))}}</td>
+                                    <td>{{date('j M Y',strtotime($item['plan_end_date']))}}</td>
+                                    <td>{!! $item['status'] !!}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Plan</th>
+                                    <th>Purchased By</th>
+                                    <th>Price</th>
+                                    <th>Purchased Date</th>
+                                    <th>Expire Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-4 col-lg-6 col-md-5 col-sm-12 layout-top-spacing">
+
+        <div class="col-xl-4 col-lg-5 col-md-5 col-sm-12 layout-top-spacing">
             <div class="widget-content widget-content-area br-6">
                 <div class="d-flex justify-content-between">
                     <h3 class="">Mac Address</h3>
@@ -112,7 +141,7 @@
                             <tr>
                                 <th>Mac Address</th>
                                 <th>Status</th>
-                                <th>Logged In At</th>
+                                {{-- <th>Logged In At</th> --}}
                             </tr>
                         </thead>
                         <tbody id="tableItem">
@@ -123,7 +152,7 @@
                             <tr>
                                 <td>{{$item->mac_address}}</td>
                                 <td>{!! $status !!}</td>
-                                <td>{{date('j M Y h:i a',strtotime($item->created_at))}}</td>
+                                {{-- <td>{{date('j M Y h:i a',strtotime($item->created_at))}}</td> --}}
                             </tr>
                             @endforeach
                         </tbody>
@@ -131,25 +160,24 @@
                             <tr>
                                 <th>Mac Address</th>
                                 <th>Status</th>
-                                <th>Logged In At</th>
+                                {{-- <th>Logged In At</th> --}}
                             </tr>
                         </tfoot>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="col-xl-8 col-lg-6 col-md-7 col-sm-12  layout-top-spacing">
+        <div class="col-xl-8 col-lg-7 col-md-7 col-sm-12  layout-top-spacing">
             <div class="widget-content widget-content-area br-6">
                 <div class="d-flex justify-content-between">
                     <h3 class="">Users Auth</h3>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
-                    <table id="multi-column-ordering1" class="table table-hover">
+                    <table id="multi-column-ordering2" class="table table-hover">
                         <thead>
                             <tr>
                                 <th>IP Address</th>
-                                <th>City</th>
-                                <th>Country</th>
+                                <th>City Country</th>                                
                                 <th>Postal</th>
                                 <th>Status</th>
                                 <th>Logged In At</th>
@@ -162,8 +190,7 @@
                             @endphp
                             <tr>
                                 <td>{{$item->ip_address}}</td>
-                                <td>{{$item->city}}</td>
-                                <td>{{$item->country}}</td>
+                                <td>{{$item->city}} - {{$item->country}}</td>                                
                                 <td>{{$item->postal}}</td>
                                 <td>{!! $status !!}</td>
                                 <td>{{date('j M Y h:i a',strtotime($item->created_at))}}</td>
@@ -173,8 +200,89 @@
                         <tfoot>
                             <tr>
                                 <th>IP Address</th>
-                                <th>City</th>
-                                <th>Country</th>
+                                <th>City Country</th>                                
+                                <th>Postal</th>
+                                <th>Status</th>
+                                <th>Logged In At</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <hr>
+
+        <div class="col-xl-4 col-lg-5 col-md-5 col-sm-12 layout-top-spacing">
+            <div class="widget-content widget-content-area br-6">
+                <div class="d-flex justify-content-between">
+                    <h3 class="">Mac Address</h3>
+                </div>
+                <div class="table-responsive mb-4 mt-4">
+                    <table id="multi-column-ordering3" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mac Address</th>
+                                <th>Status</th>
+                                {{-- <th>Logged In At</th> --}}
+                            </tr>
+                        </thead>
+                        <tbody id="tableItem">
+                            @foreach($authusers_app as $item)
+                            @php
+                            $status = ($item->status == 1) ? '<span class="text-success">Active</span>' : '<span class="text-secondary">Inactive</span>'
+                            @endphp
+                            <tr>
+                                <td>{{$item->mac_address}}</td>
+                                <td>{!! $status !!}</td>
+                                {{-- <td>{{date('j M Y h:i a',strtotime($item->created_at))}}</td> --}}
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Mac Address</th>
+                                <th>Status</th>
+                                {{-- <th>Logged In At</th> --}}
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-8 col-lg-7 col-md-7 col-sm-12  layout-top-spacing">
+            <div class="widget-content widget-content-area br-6">
+                <div class="d-flex justify-content-between">
+                    <h3 class="">Users Auth</h3>
+                </div>
+                <div class="table-responsive mb-4 mt-4">
+                    <table id="multi-column-ordering4" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>IP Address</th>
+                                <th>City Country</th>                                
+                                <th>Postal</th>
+                                <th>Status</th>
+                                <th>Logged In At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableItem">
+                            @foreach($authusers_app as $item)
+                            @php
+                            $status = ($item->status == 1) ? '<span class="text-success">Active</span>' : '<span class="text-secondary">Inactive</span>'
+                            @endphp
+                            <tr>
+                                <td>{{$item->ip_address}}</td>
+                                <td>{{$item->city}} - {{$item->country}}</td>                                
+                                <td>{{$item->postal}}</td>
+                                <td>{!! $status !!}</td>
+                                <td>{{date('j M Y h:i a',strtotime($item->created_at))}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>IP Address</th>
+                                <th>City Country</th>                                
                                 <th>Postal</th>
                                 <th>Status</th>
                                 <th>Logged In At</th>
@@ -198,6 +306,12 @@
       $('#multi-column-ordering').DataTable({
       });
       $('#multi-column-ordering1').DataTable({
+      });
+      $('#multi-column-ordering2').DataTable({
+      });
+      $('#multi-column-ordering3').DataTable({
+      });
+      $('#multi-column-ordering4').DataTable({
       });
     });
     </script>

@@ -115,53 +115,23 @@ class Webserieses extends Controller
             'name' => 'required',            
             'webseries_genre' => 'required',            
             'banner' => 'required',                        
-            'webseries_description'  => 'sometimes',                                
-        ]); 
-        
-        // print_r($request->all()); exit;
-
-        // $genre = implode(',', $request->webseries_genre);
-
-        // print_r($genre); exit;
+            'webseries_description' => 'sometimes',                                
+        ]);         
         if(!empty($request->id)){
 
             $webseries = WebSeries::firstwhere('id',$request->id);
-            // if ($request->hasFile('image')) {
-            //     $file = $request->file('image');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/webseries/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $banner = $filePath;
-            // }else{
-            //     $banner = $webseries->image;
-            // }
-
-            // if ($request->hasFile('webseries_poster')) {
-            //     $file = $request->file('webseries_poster');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/webseries/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $webseries_poster = $filePath;
-            // }else{
-            //     $webseries_poster = $webseries->poster;
-            // }
+            
             $webseries->name = $request->name;
             $webseries->banner = $request->banner;                                  
             $webseries->description = $request->webseries_description;                        
             $webseries->release_date = $request->release_date ?? null;                                                                    
             $webseries->status = $request->status;
+            $webseries->series_order = $request->order ?? 0;
             $webseries->youtube_trailer = $request->trailer_url ?? null;
             $webseries->genres = implode(',', $request->webseries_genre);
 
             
             if($webseries->save()){
-                // WebSeriesGenre::where('web_series_id',$webseries->id)->delete();
-                // foreach ($request->webseries_genre as $key => $genre) {
-                //     $WebseriesGenre = new WebSeriesGenre();
-                //     $WebseriesGenre->web_series_id = $webseries->id;
-                //     $WebseriesGenre->genre_id = $genre;
-                //     $WebseriesGenre->save();
-                // }
 
                 WebSeriesContentNetwork::where('webseries_id',$webseries->id)->delete();
                 if ($request->has('content_network') && !empty($request->content_network)) {
@@ -188,25 +158,12 @@ class Webserieses extends Controller
 
         }else{
 
-            // if ($request->hasFile('image')) {
-            //     $file = $request->file('image');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/webseries/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $banner = $filePath;
-            // }else{
-            //     $banner = '';
-            // }
-
-            // if ($request->hasFile('webseries_poster')) {
-            //     $file = $request->file('webseries_poster');
-            //     $imageName=time().uniqid().$file->getClientOriginalName();
-            //     $filePath = 'images/webseries/' . $imageName;
-            //     \Storage::disk('public')->put($filePath, file_get_contents($file));
-            //     $webseries_poster = $filePath;
-            // }else{
-            //     $webseries_poster = '';
-            // }
+            $added_series = WebSeries::whereNull('deleted_at')->get();
+            foreach ($added_series as $key => $series) {
+                if($series->name == $request->name){
+                    return redirect()->back()->withInput()->withErrors(['message' => 'Webseries with the same name already exists.']);
+                }
+            }
 
             $webseries = new WebSeries();
             $webseries->name = $request->name;
@@ -214,17 +171,11 @@ class Webserieses extends Controller
             $webseries->description = $request->webseries_description;                        
             $webseries->release_date = $request->release_date ?? null;                                                                    
             $webseries->status = $request->status;
+            $webseries->series_order = $request->order ?? 0;
             $webseries->youtube_trailer = $request->trailer_url ?? null;
             $webseries->genres = implode(',', $request->webseries_genre);
-
-            // print_r($request->all()); exit;
+            
             if($webseries->save()){                
-                // foreach ($request->webseries_genre as $key => $genre) {
-                //     $WebseriesGenre = new WebSeriesGenre();
-                //     $WebseriesGenre->web_series_id = $webseries->id;
-                //     $WebseriesGenre->genre_id = $genre;
-                //     $WebseriesGenre->save();
-                // }
 
                 if ($request->has('content_network') && !empty($request->content_network)) {
                     $cur_webseries = WebSeries::where('id', $webseries->id)->first();                
@@ -241,8 +192,7 @@ class Webserieses extends Controller
                             ]);
                         }
                     }
-                }
-                // return back()->with('message','Webseries added successfully');
+                }                
                 return redirect()->route('admin.webseries.seasons', base64_encode($webseries->id))->with('message', 'Webseries added successfully');
             }else{
                 return back()->with('message','Webseries not added successfully');

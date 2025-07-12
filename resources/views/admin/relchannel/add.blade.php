@@ -29,19 +29,19 @@
                 </div>
                 @endif
 
-                <form id="channel-form" method="post" action="{{ route('admin.RelChannel.save') }}" enctype="multipart/form-data" novalidate>
+                <form id="channel-form" method="post" action="{{ route('admin.RelChannel.save') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" value="{{ $channel->id ?? '' }}">
 
                     <div class="form-row">
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
-                            <label for="name">Name</label>
+                            <label for="label">Name*</label>
                             <input type="text" class="form-control" id="name" name="name"
                                 placeholder="Name"
                                 value="{{ old('name', $channel->name ?? '') }}" required>
                             <div class="invalid-feedback">
-                                @error('name') {{ $message }} @enderror
+                                @error('label') {{ $message }} @enderror
                             </div>
                         </div>
 

@@ -34,7 +34,7 @@ relshows
                     <a href="{{route('admin.Relshows',base64_encode($id))}}" class="btn btn-primary mb-3">Back To List</a>
                 @endif
 
-                <form id="relshow-form" method="post" action="{{ route('admin.Relshows.save') }}" enctype="multipart/form-data" novalidate>
+                <form id="relshow-form" method="post" action="{{ route('admin.Relshows.save') }}" enctype="multipart/form-data">
                     @csrf
                     @if (isset($relshow))                        
                         <input type="hidden" name="id" value="{{isset($relshow) ? $relshow->id : ''}}">
@@ -45,7 +45,7 @@ relshows
                     <div class="form-row">
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
-                            <label for="name">Name</label>
+                            <label for="name">Title*</label>
                             <input type="text" class="form-control" id="title" name="title"
                                 placeholder="Name"
                                 value="{{ old('name', $relshow->title ?? '') }}" required>

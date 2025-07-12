@@ -133,6 +133,7 @@ class ManageKidsChannel extends Controller
         $kidschannel->name = $request->name;
         $kidschannel->language = $request->language ?? null;
         $kidschannel->logo = $request->logo ?? null;
+        $kidschannel->order = $request->order ?? 0;
         $kidschannel->description = $request->description ?? null;
         $kidschannel->status = $request->status;
 

@@ -40,6 +40,9 @@
                         @csrf
                         <input type="hidden" name="id" value="@if(isset($user)){{$user->id}}@endif">
                         <div class="form-row">
+                            <div class="col-md-12">
+                                <h4>Basic Info</h4>
+                            </div>
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Name*</label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{{old('name')}}@if(isset($user)){{$user->name}}@endif" required>
@@ -58,8 +61,8 @@
                             </div>
 
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">Password*</label>
-                                <input type="text" class="form-control" id="password" name="password" placeholder="Password" value="{{old('real_password')}}@if(isset($user)){{$user->real_password}}@endif" required>
+                                <label for="fullName">Password</label>
+                                <input type="text" class="form-control" id="password" name="password" placeholder="Password" value="{{old('real_password')}}@if(isset($user)){{$user->real_password}}@endif">
                                 <div class="invalid-feedback">
                                     @error('password') {{ $message }} @enderror
                                 </div>
@@ -87,20 +90,27 @@
                             </div> -->
 
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">Mobile*</label>
+                                <label for="fullName">Mobile</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobile" value="{{old('mobile')}}@if(isset($user)){{$user->mobile}}@endif" required>
-                                    <div class="input-group-prepend">
+                                    <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobile" value="{{old('mobile')}}@if(isset($user)){{$user->mobile}}@endif">
+                                    {{-- <div class="input-group-prepend">
                                         <button type="button" class="btn btn-sm btn-dark sendOTP" onclick="sendOTP()">Send OTP</button>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="invalid-feedback">
                                     @error('mobile') {{ $message }} @enderror
                                 </div>
                                 <div class="mobileError"></div>
                             </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="fullName">Company Name</label>
+                                <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Company Name" value="{{old('company_name')}}@if(isset($user)){{$user->company_name}}@endif">
+                                <div class="invalid-feedback">
+                                    @error('company_name') {{ $message }} @enderror
+                                </div>
+                            </div>
 
-                            <div class="col-md-6 mb-4 verifyOTPDiv" style="display: none;">
+                            {{-- <div class="col-md-6 mb-4 verifyOTPDiv" style="display: none;">
                                 <label for="fullName">Verify OTP*</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="otp" name="otp" placeholder="OTP">
@@ -109,19 +119,24 @@
                                     </div>
                                 </div>
                                 <div class="otpError"></div>
+                            </div> --}}
+
+
+                            <div class="col-md-12">
+                                <h4>Address Info</h4>
                             </div>
 
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">House/Flat No*</label>
-                                <input type="text" class="form-control" id="hf_number" name="hf_number" placeholder="House/Flat No" value="{{old('hf_number')}}@if(isset($user)){{$user->hf_number}}@endif" required>
+                                <label for="fullName">House/Flat No</label>
+                                <input type="text" class="form-control" id="hf_number" name="hf_number" placeholder="House/Flat No" value="{{old('hf_number')}}@if(isset($user)){{$user->hf_number}}@endif">
                                 <div class="invalid-feedback">
                                     @error('hf_number') {{ $message }} @enderror
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">Street Number*</label>
-                                <input type="text" class="form-control" id="street_number" name="street_number" placeholder="Street Number" value="{{old('street_number')}}@if(isset($user)){{$user->street_number}}@endif" required>
+                                <label for="fullName">Street Number</label>
+                                <input type="text" class="form-control" id="street_number" name="street_number" placeholder="Street Number" value="{{old('street_number')}}@if(isset($user)){{$user->street_number}}@endif">
                                 <div class="invalid-feedback">
                                     @error('street_number') {{ $message }} @enderror
                                 </div>
@@ -129,15 +144,23 @@
 
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Landmark</label>
-                                <input type="text" class="form-control" id="landmark" name="landmark" placeholder="Landmark" value="{{old('landmark')}}@if(isset($user)){{$user->landmark}}@endif" required>
+                                <input type="text" class="form-control" id="landmark" name="landmark" placeholder="Landmark" value="{{old('landmark')}}@if(isset($user)){{$user->landmark}}@endif">
                                 <div class="invalid-feedback">
                                     @error('landmak') {{ $message }} @enderror
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">Address*</label>
-                                <textarea required type="text" id="address"  name="address" class="form-control">{{old('address')}}@if(isset($user)){{$user->address}}@endif</textarea>
+                                <label for="fullName">Country</label>
+                                <input type="text" class="form-control" id="country" name="country" placeholder="Country" value="{{old('country')}}@if(isset($user)){{$user->country}}@endif" >
+                                <div class="invalid-feedback">
+                                    @error('country') {{ $message }} @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-4">
+                                <label for="fullName">Address</label>
+                                <textarea type="text" id="address"  name="address" class="form-control">{{old('address')}}@if(isset($user)){{$user->address}}@endif</textarea>
 
                                 <!-- <input type="text" class="form-control" id="address" name="address" placeholder="Address" value="@if(isset($user)){{$user->address}}@endif" required> -->
 
@@ -146,37 +169,25 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 mb-4">
-                                <label for="fullName">Country*</label>
-                                <input type="text" class="form-control" id="country" name="country" placeholder="Country" value="{{old('country')}}@if(isset($user)){{$user->country}}@endif" required>
-                                <div class="invalid-feedback">
-                                    @error('country') {{ $message }} @enderror
-                                </div>
-                            </div>
+                            
 
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">City*</label>
-                                <input type="text" class="form-control" id="city" name="city" placeholder="City" value="{{old('city')}}@if(isset($user)){{$user->city}}@endif" required>
+                                <label for="fullName">City</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="City" value="{{old('city')}}@if(isset($user)){{$user->city}}@endif">
                                 <div class="invalid-feedback">
                                     @error('city') {{ $message }} @enderror
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-4">
-                                <label for="fullName">Pincode*</label>
-                                <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Pincode" value="{{old('pincode')}}@if(isset($user)){{$user->pincode}}@endif" required>
+                                <label for="fullName">Pincode</label>
+                                <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Pincode" value="{{old('pincode')}}@if(isset($user)){{$user->pincode}}@endif">
                                 <div class="invalid-feedback">
                                     @error('pincode') {{ $message }} @enderror
                                 </div>
                             </div>
 
-                            <div class="col-md-6 mb-4">
-                                <label for="fullName">Company Name</label>
-                                <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Company Name" value="{{old('company_name')}}@if(isset($user)){{$user->company_name}}@endif">
-                                <div class="invalid-feedback">
-                                    @error('company_name') {{ $message }} @enderror
-                                </div>
-                            </div>
+                            
 
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Status</label>

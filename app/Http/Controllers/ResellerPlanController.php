@@ -134,13 +134,13 @@ class ResellerPlanController extends Controller
             'title' => 'required',
             'price' => 'required',
             // 'description' => 'required',
-            'admin_plan' => 'required',
+            // 'admin_plan' => 'required',
             'plan_validity' => 'required',
             'total_price' =>'required'
         ]);
 
-        $admin_plans = explode(',',$request->admin_plan);
-        $Plans = AdminPlan::whereIn('id',$admin_plans)->first();
+        // $admin_plans = explode(',',$request->admin_plan);
+        // $Plans = AdminPlan::whereIn('id',$admin_plans)->first();
         // $maxvalue = 0;
         // $minvalue = 0;
         // foreach ($Plans as $key => $value) {
@@ -153,11 +153,12 @@ class ResellerPlanController extends Controller
         // }else if($request->profit_price < $minvalue){
         //     return back()->with('message',"Profit price should not be less than ".'INR'.$minvalue);
         // }
-        $sadminPlan = DB::table('super_admin_plans')->leftJoin('admin_super_admin_plans','admin_super_admin_plans.super_admin_plan_id','=','super_admin_plans.id')->where('admin_super_admin_plans.admin_plan_id',$admin_plans[0])->first();
 
-        if($request->total_price > $sadminPlan->plan_max_price){
-            return back()->with('message',"Total price should not be grater than ".$sadminPlan->plan_max_price.".");
-        }
+        // $sadminPlan = DB::table('super_admin_plans')->leftJoin('admin_super_admin_plans','admin_super_admin_plans.super_admin_plan_id','=','super_admin_plans.id')->where('admin_super_admin_plans.admin_plan_id',$admin_plans[0])->first();
+
+        // if($request->total_price > $sadminPlan->plan_max_price){
+        //     return back()->with('message',"Total price should not be grater than ".$sadminPlan->plan_max_price.".");
+        // }
 
         if(!empty($request->id)){
             // if(\Auth::user()->current_amount < $request->price){
@@ -177,20 +178,19 @@ class ResellerPlanController extends Controller
             $plan->user_id = \Auth::user()->id;
             $plan->status = $request->status;
             if($plan->save()){
-                ResellerAdminPlan::where('reseller_plan_id',$plan->id)->delete();
+                // ResellerAdminPlan::where('reseller_plan_id',$plan->id)->delete();
                 // print_r($request->super_admin_plan); exit
-                foreach ($admin_plans as $key => $a_plan) {
-                    $admin = AdminPlan::find($a_plan);
-                    $AdminPlan = new ResellerAdminPlan();
-                    $AdminPlan->admin_id = $admin->user_id;
-                    $AdminPlan->reseller_id = \Auth::user()->id;
-                    $AdminPlan->admin_plan_id = $a_plan;
-                    $AdminPlan->reseller_plan_id = $plan->id;
-                    $AdminPlan->admin_plan_price = $plan->price;
-                    $AdminPlan->save();
-
-                    // echo $adminSuperAdminPlan->id; exit;
-                }
+                // foreach ($admin_plans as $key => $a_plan) {
+                //     $admin = AdminPlan::find($a_plan);
+                //     $AdminPlan = new ResellerAdminPlan();
+                //     $AdminPlan->admin_id = $admin->user_id;
+                //     $AdminPlan->reseller_id = \Auth::user()->id;
+                //     $AdminPlan->admin_plan_id = $a_plan;
+                //     $AdminPlan->reseller_plan_id = $plan->id;
+                //     $AdminPlan->admin_plan_price = $plan->price;
+                //     $AdminPlan->save();
+                    
+                // }
 
 
                 return back()->with('message','Plan updated successfully');
@@ -218,16 +218,16 @@ class ResellerPlanController extends Controller
             $plan->status = $request->status;
             if($plan->save()){
                 // PackageChannel::where('plan_id',$plan->id)->delete();
-                foreach ($admin_plans as $key => $a_plan) {
-                    $admin = AdminPlan::find($a_plan);
-                    $adminSuperAdminPlan = new ResellerAdminPlan();
-                    $adminSuperAdminPlan->admin_plan_id = $a_plan;
-                    $adminSuperAdminPlan->admin_id = $admin->user_id;
-                    $adminSuperAdminPlan->reseller_id = \Auth::user()->id;
-                    $adminSuperAdminPlan->reseller_plan_id = $plan->id;
-                    $adminSuperAdminPlan->admin_plan_price = $plan->price;
-                    $adminSuperAdminPlan->save();
-                }
+                // foreach ($admin_plans as $key => $a_plan) {
+                //     $admin = AdminPlan::find($a_plan);
+                //     $adminSuperAdminPlan = new ResellerAdminPlan();
+                //     $adminSuperAdminPlan->admin_plan_id = $a_plan;
+                //     $adminSuperAdminPlan->admin_id = $admin->user_id;
+                //     $adminSuperAdminPlan->reseller_id = \Auth::user()->id;
+                //     $adminSuperAdminPlan->reseller_plan_id = $plan->id;
+                //     $adminSuperAdminPlan->admin_plan_price = $plan->price;
+                //     $adminSuperAdminPlan->save();
+                // }
                 return back()->with('message','Plan added successfully');
             }else{
                 return back()->with('message','Plan not added successfully');
@@ -372,7 +372,7 @@ class ResellerPlanController extends Controller
         $admin_plan_arr = explode(',',$request->admin_plan);
         if(!empty($admin_plan_arr)){
             $plans = AdminPlan::where('id',$admin_plan_arr[0])->first();
-            $sadminPlan = DB::table('super_admin_plans')->leftJoin('admin_super_admin_plans','admin_super_admin_plans.super_admin_plan_id','=','super_admin_plans.id')->where('admin_super_admin_plans.admin_plan_id',$admin_plan_arr[0])->first();
+            // $sadminPlan = DB::table('super_admin_plans')->leftJoin('admin_super_admin_plans','admin_super_admin_plans.super_admin_plan_id','=','super_admin_plans.id')->where('admin_super_admin_plans.admin_plan_id',$admin_plan_arr[0])->first();
 
             if($plans){
                 print_r(json_encode(array(
@@ -381,7 +381,7 @@ class ResellerPlanController extends Controller
                     'validity' => $plans->plan_validity,
                     'price' => $plans->total_price,
                     'description' => $plans->description,
-                    'plan_max_price' => $sadminPlan->plan_max_price,
+                    // 'plan_max_price' => $sadminPlan->plan_max_price,
                 )));
                 exit;
             }else{

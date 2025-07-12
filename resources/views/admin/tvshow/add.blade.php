@@ -22,6 +22,7 @@
                 @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
+                        <button type="button" class="close" data-dismiss="alert">×</button>
                         @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                         @endforeach
@@ -29,7 +30,7 @@
                 </div>
                 @endif
 
-                <form id="tvshow-form" method="post" action="{{ route('saveTvShow') }}" enctype="multipart/form-data" novalidate>
+                <form id="tvshow-form" method="post" action="{{ route('saveTvShow') }}" enctype="multipart/form-data">
                     @csrf
                     @if (isset($tvshow))                        
                         <input type="hidden" name="id" value="{{isset($tvshow) ? $tvshow->id : ''}}">
@@ -40,33 +41,18 @@
                     <div class="form-row">
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name"
-                                placeholder="Name"
-                                value="{{ old('name', $tvshow->name ?? '') }}" required>
+                            <label for="name">Name*</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{{ old('name', $tvshow->name ?? '') }}" required>
                             <div class="invalid-feedback">
-                                @error('name') {{ $message }} @enderror
-                            </div>
+                                @error('channel_name') {{ $message }} @enderror
+                            </div>                            
                         </div>
 
-
-                        {{-- <!-- Language -->
-                        <div class="col-md-6 mb-4">
-                            <label for="language">Language</label>
-                            <input type="text" class="form-control" id="language" name="language"
-                                placeholder="e.g. Hindi, English"
-                                value="{{ old('language', $tvshow->language ?? '') }}" required>
-                            <div class="invalid-feedback">
-                                @error('language') {{ $message }} @enderror
-                            </div>
-                        </div> --}}
 
                         <!-- Logo -->
                         <div class="col-md-6 mb-4">
                             <label for="thumbnail">Thumbnail</label>
-                            <input type="text" class="form-control" id="thumbnail" name="thumbnail"
-                                placeholder="Enter image path or URL"
-                                value="{{ old('logo', $tvshow->thumbnail ?? '') }}">
+                            <input type="text" class="form-control" id="thumbnail" name="thumbnail" placeholder="Enter image path or URL" value="{{ old('logo', $tvshow->thumbnail ?? '') }}">
                             @if(isset($tvshow) && $tvshow->thumbnail)
                                 <img src="{{ $tvshow->thumbnail }}" width="70" style="margin-top: 5px;" alt="Logo Preview">
                             @endif
@@ -76,9 +62,8 @@
                         </div>
 
                         <div class="col-md-6 mb-4">
-                            <label for="genre">Genre</label>
-                            {{-- <input type="text" class="form-control" id="genre" name="genre"placeholder="Genre"value="{{ old('genre', $tvshow->genre ?? '') }}" required> --}}
-                            <select name="genre[]" id="genre" class="form-control select" multiple>
+                            <label for="genre">Genre*</label>                            
+                            <select name="genre[]" id="genre" class="form-control select" multiple required>
                                 @foreach ($genres as $genre)
                                     <option value="{{$genre->title}}"
                                         @if (isset($tvshow) && in_array($genre->title, $currentGenres)) selected @endif>

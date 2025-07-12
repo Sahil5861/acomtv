@@ -123,10 +123,6 @@ class ContentNetworks extends Controller
             'networOrder'  => 'required',                                   
         ]); 
 
-        
-        
-        
-        
         if(!empty($request->id)){
             $network = ContentNetwork::firstwhere('id',$request->id);                        
 

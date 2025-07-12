@@ -119,15 +119,15 @@ class SuperAdminPlans extends Controller
         $request->validate([
             'title' => 'required',
             'price' => 'required',
-            'description' => 'required',
+            'description' => 'sometimes',
             // 'max_profit_percentage_for_admin' => 'required',
             // 'max_profit_price_for_admin' => 'required',
             'plan_type' => 'required',
-            'plan_max_price' => 'required',
+            // 'plan_max_price' => 'required',
         ]);
-        if(count($request->channels) < 1){
-            return back()->with('error','Please select channels.');
-        }
+        // if(count($request->channels) < 1){
+        //     return back()->with('error','Please select channels.');
+        // }
 
         // $plan_max_price = DB::table('plan_max_price')->where('id',1)->first();
 
@@ -140,8 +140,8 @@ class SuperAdminPlans extends Controller
             $plan = SadminPlan::firstwhere('id',$request->id);
             $plan->title = $request->title;
             $plan->price = $request->price;
-            $plan->net_admin_price = $request->net_admin_price;
-            $plan->description = $request->description;
+            // $plan->net_admin_price = $request->net_admin_price;
+            $plan->description = $request->description ?? '';
             // $plan->min_profit_percentage_for_admin = $request->min_profit_percentage_for_admin;
             // $plan->max_profit_percentage_for_admin = $request->max_profit_percentage_for_admin;
             // $plan->min_profit_price_for_admin = $request->min_profit_price_for_admin;
@@ -152,18 +152,26 @@ class SuperAdminPlans extends Controller
             // $plan->discount_type = $request->discount_type;
             $plan->plan_type = $request->plan_type;
             $plan->status = $request->status;
-            $plan->genre = $request->genre;
-            $plan->plan_max_price = $request->plan_max_price;
-            $plan->plan_validity = $request->plan_validity ? $request->plan_validity : 30;
-            if($plan->save()){
-                PackageChannel::where('plan_id',$plan->id)->delete();
-                foreach ($request->channels as $key => $channel) {
-                    $PackageChannel = new PackageChannel();
-                    $PackageChannel->channel_id = $channel;
-                    $PackageChannel->plan_id = $plan->id;
-                    $PackageChannel->save();
-                }
+            // $plan->genre = $request->genre;
+            // $plan->plan_max_price = $request->plan_max_price;
+            
 
+            $validity = 30;
+            if ($request->plan_type == 1) {
+                $validity = $request->plan_validity ? $request->plan_validity : 30;
+            }
+            else{
+                $validity = 3;
+            }
+            $plan->plan_validity = $validity;
+            if($plan->save()){
+                // PackageChannel::where('plan_id',$plan->id)->delete();
+                // foreach ($request->channels as $key => $channel) {
+                //     $PackageChannel = new PackageChannel();
+                //     $PackageChannel->channel_id = $channel;
+                //     $PackageChannel->plan_id = $plan->id;
+                //     $PackageChannel->save();
+                // }
 
                 return back()->with('message','Plan updated successfully');
             }else{
@@ -176,8 +184,8 @@ class SuperAdminPlans extends Controller
             $plan = new SadminPlan();
             $plan->title = $request->title;
             $plan->price = $request->price;
-            $plan->net_admin_price = $request->net_admin_price;
-            $plan->description = $request->description;
+            // $plan->net_admin_price = $request->net_admin_price;
+            $plan->description = $request->description ?? '';
             // $plan->min_profit_percentage_for_admin = $request->min_profit_percentage_for_admin;
             // $plan->max_profit_percentage_for_admin = $request->max_profit_percentage_for_admin;
             // $plan->min_profit_price_for_admin = $request->min_profit_price_for_admin;
@@ -188,17 +196,26 @@ class SuperAdminPlans extends Controller
             // $plan->discount_type = $request->discount_type;
             $plan->plan_type = $request->plan_type;
             $plan->status = $request->status;
-            $plan->genre = $request->genre;
-            $plan->plan_max_price = $request->plan_max_price;
-            $plan->plan_validity = $request->plan_validity ? $request->plan_validity : 30;
+            // $plan->genre = $request->genre;
+            // $plan->plan_max_price = $request->plan_max_price;
+            // $plan->plan_validity = $request->plan_validity ? $request->plan_validity : 30;
+
+            $validity = 30;
+            if ($request->plan_type == 'paid') {
+                $validity = $request->plan_validity ? $request->plan_validity : 30;
+            }
+            else{
+                $validity = 3;
+            }
+            $plan->plan_validity = $validity;
             if($plan->save()){
 
-                foreach ($request->channels as $key => $channel) {
-                    $PackageChannel = new PackageChannel();
-                    $PackageChannel->channel_id = $channel;
-                    $PackageChannel->plan_id = $plan->id;
-                    $PackageChannel->save();
-                }
+                // foreach ($request->channels as $key => $channel) {
+                //     $PackageChannel = new PackageChannel();
+                //     $PackageChannel->channel_id = $channel;
+                //     $PackageChannel->plan_id = $plan->id;
+                //     $PackageChannel->save();
+                // }
                 return back()->with('message','Plan added successfully');
             }else{
                 return back()->with('message','Plan not added successfully');

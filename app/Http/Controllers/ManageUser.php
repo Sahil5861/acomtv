@@ -164,7 +164,7 @@ class ManageUser extends Controller
 
             ->orWhere(function($query)  use ($searchValue,$loggedUser)
             {
-                $query->Where('clientusers.mobile', 'like', '%' . $searchValue . '%')
+                $query->Where('clientusers.mobile', 'like', '%' . $searchValue . '%')   
                 ->whereNull('clientusers.deleted_at')
                 ->where('clientusers.created_by',$loggedUser->id);
 
@@ -277,8 +277,6 @@ class ManageUser extends Controller
 
     public function updateStatus($id){
         $user = ClientUser::find(base64_decode($id));
-
-
         if($user){
             $user->status = $user->status == '1' ? '0' : '1';
             $user->save();
@@ -292,16 +290,16 @@ class ManageUser extends Controller
     public function add(Request $request){
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email',
+            // 'email' => 'required|email',
             'mobile' => 'required',
-            'address' => 'required',
+            // 'address' => 'required',
             // 'password' => 'required',
             // 'role' => 'required',
-            'country' => 'required',
-            'city' => 'required',
-            'hf_number' => 'required',
-            'street_number' => 'required',
-            'pincode' => 'required',
+            // 'country' => 'required',
+            // 'city' => 'required',
+            // 'hf_number' => 'required',
+            // 'street_number' => 'required',
+            // 'pincode' => 'required',
             // 'company_name' => 'required',
         ]);
 
@@ -317,21 +315,29 @@ class ManageUser extends Controller
             // $password = md5($hash_pass1);
 
             $user->name = $request->name;
-            $user->email = $request->email;
+            $user->email = $request->email ?? '';
             $user->mobile = $request->mobile;
-            $user->address = $request->address;
-            $user->hf_number = $request->hf_number;
-            $user->street_number = $request->street_number;
-            $user->landmark = $request->landmark;
-            $user->country = $request->country;
-            $user->city = $request->city;
-            $user->pincode = $request->pincode;
+            $user->address = $request->address ?? '';
+            $user->hf_number = $request->hf_number ?? '';
+            $user->street_number = $request->street_number ?? '';
+            $user->landmark = $request->landmark ?? '';
+            $user->country = $request->country ?? '';
+            $user->city = $request->city ?? '';
+            $user->pincode = $request->pincode ?? '';
             $user->created_by = \Auth::user()->id;
             $user->created_by_role = (\Auth::user()->role == 6) ? 'netadmin' : '';
             if($request->updatePin){
                 $user->login_pin = User::generateLoginPin();
                 $user->mac_address = '';
                 Userauth::where('user_id', $request->id)->update(['status'=> 0]);
+            }
+
+            if($request->updateAppPin){
+                $user->login_pin_app = User::generateLoginAppPin();                
+            }
+
+            if($request->updateOver18Pin){
+                $user->over18_pin = User::generateOver18Pin();                 
             }
             // $user->password = $real_password;
             // $user->user_plan_id = $user_plan;
@@ -474,15 +480,15 @@ class ManageUser extends Controller
             // $password = md5($hash_pass1);
 
             $user->name = $request->name;
-            $user->email = $request->email;
+            $user->email = $request->email ?? '';
             $user->mobile = $request->mobile;
-            $user->address = $request->address;
-            $user->hf_number = $request->hf_number;
-            $user->street_number = $request->street_number;
-            $user->landmark = $request->landmark;
-            $user->country = $request->country;
-            $user->city = $request->city;
-            $user->pincode = $request->pincode;
+            $user->address = $request->address ?? '';
+            $user->hf_number = $request->hf_number ?? '';
+            $user->street_number = $request->street_number ?? '';
+            $user->landmark = $request->landmark ?? '';
+            $user->country = $request->country ?? '';
+            $user->city = $request->city ?? '';
+            $user->pincode = $request->pincode ?? '';
             $user->created_by = \Auth::user()->id;
             $user->created_by_role = (\Auth::user()->role == 6) ? 'netadmin' : '';
 
@@ -598,7 +604,9 @@ class ManageUser extends Controller
     public function userHistory($id){
         $id = base64_decode($id);
         $this->data['user'] = ClientUser::where('id',$id)->first();
-        $this->data['authusers'] = Userauth::where('user_id',$id)->orderBy('id','desc')->get();
+        $this->data['authusers'] = Userauth::where('user_id',$id)->where('type', 'tv')->orderBy('id','desc')->get();
+        $this->data['authusers_app'] = Userauth::where('user_id',$id)->where('type', 'app')->orderBy('id','desc')->get();
+
         $userPlanDetails = UserPlanDetails::select('user_plan_details.*','clientusers.name','clientusers.mac_address','clientusers.updated_at')->leftJoin('clientusers','clientusers.id','=','user_plan_details.user_id')->where('user_plan_details.user_id',$id)->orderBy('user_plan_details.status','desc')->get();
         if(isset($userPlanDetails[0]->id)){
             foreach ($userPlanDetails as $key => $value) {
