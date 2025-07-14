@@ -540,6 +540,11 @@ class Movies extends Controller
 
 
     public function importmovies(Request $request){
+        $request->validate([
+            'playlist_id' => 'required',
+            'genre' => 'required',
+            'content_network' => 'required'
+        ]);
         $playlistId = $request->input('playlist_id');
         $genres = implode(',', $request->genre) ?? '';
 
@@ -576,7 +581,7 @@ class Movies extends Controller
                 $movieName = $snippet['title'] ?? null;
                 $movie_url = $snippet['resourceId']['videoId'] ?? null;
 
-                if ($this->checkIsExist($movieName, $movie_url)) {
+                if ($this->checkIsExist($movieName, $movie_url) || trim($movieName) == 'Private video') {
                     continue;
                 }
 
@@ -619,7 +624,7 @@ class Movies extends Controller
                     }
                 }            
             }
-            
+
             $nextPageToken = $data['nextPageToken'] ?? null;                    
         } while ($nextPageToken);  
 
