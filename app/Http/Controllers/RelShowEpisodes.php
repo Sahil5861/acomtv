@@ -280,7 +280,7 @@ class RelShowEpisodes extends Controller
                 $title = $snippet['title'] ?? null;
                 $url = $snippet['resourceId']['videoId'] ?? null;
     
-                if ($this->checkIsExist($title, $url)) {
+                if ($this->checkIsExist($title, $url) || trim($title) == 'Private video') {
                     continue;
                 }
     
