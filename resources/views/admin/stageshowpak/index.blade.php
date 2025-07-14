@@ -117,6 +117,7 @@
                             <option value="{{$item->id}}">{{$item->name}}</option>
                         @endforeach
                     </select> --}}
+                    
                     <a href="{{url('add-stage-show')}}" class="btn btn-primary mb-2">Add +</a>
                     <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
                         Import from Playlist

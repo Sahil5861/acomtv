@@ -21,7 +21,7 @@ class LaughterShows extends Controller
         $playlist_ids = Laughterhow::where('playlist_id', '!=', null)->pluck('playlist_id')->unique()->values();        
         return view('admin.laughtershow.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
-    public function getLaughterhowOrderList(){
+    public function getLaughterShowOrderList(){
         $this->data['movies'] = Laughterhow::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
         // echo count($this->data['movies']); exit;
         $allMovies = [];
@@ -410,7 +410,7 @@ class LaughterShows extends Controller
             echo json_encode(['message','Laughter Show not deleted successfully']);
         }
     }
-    public function saveMovieOrder(Request $request)
+    public function saveLaughterShowOrder(Request $request)
     {
         $ids = $request->ids;
         if (!empty($ids)) {
@@ -419,7 +419,7 @@ class LaughterShows extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Laughterhow order updated successfully.');
+        return redirect()->back()->with('success', 'Laughter show order updated successfully.');
     }
     public function updateStatus($id){
         $movie = Laughterhow::find(base64_decode($id));        

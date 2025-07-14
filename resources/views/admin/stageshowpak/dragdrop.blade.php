@@ -17,13 +17,13 @@
 <div class="layout-px-spacing">
     <div class="row" id="cancel-row">
         <div class="col-lg-12 layout-spacing layout-top-spacing">
-            <form id="order-form" method="post" action="{{ route('saveMovieOrder') }}" enctype="multipart/form-data" novalidate class="simple-example">
+            <form id="order-form" method="post" action="{{ route('saveStageShowPakOrder') }}" enctype="multipart/form-data" novalidate class="simple-example">
                 @csrf
                 <div class="statbox widget box box-shadow">
                     <div class="widget-header">
                         <div class="row">
                             <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                                <h4>Set Movie Order</h4>
+                                <h4>Set Show Order</h4>
                             </div>           
                         </div>
                     </div>
