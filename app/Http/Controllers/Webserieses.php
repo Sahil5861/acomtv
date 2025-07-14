@@ -33,7 +33,7 @@ class Webserieses extends Controller
         $this->data['dataForLoop'] = $dataForLoop;
         $this->data['allWebseries'] = $allWebseries;
 
-        return view('admin.Webseries.dragdrop', $this->data);
+        return view('admin.webseries.dragdrop', $this->data);
     }
 
     /* Process ajax request */

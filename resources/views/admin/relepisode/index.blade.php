@@ -117,6 +117,7 @@
 
 
                 <div class="text-right">
+                    <a href="{{ route('admin.relshowepisode.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
                     <a href="{{url('add-religious-episode/'.base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                     <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
                         Import from Playlist

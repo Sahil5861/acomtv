@@ -19,6 +19,26 @@ class RelShowEpisodes extends Controller
         return view('admin.relepisode.index', compact('id', 'show'));
     }
 
+    public function getRelShowEpisodesOrderList($id)
+    {
+        $id = base64_decode($id);
+        $this->data['relshowepisode'] = RelshowsEpisode::whereNull('deleted_at')->where('show_id', $id)->orderBy('episode_order', 'asc')->get();
+
+        $this->data['id'] = $id;
+        $allRelShowEpisodes = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['relshowepisode'] as $episode) {
+            $allRelShowEpisodes[] = $episode->episode_order;
+            $dataForLoop[$episode->episode_order] = $episode;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allRelShowEpisodes'] = $allRelShowEpisodes;
+
+        return view('admin.relepisode.dragdrop', $this->data);
+    }
+
     /* Process ajax request */
     public function getRelShowEpisodesList(Request $request, $id){
         $draw = $request->get('draw');
@@ -200,6 +220,18 @@ class RelShowEpisodes extends Controller
         }else{
             echo json_encode(['message','Episode not deleted successfully']);
         }
+    }
+
+    public function saveRelShowEpisodesOrders(Request $request)
+    {
+        $ids = $request->ids; 
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                RelshowsEpisode::where('id', $id)->update(['episode_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Episodes order updated successfully.');
     }
 
     public function updateStatus($id){

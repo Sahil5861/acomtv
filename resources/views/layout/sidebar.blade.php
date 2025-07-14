@@ -163,11 +163,11 @@
             </a>
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*sports*') || request()->is('*sports*')){ echo 'show';} ?>" id="sports" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*sports')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.sportscategory')}}"> Sport Category List </a>
+                    <a href="{{route('admin.sportscategory')}}"> Category List </a>
                 </li>
-                {{-- <li class="<?php if(request()->is('*tvshow')){ echo 'active';} ?>" >
-                    <a href="{{route('admin.sporttournament')}}"> Sports Channel List </a>
-                </li> --}}
+                <li class="<?php if(request()->is('*sports-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.sportscategory.order')}}"> Category Order </a>
+                </li> 
             </ul>
             
         </li>

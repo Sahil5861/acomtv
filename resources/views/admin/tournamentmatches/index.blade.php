@@ -110,7 +110,8 @@
                     </p>
                 </div>
                 
-                <div class="text-right">
+                <div class="text-right">                    
+                    <a href="{{ route('admin.tournamentmatches.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Matches</a>
                     <a href="{{route('addsportstournamentseasonepisodes', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">

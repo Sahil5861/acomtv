@@ -104,6 +104,7 @@
                 </div>
 
                 <div class="text-right">
+                    <a href="{{url('sports-tournament-order',base64_encode($id))}}" class="btn btn-primary mb-2">Order Tournament</a>
                     <a href="{{ route('addsportstournament', base64_encode($id)) }}" class="btn btn-primary mb-2">Add +</a>
                 </div>
 
