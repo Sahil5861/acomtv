@@ -22,7 +22,26 @@ class ManageTournamentMatches extends Controller
         return view('admin.tournamentmatches.index', compact('id'));
     }
 
-    
+    public function getTournamentMatchesOrderList($id)
+    {
+        $id = base64_decode($id);
+        $this->data['tournamentmatch'] = TournamentMatches::whereNull('deleted_at')->where('tournament_season_id', $id)->orderBy('match_order', 'asc')->get();
+
+        $this->data['id'] = $id;
+        $allTvShowEpisodes = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['tournamentmatch'] as $episode) {
+            $allTvShowEpisodes[] = $episode->match_order;
+            $dataForLoop[$episode->match_order] = $episode;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allTvShowEpisodes'] = $allTvShowEpisodes;
+
+        return view('admin.tournamentmatches.dragdrop', $this->data);
+    }
+
 
     public function getSportsTournamentSeasonEpisodeList(Request $request, $id){
         $draw = $request->get('draw');
@@ -173,16 +192,16 @@ class ManageTournamentMatches extends Controller
 
         if (!empty($request->id)) {
             if ($match->save()) {
-                return back()->with('message','Tournament Matche updated successfully');
+                return back()->with('message','Tournament Match updated successfully');
             } else {
-                return back()->with('message','Tournament Matche not updated');
+                return back()->with('message','Tournament Match not updated');
             }
         }
         else{
             if ($match->save()) {
-                return back()->with('message', $request->id ? 'TournamentMatches not updated' : 'Tournament Matche added');
+                return back()->with('message', $request->id ? 'TournamentMatches not updated' : 'Tournament Match added');
             } else {
-                return back()->with('message', $request->id ? 'TournamentMatches not updated' : 'Tournament Matche not added');
+                return back()->with('message', $request->id ? 'TournamentMatches not updated' : 'Tournament Match not added');
             }
         }
     }
@@ -202,9 +221,21 @@ class ManageTournamentMatches extends Controller
         $tournamentseason->deleted_at = time();
 
         if ($tournamentseason->save()) {
-            return response()->json(['message' => 'TournamentMatches deleted successfully']);
+            return response()->json(['message' => 'Tournament Matches deleted successfully']);
         } else {
-            return response()->json(['message' => 'TournamentMatches not deleted']);
+            return response()->json(['message' => 'Tournament Matches not deleted']);
         }
+    }
+    
+    public function saveTournamentMatchesOrders(Request $request)
+    {
+        $ids = $request->ids; 
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                TournamentMatches::where('id', $id)->update(['match_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Matches order updated successfully.');
     }
 }

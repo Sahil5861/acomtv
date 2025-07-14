@@ -250,7 +250,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/editSportsCategory/{id}', [ManageSportsCategory::class, 'edit'])->name('editsportscategory');
         Route::post('/sports-category/destroy', [ManageSportsCategory::class,'destroy'])->name('sportscategory.destroy');
         Route::get('/sports-category/update-status/{id}', [ManageSportsCategory::class,'updateStatus'])->name('sportscategory.update-status');        
-        
+        Route::get('/sports-category-order', [ManageSportsCategory::class, 'getSportsCategoryOrderList'])->name('admin.sportscategory.order');
+        Route::post('/save-sports-category-orders', [ManageSportsCategory::class,'saveSportsCategoryOrder'])->name('saveSportsCategoryOrder');
+       
 
         
         // // sportschannel
@@ -270,7 +272,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-sportstournament/{id}', [ManageSportsTournament::class, 'edit'])->name('editsportstournament');
         Route::post('/sportstournament/destroy', [ManageSportsTournament::class,'destroy'])->name('sportstournament.destroy');
         Route::get('/tournament/update-status/{id}', [ManageSportsTournament::class,'updateStatus'])->name('sportschannel.update-status');        
-        
+        Route::get('/sports-tournament-order/{id}', [ManageSportsTournament::class, 'getSportsTournamentOrderList'])->name('admin.sportsctournament.order');
+        Route::post('/save-sports-tournament-orders', [ManageSportsTournament::class,'saveSportsTournamentOrder'])->name('saveSportsTournamentOrder');
+       
 
         // tournament sesons
         Route::get('/sports-tournament-seasons/{id}', [ManageTournamentSeason::class, 'index'])->name('admin.sporttournamentseasons');
@@ -280,17 +284,21 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-sports-tournament-season/{id}', [ManageTournamentSeason::class, 'edit'])->name('editsportstournamentseason');
         Route::post('/sportstournamentseason/destroy', [ManageTournamentSeason::class,'destroy'])->name('sportstournamentseason.destroy');
         Route::get('/tournament-season/update-status/{id}', [ManageTournamentSeason::class,'updateStatus'])->name('sportschannelseason.update-status');        
+        Route::get('/tournament-season-order/{id}', [ManageTournamentSeason::class, 'getTournamentSeasonOrderList'])->name('admin.tournamentseason.order');
+        Route::post('/save-tournament-seasons-orders', [ManageTournamentSeason::class,'savetournamentSeasonOrders'])->name('savetournamentSeasonOrders');
 
         
         
-        // season episodes
+        // tournament season matches/episodes
         Route::get('/sports-tournament-seasons-episodes/{id}', [ManageTournamentMatches::class, 'index'])->name('admin.sporttournamentseasonsepisodes');
         Route::get('/get-sportstournament-episodesList/{id}', [ManageTournamentMatches::class, 'getSportsTournamentSeasonEpisodeList'])->name('get-sports-tournament-episodesList');
         Route::get('/add-sports-tournament-season-episodes/{id}', [ManageTournamentMatches::class,'add'])->name('addsportstournamentseasonepisodes');
         Route::post('/sportstournamentseasonepisodes-save', [ManageTournamentMatches::class,'save'])->name('savesportstournamentseasonepisodes');
         Route::get('/edit-sports-tournament-season-episodes/{id}', [ManageTournamentMatches::class, 'edit'])->name('editsportstournamentseasonepisodes');
         Route::post('/sportstournamentseasonepisodes/destroy', [ManageTournamentMatches::class,'destroy'])->name('sportstournamentseasonepisodes.destroy');
-        Route::get('/tournament-season-episodes/update-status/{id}', [ManageTournamentMatches::class,'updateStatus'])->name('sportschannelseasonepisodes.update-status');        
+        Route::get('/tournament-season-episodes/update-status/{id}', [ManageTournamentMatches::class,'updateStatus'])->name('sportschannelseasonepisodes.update-status');
+        Route::get('/tournament-match-order/{id}', [ManageTournamentMatches::class, 'getTournamentMatchesOrderList'])->name('admin.tournamentmatches.order');
+        Route::post('/save-tournament-match-orders', [ManageTournamentMatches::class,'saveTournamentMatchesOrders'])->name('saveTournamentMatchesOrders');
 
         
 
@@ -585,6 +593,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/religious-shows-edit/{id}', [ManageRelShows::class,'edit'])->name('admin.Relshows.edit');
         Route::get('/religious-shows-update-status/{id}', [ManageRelShows::class,'updateStatus'])->name('admin.Relshows.update-status');        
         Route::post('/religious-shows-destroy', [ManageRelShows::class,'destroy'])->name('admin.Relshows.destroy');
+        Route::get('/relegious-show-order/{id}', [ManageRelShows::class, 'getRelShowOrderList'])->name('admin.relshows.order');
+        Route::post('/save-relegious-show-orders', [ManageRelShows::class, 'saveRelShowOrder'])->name('saveRelShowOrder');
 
         // Religious Episodes
         Route::get('/religious-episodes/{id}', [RelShowEpisodes::class, 'index'])->name('admin.rel_episodes.episodes');
@@ -594,6 +604,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-religious-episode/{id}', [RelShowEpisodes::class,'edit'])->name('rel_episodes.edit');
         Route::get('/religious-episode/update-status/{id}', [RelShowEpisodes::class,'updateStatus'])->name('rel_episodes.update-status');        
         Route::post('/religious-episode/destroy', [RelShowEpisodes::class,'destroy'])->name('rel_episodes.destroy');
+        Route::get('/relshowepisode-order/{id}', [RelShowEpisodes::class, 'getRelShowEpisodesOrderList'])->name('admin.relshowepisode.order');
+        Route::post('/save-relshowepisode-orders', [RelShowEpisodes::class,'saveRelShowEpisodesOrders'])->name('saveRelShowEpisodesOrders');
+
 
         Route::post('import-religious-episode-playlits', [RelShowEpisodes::class, 'importreligiousepisode'])->name('importreligiousepisode');
 

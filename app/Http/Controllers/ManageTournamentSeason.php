@@ -192,20 +192,38 @@ class ManageTournamentSeason extends Controller
         }
     }
 
-    public function getTournamentSeasonOrderList()
+    public function getTournamentSeasonOrderList($id)
     {
-        $this->data['tournamentseasons'] = TournamentSeason::orderBy('index', 'asc')->get();
-        return view('admin.tournamentseason.dragdrop', $this->data);
-    }
+        $id = base64_decode($id);
+        $this->data['tournamentseasons'] = TournamentSeason::whereNull('deleted_at')
+            ->where('sports_tournament_id', $id)
+            ->orderBy('season_order', 'asc')
+            ->get();
 
-    public function saveTournamentSeasonOrders(Request $request)
-    {
-        foreach ($request->numbers as $key => $id) {
-            $tournamentseason = TournamentSeason::find($id);
-            $tournamentseason->index = $key + 1;
-            $tournamentseason->save();
+        $this->data['id'] = $id;
+        $allTournamentSeasons = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['tournamentseasons'] as $season) {
+            $allTournamentSeasons[] = $season->season_order;
+            $dataForLoop[$season->season_order] = $season;
         }
 
-        return back()->with('message', 'TournamentSeason ordered successfully');
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allTournamentSeasons'] = $allTournamentSeasons;
+
+        return view('admin.tournamentseasons.dragdrop', $this->data);
+    }
+
+    public function savetournamentSeasonOrders(Request $request)
+    {
+        $ids = $request->ids;
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                TournamentSeason::where('id', $id)->update(['season_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Seasons order updated successfully.');
     }
 }

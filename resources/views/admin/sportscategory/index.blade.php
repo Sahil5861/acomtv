@@ -94,7 +94,8 @@
                 @endif 
                 
                 
-                <div class="text-right">
+                <div class="text-right">                    
+                    <a href="{{url('sports-category-order')}}" class="btn btn-primary mb-2">Order Category</a>
                     <a href="{{route('addsportscategory')}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">

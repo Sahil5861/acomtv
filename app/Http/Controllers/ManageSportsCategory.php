@@ -12,6 +12,24 @@ class ManageSportsCategory extends Controller
     {
         return view('admin.sportscategory.index');
     }
+    
+    public function getSportsCategoryOrderList()
+    {
+        $this->data['sportscategory'] = SportsCategory::whereNull('deleted_at')->orderBy('sports_cat_order', 'asc')->get();
+
+        $allSportsCategory = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['sportscategory'] as $sportscategory) {
+            $allSportsCategory[] = $sportscategory->sports_cat_order;
+            $dataForLoop[$sportscategory->sports_cat_order] = $sportscategory;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allSportsCategory'] = $allSportsCategory;
+
+        return view('admin.sportscategory.dragdrop', $this->data);
+    }
 
     public function getSportsCategoryList(Request $request){
         $draw = $request->get('draw');
@@ -169,4 +187,17 @@ class ManageSportsCategory extends Controller
             return response()->json(['message' => 'SportsCategory not deleted']);
         }
     }
+    public function saveSportsCategoryOrder(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                SportsCategory::where('id', $id)->update(['sports_cat_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Tv Channel order updated successfully.');
+    }
+
 }

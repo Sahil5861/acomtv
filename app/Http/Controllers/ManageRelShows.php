@@ -16,6 +16,23 @@ class ManageRelShows extends Controller
         return view('admin.relshows.index', compact('id'));
     }
 
+    public function getRelShowOrderList($id)
+    {   $id = base64_decode($id);
+        $this->data['relshows'] = RelShow::whereNull('deleted_at')->where('channel_id',$id)->orderBy('rel_order', 'asc')->get();
+
+        $allRelShows = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['relshows'] as $relshow) {
+            $allRelShows[] = $relshow->rel_order;
+            $dataForLoop[$relshow->rel_order] = $relshow;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allRelShows'] = $allRelShows;
+
+        return view('admin.relshows.dragdrop', $this->data);
+    }
 
     public function getRelShowList(Request $request, $id){
         $draw = $request->get('draw');
@@ -148,15 +165,15 @@ class ManageRelShows extends Controller
 
         if (!empty($request->id)) {
             if ($relshows->save()) {
-                return back()->with('message', $request->id ? 'RelShow updated successfully' : 'RelShow added successfully');
+                return back()->with('message', $request->id ? 'RelShow updated successfully' : 'Relegious Show added successfully');
             } else {
                 return back()->with('message', $request->id ? 'RelShow not updated' : 'RelShow not added');
             }
         }
         else{
             if ($relshows->save()) {
-                // return redirect()->route('admin.kidshowsseason', base64_encode($relshows->id))->with('message', $request->id ? 'RelShow updated successfully' : 'RelShow added successfully');
-                return back()->with('message', 'RelShow added successfully !');
+                // return redirect()->route('admin.kidshowsseason', base64_encode($relshows->id))->with('message', $request->id ? 'RelShow updated successfully' : 'Relegious Show added successfully');
+                return back()->with('message', 'Relegious Show added successfully !');
             } else {
                 return back()->with('message', 'RelShow not added');
             }
@@ -188,20 +205,16 @@ class ManageRelShows extends Controller
         }
     }
 
-    public function getRelShowOrderList()
+    public function saveRelShowOrder(Request $request)
     {
-        $this->data['relshowss'] = RelShow::orderBy('index', 'asc')->get();
-        return view('admin.relshows.dragdrop', $this->data);
-    }
+        $ids = $request->ids;
 
-    public function saveRelShowOrders(Request $request)
-    {
-        foreach ($request->numbers as $key => $id) {
-            $relshows = RelShow::find($id);
-            $relshows->index = $key + 1;
-            $relshows->save();
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                RelShow::where('id', $id)->update(['rel_order' => $index + 1]);
+            }
         }
 
-        return back()->with('message', 'RelShow ordered successfully');
+        return redirect()->back()->with('success', 'Relegious Show order updated successfully.');
     }
 }

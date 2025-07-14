@@ -196,20 +196,34 @@ class ManageSportsTournament extends Controller
         }
     }
 
-    public function getSportsTournamentOrderList()
-    {
-        $this->data['tournaments'] = SportsTournament::orderBy('index', 'asc')->get();
-        return view('admin.tournament.dragdrop', $this->data);
-    }
+    public function getSportsTournamentOrderList($id)
+    {   $id = base64_decode($id);
+        $this->data['sportstournament'] = SportsTournament::whereNull('deleted_at')->where('sports_category_id',$id)->orderBy('sports_cat_order', 'asc')->get();
 
-    public function saveSportsTournamentOrders(Request $request)
-    {
-        foreach ($request->numbers as $key => $id) {
-            $tournament = SportsTournament::find($id);
-            $tournament->index = $key + 1;
-            $tournament->save();
+        $allsportstournament = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['sportstournament'] as $sportstournament) {
+            $allsportstournament[] = $sportstournament->sports_cat_order;
+            $dataForLoop[$sportstournament->sports_cat_order] = $sportstournament;
         }
 
-        return back()->with('message', 'SportsTournament ordered successfully');
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allsportstournament'] = $allsportstournament;
+
+        return view('admin.sportsctournament.dragdrop', $this->data);
+    }
+
+    public function saveSportsTournamentOrder(Request $request)
+    {
+        $ids = $request->ids;
+
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                SportsTournament::where('id', $id)->update(['sports_cat_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Sports Tournament order updated successfully.');
     }
 }
