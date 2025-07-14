@@ -48,6 +48,9 @@ use App\Http\Controllers\SuperAdminAdPlan;
 use App\Http\Controllers\AdminAdPlan;
 use App\Http\Controllers\AdminAd;
 use App\Http\Controllers\ResellerAd;
+use App\Http\Controllers\StageShowsPak;
+use App\Http\Controllers\LaughterShows;
+
 
 
 
@@ -343,6 +346,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/check-channel-name', [Channels::class,'checkChannelName'])->name('check-channel-name');
         Route::post('/check-channel-number', [Channels::class,'checkChannelNumber'])->name('check-channel-number');
 
+        Route::post('update-column', [movies::class, 'updateColumn'])->name('update-column');
+
         //Movies
         Route::get('/movies', [Movies::class, 'index'])->name('admin.movies');
         Route::get('/getMoviesList', [Movies::class, 'getMoviesList'])->name('getMovieList');
@@ -358,11 +363,42 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/movie/update-status/{id}', [Movies::class,'updateStatus'])->name('movie.update-status');
         Route::post('/check-channel-name', [Movies::class,'checkChannelName'])->name('check-channel-name');
         Route::post('/check-channel-number', [Movies::class,'checkChannelNumber'])->name('check-channel-number');
+        Route::post('import-movies-playlits', [Movies::class, 'importstageshows'])->name('importmovies');
 
-        Route::post('import-movie-playlits', [Movies::class, 'importmovies'])->name('importmovies');
+    
+
+        //Stage Shows
+        Route::get('/stage-shows', [StageShowsPak::class, 'index'])->name('admin.stage-shows');
+        Route::get('/getStageShowsPakList', [StageShowsPak::class, 'getStageShowsPakList'])->name('getStageShowsPakList');
+        Route::get('/stage-show-order', [StageShowsPak::class, 'getMovieOrderList'])->name('admin.stageshow.order');
+        Route::get('/deleted-stage-show', [StageShowsPak::class, 'deletedChannel'])->name('admin.stageshow.deleted');
+        Route::get('/getDeletedChannelList', [StageShowsPak::class, 'getDeletedChannelList'])->name('getDeletedMovieList');
+        Route::get('/recover-channel/{id}', [StageShowsPak::class, 'recoverChannel'])->name('admin.stageshow.recoverMovie');
+        Route::get('/add-stage-show', [StageShowsPak::class,'addChannel'])->name('addstageshow');
+        Route::post('/addstageshow', [StageShowsPak::class,'add'])->name('savestageshow');
+        Route::post('/save-stage-show-orders', [StageShowsPak::class,'savestageshowOrder'])->name('saveMovieOrder');
+        Route::get('/edit-stage-show/{id}', [StageShowsPak::class,'editstageshow'])->name('edit-stageshow');
+        Route::post('/stage-show/destroy', [StageShowsPak::class,'destroy'])->name('stageshow.destroy');
+        Route::get('/stage-show/update-status/{id}', [StageShowsPak::class,'updateStatus'])->name('stageshow.update-status');        
+        Route::post('import-stage-show-playlits', [StageShowsPak::class, 'importstageshows'])->name('importstageshows');
 
 
-        Route::post('update-column', [movies::class, 'updateColumn'])->name('update-column');
+        //Laughter Shows
+        Route::get('/laughter-shows', [LaughterShows::class, 'index'])->name('admin.laughter-shows');
+        Route::get('/getLaughterShowsList', [LaughterShows::class, 'getLaughterShowsList'])->name('getLaughterShowsList');
+        Route::get('/laughter-show-order', [LaughterShows::class, 'getMovieOrderList'])->name('admin.laughtershow.order');
+        Route::get('/deleted-laughter-show', [LaughterShows::class, 'deletedChannel'])->name('admin.laughtershow.deleted');
+        Route::get('/getDeletedChannelList', [LaughterShows::class, 'getDeletedChannelList'])->name('getDeletedMovieList');
+        Route::get('/recover-channel/{id}', [LaughterShows::class, 'recoverChannel'])->name('admin.laughtershow.recoverMovie');
+        Route::get('/add-laughter-show', [LaughterShows::class,'addChannel'])->name('addlaughtershow');
+        Route::post('/addlaughtershow', [LaughterShows::class,'add'])->name('savelaughtershow');
+        Route::post('/save-laughter-show-orders', [LaughterShows::class,'savelaughtershowOrder'])->name('saveMovieOrder');
+        Route::get('/edit-laughter-show/{id}', [LaughterShows::class,'editlaughtershow'])->name('edit-laughtershow');
+        Route::post('/laughter-show/destroy', [LaughterShows::class,'destroy'])->name('laughtershow.destroy');
+        Route::get('/laughter-show/update-status/{id}', [LaughterShows::class,'updateStatus'])->name('laughtershow.update-status');        
+        Route::post('import-laughter-show-playlits', [LaughterShows::class, 'importlaughtershows'])->name('importlaughtershows');
+
+        
 
 
         //Adult Movies

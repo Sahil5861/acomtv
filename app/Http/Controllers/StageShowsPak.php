@@ -3,18 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Movie;
-use App\Models\MovieLink;
+use App\Models\StageshowPak;
 use App\Models\Genre;
-use App\Models\MovieGenre;
 use App\Models\ContentNetwork;
-use App\Models\MovieContentNetwork;
+use App\Models\StageshowPakContentNetwork;
 use Illuminate\Support\Facades\DB;
 
 
 
 
-class Movies extends Controller
+class StageShowsPak extends Controller
 {
     public function index()
     {
@@ -22,13 +20,12 @@ class Movies extends Controller
         $genres = Genre::where('status',1)->get();
 
 
-        $playlist_ids = Movie::where('playlist_id', '!=', null)->pluck('playlist_id')->unique()->values();        
-        return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids'));
+        $playlist_ids = StageshowPak::where('playlist_id', '!=', null)->pluck('playlist_id')->unique()->values();        
+        return view('admin.stageshowpak.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
-    public function getMovieOrderList()
-    {
-        $this->data['movies'] = Movie::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
-// echo count($this->data['movies']); exit;
+    public function getStageshowPakOrderList(){
+        $this->data['movies'] = StageshowPak::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
+        // echo count($this->data['movies']); exit;
         $allMovies = [];
         $dataForLoop = [];
 
@@ -46,94 +43,7 @@ class Movies extends Controller
         return view('admin.movie.deleted');
     }
     
-
-    /* Process ajax request */
-    // public function getMoviesList(Request $request)
-    // {
-    //     $contentNetworkId = $request->input('content_network');
-
-    //     $draw = $request->get('draw');
-    //     $start = $request->get("start");
-    //     $rowperpage = $request->get("length"); // total number of rows per page
-
-    //     $columnIndex_arr = $request->get('order');
-    //     $columnName_arr = $request->get('columns');
-    //     $order_arr = $request->get('order');
-    //     $search_arr = $request->get('search');
-
-    //     $columnIndex = $columnIndex_arr[0]['column']; // Column index
-    //     $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-    //     $columnSortOrder = $order_arr[0]['dir']; // asc or desc
-    //     $searchValue = $search_arr['value']; // Search value
-
-    //     // Total records
-    //     // Total records
-    //     $totalRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->count();
-    //     $inactiveRecords = Movie::select('count(*) as allcount')->where('status','0')->whereNull('movies.deleted_at')->count();
-    //     $activeRecords = Movie::select('count(*) as allcount')->where('status','1')->whereNull('movies.deleted_at')->count();
-    //     $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at')->count();
-
-
-    //     $totalRecordswithFilter = Movie::select('count(*) as allcount')
-    //     ->where('name', 'like', '%' . $searchValue . '%')
-    //     // ->where('channels.status', '=', 1)
-    //     ->whereNull('movies.deleted_at')
-    //     ->count();
-
-    //     // Get records, also we have included search filter as well
-    //     $records = Movie::orderBy($columnName, $columnSortOrder)
-    //         // ->where('channels.status', '=', 1)
-    //         ->whereNull('movies.deleted_at')
-    //         ->where('movies.name', 'like', '%' . $searchValue . '%')
-
-    //         // ->orWhere('channels.description', 'like', '%' . $searchValue . '%')
-    //         // ->orWhere('channels.contact_email', 'like', '%' . $searchValue . '%')
-    //         ->select('movies.*')->orderBy('movies.updated_at','desc')            
-    //         ->skip($start)
-    //         ->take($rowperpage)
-    //         ->get();
-
-    //     $data_arr = array();
-
-    //     foreach ($records as $record) {
-    //         if($record->status == 1){
-    //             $status = '<a onchange="updateStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
-    //         }else{
-    //             $status = '<a onchange="updateStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
-    //         }
-
-    //         if($record->deleted_at){
-    //             $del_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>';
-    //         }else{
-    //             $del_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
-    //         }
-
-    //         $data_arr[] = array(
-    //             "name" => $record->name,                                                            
-    //             "status" => $status,                
-    //             "banner" => '<img src="'.$record->banner.'" width="100px">',
-    //             "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
-    //             "action" => '<div class="action-btn">
-    //                     <a href="edit-movie/'.base64_encode($record->id).'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>                        
-    //                     <a href="javascript:;" onclick="delete_item(\''.base64_encode($record->id).'\',\'movie\')">'.$del_icon.'</a>
-    //                   </div>',
-    //         );
-    //     }
-
-    //     $response = array(
-    //         "draw" => intval($draw),
-    //         "iTotalRecords" => $totalRecords,
-    //         "iTotalDisplayRecords" => $totalRecordswithFilter,
-    //         "aaData" => $data_arr,
-    //         "totalRecords" => number_format($totalRecords),
-    //         "activeRecords" => number_format($activeRecords),
-    //         "inactiveRecords" => number_format($inactiveRecords),
-    //         "deletedRecords" => number_format($deletedRecords),
-    //     );
-    //     echo json_encode($response);
-    // }
-
-    public function getMoviesList(Request $request)
+    public function getStageShowsPakList(Request $request)
     {
         
         $draw = $request->get('draw');
@@ -153,25 +63,15 @@ class Movies extends Controller
 
         $playlist_id = $request->input('playlist_id');
 
-        $movieQuery = Movie::query()->whereNull('movies.deleted_at');
-        if (!empty($playlist_id)) {
-            // $movieQuery->whereHas('networks', function ($q) use ($contentNetworkId) {
-            //     $q->where('network_id', $contentNetworkId);
-            // });
+        $movieQuery = StageshowPak::query()->whereNull('stage_shows_pak.deleted_at');
+        if (!empty($playlist_id)) {            
             $movieQuery->where('playlist_id', $playlist_id);
         }
 
-        // Total records
-        // Total records
-        // $totalRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->count();
-        // $inactiveRecords = Movie::select('count(*) as allcount')->where('status','0')->whereNull('movies.deleted_at')->count();
-        // $activeRecords = Movie::select('count(*) as allcount')->where('status','1')->whereNull('movies.deleted_at')->count();
-        // $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at')->count();
-
-        $totalRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at');
-        $inactiveRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->where('status','0');
-        $activeRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->where('status','1');
-        $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at');
+        $totalRecords = StageshowPak::select('count(*) as allcount')->whereNull('stage_shows_pak.deleted_at');
+        $inactiveRecords = StageshowPak::select('count(*) as allcount')->whereNull('stage_shows_pak.deleted_at')->where('status','0');
+        $activeRecords = StageshowPak::select('count(*) as allcount')->whereNull('stage_shows_pak.deleted_at')->where('status','1');
+        $deletedRecords = StageshowPak::select('count(*) as allcount')->whereNotNull('stage_shows_pak.deleted_at');
 
         if (!empty($playlist_id)) {
             $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
@@ -187,8 +87,8 @@ class Movies extends Controller
 
 
         $totalRecordswithFilter = $movieQuery->where(function($query) use ($searchValue) {
-                                                        $query->where('movies.name', 'like', '%' . $searchValue . '%')
-                                                            ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
+                                                        $query->where('stage_shows_pak.name', 'like', '%' . $searchValue . '%')
+                                                            ->orWhere('stage_shows_pak.playlist_id', 'like', '%' . $searchValue . '%');
                                                     }) 
                                             ->count();
 
@@ -196,10 +96,10 @@ class Movies extends Controller
         $records = $movieQuery->orderBy($columnName, $columnSortOrder)
             // ->where('channels.status', '=', 1)            
             ->where(function($query) use ($searchValue) {
-                $query->where('movies.name', 'like', '%' . $searchValue . '%')
-                    ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
+                $query->where('stage_shows_pak.name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('stage_shows_pak.playlist_id', 'like', '%' . $searchValue . '%');
             })                      
-            ->select('movies.*')->orderBy('movies.updated_at','desc')            
+            ->select('stage_shows_pak.*')->orderBy('stage_shows_pak.updated_at','desc')            
             ->skip($start)
             ->take($rowperpage)
             ->get();
@@ -208,9 +108,9 @@ class Movies extends Controller
 
         foreach ($records as $record) {
             if($record->status == 1){
-                $status = '<a onchange="updateStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
+                $status = '<a onchange="updateStatus(\''.url('stage-show/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
             }else{
-                $status = '<a onchange="updateStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
+                $status = '<a onchange="updateStatus(\''.url('stage-show/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
             }
 
             if($record->deleted_at){
@@ -227,8 +127,8 @@ class Movies extends Controller
                 "banner" => '<img src="'.$record->banner.'" width="100px">',
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">
-                        <a href="edit-movie/'.base64_encode($record->id).'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>                        
-                        <a href="javascript:;" onclick="delete_item(\''.base64_encode($record->id).'\',\'movie\')">'.$del_icon.'</a>
+                        <a href="edit-stage-show/'.base64_encode($record->id).'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>                        
+                        <a href="javascript:;" onclick="deleteRowModal(\''.base64_encode($record->id).'\',\'stage_show\')">'.$del_icon.'</a>
                       </div>',
             );
         }
@@ -374,7 +274,7 @@ class Movies extends Controller
     public function addChannel(){        
         $this->data['genres'] = Genre::where('status',1)->get();
         $this->data['networks'] = ContentNetwork::where('deleted_at', null)->get();
-        return view('admin.movie.add',$this->data);
+        return view('admin.stageshowpak.add',$this->data);
     }
 
     public function add(Request $request){
@@ -387,76 +287,76 @@ class Movies extends Controller
         // print_r($request->all()); exit();
         if(!empty($request->id)){
 
-            $movie = Movie::firstwhere('id',$request->id);
-            $movie->name = $request->name;
-            $movie->banner = $request->banner;                                  
-            $movie->description = $request->movie_description;                        
-            $movie->release_date = $request->release_date ?? null;                                                                    
-            $movie->status = $request->status;
-            $movie->index = $request->index ?? 0;
-            $movie->source_type = $request->source_type;
-            $movie->youtube_trailer = $request->trailer_url ?? null;
-            $movie->movie_url = $request->movie_url ?? null;
-            $movie->genres = implode(',', $request->movie_genre);
-            if($movie->save()){
+            $stage_show = StageshowPak::firstwhere('id',$request->id);
+            $stage_show->name = $request->name;
+            $stage_show->banner = $request->banner;                                  
+            $stage_show->description = $request->movie_description;                        
+            $stage_show->release_date = $request->release_date ?? null;                                                                    
+            $stage_show->status = $request->status;
+            $stage_show->index = $request->index ?? 0;
+            $stage_show->source_type = $request->source_type;
+            $stage_show->youtube_trailer = $request->trailer_url ?? null;
+            $stage_show->movie_url = $request->movie_url ?? null;
+            $stage_show->genres = implode(',', $request->movie_genre);
+            if($stage_show->save()){
                 
-                MovieContentNetwork::where('movie_id',$movie->id)->delete();
+                StageshowPakContentNetwork::where('movie_id',$stage_show->id)->delete();
                 if ($request->has('content_network') && !empty($request->content_network)) {                    
-                    DB::table('content_network_log')->where('content_id', $movie->id)->where('content_type', $movie->content_type)->delete();                                                                
+                    DB::table('content_network_log')->where('content_id', $stage_show->id)->where('content_type', $stage_show->content_type)->delete();                                                                
                     foreach ($request->content_network as $key => $network) {
-                        $MovieNetwork = new MovieContentNetwork();
-                        $MovieNetwork->movie_id = $movie->id;
-                        $MovieNetwork->network_id = $network;
-                        if ($MovieNetwork->save()) {                           
+                        $StageshowPakNetwork = new StageshowPakContentNetwork();
+                        $StageshowPakNetwork->stage_show_id = $stage_show->id;
+                        $StageshowPakNetwork->network_id = $network;
+                        if ($StageshowPakNetwork->save()) {                           
                             DB::table('content_network_log')->insert([
-                                'content_id' => $movie->id,
+                                'content_id' => $stage_show->id,
                                 'network_id' => $network,
-                                'content_type' => $movie->content_type,                            
+                                'content_type' => $stage_show->content_type,                            
                             ]);
                         }
                     }
                 }
 
 
-                return back()->with('message','Movie updated successfully');
+                return back()->with('message','Stage Show updated successfully');
             }else{
-                return back()->with('message','Movie not updated successfully');
+                return back()->with('message','Stage Show not updated successfully');
             }
 
         }else{
 
-            $addedMovies = Movie::whereNull('deleted_at')->get();
+            // print_r($request->all()); exit;
+            $addedMovies = StageshowPak::whereNull('deleted_at')->get();
             foreach ($addedMovies as $key => $movie) {
                 if ($movie->name == $request->name || $movie->movie_url == $request->movie_url) {
                     return redirect()->back()->withInput()->withErrors(['message' => 'Movie with the same name or URL already exists.']);
                 }
             }
-            $movie = new Movie();
-            $movie->name = $request->name;
-            $movie->banner = $request->banner;                                  
-            $movie->description = $request->movie_description ?? null;                        
-            $movie->release_date = $request->release_date ?? null;                                                                    
-            $movie->status = $request->status;
-            $movie->index = $request->index ?? 0;
-            $movie->source_type = $request->source_type;    
-            $movie->youtube_trailer = $request->trailer_url ?? null;
-            $movie->movie_url = $movie->source_type = $request->source_type;                            
-            $movie->genres = implode(',', $request->movie_genre);
-            if($movie->save()){                                
+            $stage_show = new StageshowPak();
+            $stage_show->name = $request->name;
+            $stage_show->banner = $request->banner;                                  
+            $stage_show->description = $request->movie_description ?? null;                        
+            $stage_show->release_date = $request->release_date ?? null;                                                                    
+            $stage_show->status = $request->status;
+            $stage_show->index = $request->index ?? 0;
+            $stage_show->source_type = $request->source_type;                
+            $stage_show->movie_url = $request->source_type;                            
+            $stage_show->genres = implode(',', $request->movie_genre);
+            if($stage_show->save()){                                
                 if ($request->has('content_network') && !empty($request->content_network)) {
-                    $cur_movies = Movie::where('id', $movie->id)->first();
-                    $newtworkMovies = MovieContentNetwork::where('movie_id',$movie->id)->get();
+                    $cur_movies = StageshowPak::where('id', $stage_show->id)->first();
+                    $newtworkMovies = StageshowPakContentNetwork::where('movie_id',$stage_show->id)->get();
                     if ($newtworkMovies) {
-                        MovieContentNetwork::where('movie_id',$movie->id)->delete();
+                        StageshowPakContentNetwork::where('movie_id',$stage_show->id)->delete();
                     }
                     foreach ($request->content_network as $key => $network) {
-                        $MovieNetwork = new MovieContentNetwork();
-                        $MovieNetwork->movie_id = $movie->id;
+                        $MovieNetwork = new StageshowPakContentNetwork();
+                        $MovieNetwork->movie_id = $stage_show->id;
                         $MovieNetwork->network_id = $network;
                         
                         if ($MovieNetwork->save()) {
                             DB::table('content_network_log')->insert([
-                                'content_id' => $movie->id,
+                                'content_id' => $stage_show->id,
                                 'network_id' => $network,
                                 'content_type' => $cur_movies->content_type,                            
                             ]);
@@ -464,56 +364,52 @@ class Movies extends Controller
                     }
                 }
 
-                return back()->with('message','Movie added successfully');
+                return back()->with('message','Stage Show added successfully');
             }else{
-                return back()->with('message','Movie not added successfully');
+                return back()->with('message','Stage Show not added successfully');
             }
         }
 
     }
 
-    public function editChannel($id){  
-        $movie = Movie::where('id', base64_decode($id))->first();              
-        $this->data['movie'] = $movie;
+    public function editstageshow($id){  
+        $stage_show = StageshowPak::where('id', base64_decode($id))->first();              
+        $this->data['stage_show'] = $stage_show;
         $this->data['genres'] = Genre::where('status',1)->get();
         $this->data['networks'] = ContentNetwork::where('deleted_at', null)->get();
-        // $channelGenre = MovieGenre::where('movie_id',base64_decode($id))->get();
+        // $channelGenre = MovieGenre::where('stage_show_id',base64_decode($id))->get();
 
-        $this->data['channelGenre'] = explode(',', $movie->genres);
-        $movieNetwork = MovieContentNetwork::where('movie_id', base64_decode($id))->get();        
+        $this->data['channelGenre'] = explode(',', $stage_show->genres);
+        $stageshowsnetwork = StageshowPakContentNetwork::where('movie_id', base64_decode($id))->get();        
         // print_r($channelGenre); exit();
         // $this->data['channelGenre'] = [];
-        $this->data['movieNetwork'] = [];
+        $this->data['stageshowsnetwork'] = [];
         // if($channelGenre){
         //     foreach ($channelGenre as $key => $value) {
         //         $this->data['channelGenre'][] = $value->genre_id;
         //     }
         // }
 
-        if($movieNetwork){
-            foreach ($movieNetwork as $key => $value) {
-                $this->data['movieNetwork'][] = $value->network_id;
+        if($stageshowsnetwork){
+            foreach ($stageshowsnetwork as $key => $value) {
+                $this->data['stageshowsnetwork'][] = $value->network_id;
             }
         }
-        // print_r($this->data['movieNetwork']); exit;
-        return view('admin.movie.add',$this->data);
+        // print_r($this->data['stageshowsnetwork']); exit;
+        return view('admin.stageshowpak.add',$this->data);
     }
 
     public function destroy(Request $request){
-        $movie = Movie::where('id',base64_decode($request->id))->first();
+        $movie = StageshowPak::where('id',base64_decode($request->id))->first();
 
         
         $movie->deleted_at = time();
         if($movie->save()){
 
-            MovieContentNetwork::where('movie_id',$movie->id)->delete();
-            $links = MovieLink::where('movie_id', $movie->id)->get();
-            if ($links) {
-                MovieLink::where('movie_id', $movie->id)->delete();
-            }
-            echo json_encode(['message','Movie deleted successfully']);
+            StageshowPakContentNetwork::where('movie_id',$movie->id)->delete();            
+            echo json_encode(['message','Stage Show deleted successfully']);
         }else{
-            echo json_encode(['message','Movie not deleted successfully']);
+            echo json_encode(['message','Stage Show not deleted successfully']);
         }
     }
     public function saveMovieOrder(Request $request)
@@ -521,25 +417,25 @@ class Movies extends Controller
         $ids = $request->ids;
         if (!empty($ids)) {
             foreach ($ids as $index => $id) {
-                Movie::where('id', $id)->update(['movie_order' => $index + 1]);
+                StageshowPak::where('id', $id)->update(['movie_order' => $index + 1]);
             }
         }
 
-        return redirect()->back()->with('success', 'Movie order updated successfully.');
+        return redirect()->back()->with('success', 'StageshowPak order updated successfully.');
     }
     public function updateStatus($id){
-        $movie = Movie::find(base64_decode($id));        
+        $movie = StageshowPak::find(base64_decode($id));        
         if($movie){
             $movie->status = $movie->status == '1' ? '0' : '1';
             $movie->save();
-            echo json_encode(['message','Movie status updated successfully']);
+            echo json_encode(['message','StageshowPak status updated successfully']);
         }else{
             echo json_encode(['message','Something went wrong!!']);
         }
     }
 
 
-    public function importmovies(Request $request){
+    public function importstageshows(Request $request){
         $request->validate([
             'playlist_id' => 'required',
             'genre' => 'required',
@@ -588,9 +484,9 @@ class Movies extends Controller
                 $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
                 $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
                         
-                $movie = new Movie();
+                $movie = new StageshowPak();
 
-                $channel_number = Movie::whereNull('deleted_at')->count();
+                $channel_number = StageshowPak::whereNull('deleted_at')->count();
                 $formated_number = $channel_number + 1;   
 
                 $movie->name = $movieName;
@@ -607,9 +503,9 @@ class Movies extends Controller
 
                 if ($movie->save()) {
                     if ($request->has('content_network') && !empty($request->content_network)) {
-                        $cur_movies = Movie::where('id', $movie->id)->first();                        
+                        $cur_movies = StageshowPak::where('id', $movie->id)->first();                        
                         foreach ($request->content_network as $key => $network) {
-                            $MovieNetwork = new MovieContentNetwork();
+                            $MovieNetwork = new StageshowPakContentNetwork();
                             $MovieNetwork->movie_id = $movie->id;
                             $MovieNetwork->network_id = $network;
                             
@@ -636,51 +532,12 @@ class Movies extends Controller
 
 
     public function checkIsExist($movie_name, $url){
-        return Movie::where(function ($query) use ($movie_name, $url){
+        return StageshowPak::where(function ($query) use ($movie_name, $url){
             $query->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($movie_name))])
                     ->orWhereRaw('LOWER(TRIM(movie_url)) = ?', [strtolower(trim($url))]);
         })
         ->whereNull('deleted_at')
         ->first();
-    }
-
-
-    public function updateColumn(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|integer',
-            'table' => 'required|string',
-            'column' => 'required|string',
-            'value' => 'required'
-        ]);
-
-        // Sanitize table and column names to prevent SQL injection
-        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak']; // add more if needed
-        $allowedColumns = ['name', 'title']; // add other editable columns if needed
-
-        if (!in_array($request->table, $allowedTables) || !in_array($request->column, $allowedColumns)) {
-            return response()->json(['error' => 'Invalid table or column'], 400);
-        }
-        
-        $isExist = DB::table($request->table)->whereRaw('LOWER(TRIM('.$request->column.')) = ?', [strtolower(trim($request->value))])->first();
-
-        if ($isExist) {
-            return response()->json(['message' => 'This '.$request->column.' already exists']);
-        }
-        
-
-        try {
-            // Update the record
-            DB::table($request->table)
-                ->where('id', $request->id)
-                ->update([
-                    $request->column => $request->value
-                ]);
-
-            return response()->json(['success' => true, 'message' => 'Record updated successfully.']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Update failed.', 'error' => $e->getMessage()], 500);
-        }
     }
 
 

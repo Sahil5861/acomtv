@@ -195,6 +195,44 @@
             </ul>
         </li>
 
+        <li class="menu">
+            <a href="#app4" data-toggle="collapse" <?php if(request()->is('*stage-shows*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+                <div class="">
+                    {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-airplay"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 21 7 21 12 15"></polygon></svg> --}}
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><polygon points="10 9 15 12 10 15 10 9"/></svg>
+
+                    <span>Stage Shows</span>
+                </div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*stage-shows*')){ echo 'show';} ?>" id="app4" data-parent="#accordionExample">
+                <li class="<?php if(request()->is('*webseries')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.stage-shows')}}"> List </a>
+                </li>                 
+            </ul>
+        </li>
+
+        <li class="menu">
+            <a href="#app5" data-toggle="collapse" <?php if(request()->is('*laughter-shows*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+                <div class="">
+                    {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-airplay"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 21 7 21 12 15"></polygon></svg> --}}
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><polygon points="10 9 15 12 10 15 10 9"/></svg>
+
+                    <span>Laughter Shows</span>
+                </div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*laughter-shows*')){ echo 'show';} ?>" id="app5" data-parent="#accordionExample">
+                <li class="<?php if(request()->is('*webseries')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.laughter-shows')}}"> List </a>
+                </li>                 
+            </ul>
+        </li>
+
         <div class="tit">Manage Specials</div>
         <li class="menu">
             <a href="#app1" data-toggle="collapse" <?php if(request()->is('*genre*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
