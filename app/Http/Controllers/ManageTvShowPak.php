@@ -18,20 +18,20 @@ class ManageTvShowPak extends Controller
     
     public function getTvShowOrderList($id)
     {   $id = base64_decode($id);
-        $this->data['tvshows'] = TvShowPak::whereNull('deleted_at')->where('tv_channel_id',$id)->orderBy('order', 'asc')->get();
+        $this->data['tvshowspak'] = TvShowPak::whereNull('deleted_at')->where('tv_channel_id',$id)->orderBy('order', 'asc')->get();
 
-        $allTvShows = [];
+        $allTvShowsPak = [];
         $dataForLoop = [];
 
-        foreach ($this->data['tvshows'] as $tvshow) {
-            $allTvShows[] = $tvshow->order;
-            $dataForLoop[$tvshow->order] = $tvshow;
+        foreach ($this->data['tvshowspak'] as $tvshowpak) {
+            $allTvShowsPak[] = $tvshowpak->order;
+            $dataForLoop[$tvshowpak->order] = $tvshowpak;
         }
 
         $this->data['dataForLoop'] = $dataForLoop;
-        $this->data['allTvShows'] = $allTvShows;
+        $this->data['allTvShowsPak'] = $allTvShowsPak;
 
-        return view('admin.tvshow.dragdrop', $this->data);
+        return view('admin.tvshowpak.dragdrop', $this->data);
     }
 
     
@@ -205,7 +205,7 @@ class ManageTvShowPak extends Controller
             return response()->json(['message' => 'TvShowPak not deleted']);
         }
     }
-    public function saveTvshowOrder(Request $request)
+    public function saveTvShowPakOrder(Request $request)
     {
         $ids = $request->ids;
 
