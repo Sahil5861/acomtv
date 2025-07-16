@@ -427,7 +427,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/check-channel-number', [Movies::class,'checkChannelNumber'])->name('check-channel-number');
         Route::post('import-movies-playlits', [Movies::class, 'importmovies'])->name('importmovies');
 
-    
+        
 
         //Stage Shows
         Route::get('/stage-shows', [StageShowsPak::class, 'index'])->name('admin.stage-shows');
@@ -441,6 +441,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/save-stage-show-orders', [StageShowsPak::class,'savestageshowOrder'])->name('saveMovieOrder');
         Route::get('/edit-stage-show/{id}', [StageShowsPak::class,'editstageshow'])->name('edit-stageshow');
         Route::post('/stage-show/destroy', [StageShowsPak::class,'destroy'])->name('stageshow.destroy');
+        
+        Route::get('/stageshowpak-order', [StageShowsPak::class, 'getStageshowPakOrderList'])->name('admin.stageshowpak.order');
+        Route::post('/save-stageshowpak-orders', [StageShowsPak::class,'saveStageShowPakOrder'])->name('saveStageShowPakOrder');
+        
         Route::get('/stage-show/update-status/{id}', [StageShowsPak::class,'updateStatus'])->name('stageshow.update-status');        
         Route::post('import-stage-show-playlits', [StageShowsPak::class, 'importstageshows'])->name('importstageshows');
 
@@ -457,6 +461,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/save-laughter-show-orders', [LaughterShows::class,'savelaughtershowOrder'])->name('saveMovieOrder');
         Route::get('/edit-laughter-show/{id}', [LaughterShows::class,'editlaughtershow'])->name('edit-laughtershow');
         Route::post('/laughter-show/destroy', [LaughterShows::class,'destroy'])->name('laughtershow.destroy');
+        
+        Route::get('/laughtershow-order', [LaughterShows::class, 'getLaughterShowOrderList'])->name('admin.laughtershow.order');
+        Route::post('/save-laughtershow-orders', [LaughterShows::class,'saveLaughterShowOrder'])->name('saveLaughterShowOrder');
+        
         Route::get('/laughter-show/update-status/{id}', [LaughterShows::class,'updateStatus'])->name('laughtershow.update-status');        
         Route::post('import-laughter-show-playlits', [LaughterShows::class, 'importlaughtershows'])->name('importlaughtershows');
 

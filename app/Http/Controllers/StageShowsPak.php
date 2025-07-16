@@ -412,7 +412,7 @@ class StageShowsPak extends Controller
             echo json_encode(['message','Stage Show not deleted successfully']);
         }
     }
-    public function saveMovieOrder(Request $request)
+    public function saveStageShowPakOrder(Request $request)
     {
         $ids = $request->ids;
         if (!empty($ids)) {

@@ -233,8 +233,11 @@
                 </div>
             </a>
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*stage-shows*')){ echo 'show';} ?>" id="app4" data-parent="#accordionExample">
-                <li class="<?php if(request()->is('*webseries')){ echo 'active';} ?>" >
+                <li class="<?php if(request()->is('*stage-shows*')){ echo 'active';} ?>" >
                     <a href="{{route('admin.stage-shows')}}"> List </a>
+                </li>
+                <li class="<?php if(request()->is('*stage-shows-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.stageshowpak.order')}}"> Order </a>
                 </li>                 
             </ul>
         </li>
@@ -252,9 +255,12 @@
                 </div>
             </a>
             <ul class="collapse submenu list-unstyled <?php if(request()->is('*laughter-shows*')){ echo 'show';} ?>" id="app5" data-parent="#accordionExample">
-                <li class="<?php if(request()->is('*webseries')){ echo 'active';} ?>" >
+                <li class="<?php if(request()->is('*laughter-shows')){ echo 'active';} ?>" >
                     <a href="{{route('admin.laughter-shows')}}"> List </a>
-                </li>                 
+                </li>       
+                <li class="<?php if(request()->is('*laughter-shows-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.laughtershow.order')}}"> Order </a>
+                </li>          
             </ul>
         </li>
 
