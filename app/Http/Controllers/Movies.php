@@ -22,13 +22,13 @@ class Movies extends Controller
         $genres = Genre::where('status',1)->get();
 
 
-        $playlist_ids = Movie::where('playlist_id', '!=', null)->pluck('playlist_id')->unique()->values();        
+        $playlist_ids = Movie::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();        
         return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
     public function getMovieOrderList()
     {
         $this->data['movies'] = Movie::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
-// echo count($this->data['movies']); exit;
+        // echo count($this->data['movies']); exit;
         $allMovies = [];
         $dataForLoop = [];
 
@@ -152,13 +152,16 @@ class Movies extends Controller
 
 
         $playlist_id = $request->input('playlist_id');
+        $status = $request->input('status');
+        $status = number_format($status);
 
         $movieQuery = Movie::query()->whereNull('movies.deleted_at');
-        if (!empty($playlist_id)) {
-            // $movieQuery->whereHas('networks', function ($q) use ($contentNetworkId) {
-            //     $q->where('network_id', $contentNetworkId);
-            // });
+        if (!empty($playlist_id)) {            
             $movieQuery->where('playlist_id', $playlist_id);
+        }
+
+        if (!empty($status)) {                     
+            $movieQuery->where('status', $status);
         }
 
         // Total records
@@ -178,6 +181,13 @@ class Movies extends Controller
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+        }
+
+        if (!empty($status)) {
+            $totalRecords = $totalRecords->where('status', $status);
+            $inactiveRecords = $inactiveRecords->where('status', $status);
+            $activeRecords = $activeRecords->where('status', $status);
+            $deletedRecords = $deletedRecords->where('status', $status);
         }
 
         $totalRecords = $totalRecords->count();
@@ -208,9 +218,9 @@ class Movies extends Controller
 
         foreach ($records as $record) {
             if($record->status == 1){
-                $status = '<a onchange="updateStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
+                $status = '<a onchange="updateMovieStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
             }else{
-                $status = '<a onchange="updateStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
+                $status = '<a onchange="updateMovieStatus(\''.url('movie/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
             }
 
             if($record->deleted_at){
@@ -224,6 +234,19 @@ class Movies extends Controller
                 "name" => $record->name,                                                            
                 "status" => $status, 
                 'playlist_id' => $record->playlist_id ?? '',               
+                "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->movie_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
+                    width="20" height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    class="feather feather-eye">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </a>',
                 "banner" => '<img src="'.$record->banner.'" width="100px">',
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">
@@ -327,23 +350,23 @@ class Movies extends Controller
             }else{
                 $del_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
             }
+            
 
             // <a href="'.route('admin.channel.recoverChannel',base64_encode($record->id)).'" data-toggle="tooltip" title="Undo Channel" class="undo-channel">'.$del_icon.'</a>
 
             $data_arr[] = array(
                 "channel_name" => $record->channel_name,
                 "channel_number" => $record->channel_number,
-                "channel_logo" => $record->channel_logo,
+                "channel_logo" => $record->channel_logo,                
                 // "channel_genre" => $record->channel_genre,
                 "channel_language" => $record->language ? $record->language->title : '',
                 "channel_link" => '<a class="btn btn-primary mb-3 rounded bs-tooltip" data-toggle="tooltip" title="Click to open link" href="'.$record->channel_link.'" target="_blank" >Link</a>',
-                "status" => $status,
+                "status" => $status,                
 
                 "created_at" => date('j M Y h:i a',strtotime($record->created_at)),
                 "action" => '<div class="action-btn">
-
-                        <a data-toggle="tooltip" title="Undo Channel" onclick="undoChannel('.$record->id.')">'.$del_icon.'</a>
-                      </div>',
+                                <a data-toggle="tooltip" title="Undo Channel" onclick="undoChannel('.$record->id.')">'.$del_icon.'</a>
+                            </div>',
             );
         }
 
@@ -440,7 +463,7 @@ class Movies extends Controller
             $movie->index = $request->index ?? 0;
             $movie->source_type = $request->source_type;    
             $movie->youtube_trailer = $request->trailer_url ?? null;
-            $movie->movie_url = $movie->source_type = $request->source_type;                            
+            $movie->movie_url = $request->movie_url ?? null;
             $movie->genres = implode(',', $request->movie_genre);
             if($movie->save()){                                
                 if ($request->has('content_network') && !empty($request->content_network)) {
@@ -655,14 +678,14 @@ class Movies extends Controller
         ]);
 
         // Sanitize table and column names to prevent SQL injection
-        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak']; // add more if needed
-        $allowedColumns = ['name', 'title']; // add other editable columns if needed
+        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak', 'web_series_episoade']; // add more if needed
+        $allowedColumns = ['name', 'title', 'Episoade_Name']; // add other editable columns if needed
 
         if (!in_array($request->table, $allowedTables) || !in_array($request->column, $allowedColumns)) {
             return response()->json(['error' => 'Invalid table or column'], 400);
         }
         
-        $isExist = DB::table($request->table)->whereRaw('LOWER(TRIM('.$request->column.')) = ?', [strtolower(trim($request->value))])->first();
+        $isExist = DB::table($request->table)->whereRaw('LOWER(TRIM('.$request->column.')) = ?', [strtolower(trim($request->value))])->whereNull('deleted_at')->first();
 
         if ($isExist) {
             return response()->json(['message' => 'This '.$request->column.' already exists']);

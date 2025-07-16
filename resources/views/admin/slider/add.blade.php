@@ -33,7 +33,7 @@
                         <input type="hidden" name="id" value="@if(isset($slider)){{$slider->id}}@endif">
                         <div class="form-row">
 
-                            <div class="col-md-6 mb-4">
+                            {{-- <div class="col-md-6 mb-4">
                                 <label for="fullName">Slider Type*</label>
                                 <select name="content_type" id="add_slider_type" class="form-control">
                                     <option value="1"@if(isset($slider)){{$slider->content_type == '1' ? 'selected' : ''}} @endif>Movies</option>                                    
@@ -43,9 +43,9 @@
                                 <div class="invalid-feedback">
                                     @error('content_type') {{ $message }} @enderror
                                 </div>
-                            </div>
+                            </div> --}}
 
-                            <div class="col-md-6 mb-4" id="add_cs_Movie_div">
+                            {{-- <div class="col-md-6 mb-4" id="add_cs_Movie_div">
             					<label class="control-label">Movie</label>
                                 <select id="Movie_id" class="form-control select" onchange="(updatedata('1', this))" name="content_id_movie">
                                     <option value="">Select an Option</option>    
@@ -61,7 +61,7 @@
                                     <option value="">Select Series</option> 
                                     <option value="" selected>Select Channel</option>      
                                     @foreach ($serieses as $series)
-                                        <option value="{{$series->id}}" @if(isset($slider)){{$slider->content_type == $series->content_type ? 'selected' : ''}} @endif>{{$series->name}}</option>
+                                        <option value="{{$series->id}}" @if(isset($slider)){{$slider->content_id == $series->id ? 'selected' : ''}} @endif>{{$series->name}}</option>
                                     @endforeach
                                 </select>            					                                
             				</div>
@@ -71,10 +71,10 @@
                                 <select id="Live_Tv_id" class="form-control select" name="content_id_channel" style="width:100%;" onchange="(updatedata('5', this))">
                                     <option value="" selected>Select Channel</option>    
                                     @foreach ($livechannels as $channel)
-                                        <option value="{{$channel->id}}" @if(isset($slider)){{$slider->content_type == $channel->content_type ? 'selected' : ''}} @endif>{{$channel->channel_name}}</option>
+                                        <option value="{{$channel->id}}" @if(isset($slider)){{$slider->content_id == $channel->id ? 'selected' : ''}} @endif>{{$channel->channel_name}}</option>
                                     @endforeach
                                 </select>            					                                
-            				</div>
+            				</div> --}}
                             
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Title*</label>
@@ -93,7 +93,7 @@
                             </div> --}}
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Image*</label>                                
-                                <input type="text" class="form-control" id="image" name="image" placeholder="Banner" value="@if(isset($slider)){{$slider->banner}} @endif">
+                                <input type="text" class="form-control" id="image" name="image" placeholder="Banner" value="@if(isset($slider)){{$slider->banner}} @endif" required>
                                 <div class="invalid-feedback">
                                     @error('title') {{ $message }} @enderror
                                 </div>
@@ -102,10 +102,10 @@
                                 @endif
                             </div>                            
 
-                            <div class="col-md-6 mb-4">
-                                <label for="url">URL</label>
-                                <input type="text" name="url" id="url" class="form-control" value="@if(isset($slider)){{$slider->url}}@endif" placeholder="URL">
-                            </div>
+                            {{-- <div class="col-md-6 mb-4">
+                                <label for="url">URL*</label>
+                                <input type="text" name="url" id="url" class="form-control" value="@if(isset($slider)){{$slider->url}}@endif" placeholder="URL" required>
+                            </div> --}}
 
                             {{-- <div class="col-md-6 mb-4">
                                 <label for="url">Source Type</label>
@@ -115,10 +115,10 @@
                                 </select>
                             </div>  --}}
 
-                            <div class="col-md-6 mb-4">
+                            {{-- <div class="col-md-6 mb-4">
                                 <label for="source_type">Source Type</label>
                                 <input type="text" name="source_type" id="source_type" class="form-control" value="@if(isset($slider)){{$slider->source_type}}@endif" >
-                            </div>
+                            </div> --}}
                             
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Status</label>
@@ -128,10 +128,7 @@
                                 </select>
                                 <div class="invalid-feedback">
                                     @error('status') {{ $message }} @enderror
-                                </div>
-                                <!-- <div class="valid-feedback">
-                                    Looks good!
-                                </div> -->
+                                </div>                                
                             </div>
                         </div>
                         @if(isset($slider))
@@ -155,30 +152,30 @@
 
 <script>
 
-    let issetSlider = '{{isset($slider)}}' ? true : false;
-    if (issetSlider) {
-        let contentType = '{{isset($slider) ? $slider->content_type : ''}}';
-        if (contentType == 1) {
-            document.getElementById('add_cs_Movie_div').removeAttribute("hidden");
-            document.getElementById('add_cs_Live_Tv_div').setAttribute("hidden", "");
-            document.getElementById('add_cs_Web_Series_div').setAttribute("hidden", "");
-        }
-        else if (contentType == 2) {
-            document.getElementById('add_cs_Movie_div').setAttribute("hidden", "");
-            document.getElementById('add_cs_Web_Series_div').removeAttribute("hidden");
-            document.getElementById('add_cs_Live_Tv_div').setAttribute("hidden", "");
-        }
-        else{
-            document.getElementById('add_cs_Movie_div').setAttribute("hidden", "");
-            document.getElementById('add_cs_Web_Series_div').setAttribute("hidden", "");
-            document.getElementById('add_cs_Live_Tv_div').removeAttribute("hidden", "");
+    // let issetSlider = '{{isset($slider)}}' ? true : false;
+    // if (issetSlider) {
+    //     let contentType = '{{isset($slider) ? $slider->content_type : ''}}';
+    //     if (contentType == 1) {
+    //         document.getElementById('add_cs_Movie_div').removeAttribute("hidden");
+    //         document.getElementById('add_cs_Live_Tv_div').setAttribute("hidden", "");
+    //         document.getElementById('add_cs_Web_Series_div').setAttribute("hidden", "");
+    //     }
+    //     else if (contentType == 2) {
+    //         document.getElementById('add_cs_Movie_div').setAttribute("hidden", "");
+    //         document.getElementById('add_cs_Web_Series_div').removeAttribute("hidden");
+    //         document.getElementById('add_cs_Live_Tv_div').setAttribute("hidden", "");
+    //     }
+    //     else{
+    //         document.getElementById('add_cs_Movie_div').setAttribute("hidden", "");
+    //         document.getElementById('add_cs_Web_Series_div').setAttribute("hidden", "");
+    //         document.getElementById('add_cs_Live_Tv_div').removeAttribute("hidden", "");
 
-        }
-    }
-    else{
-        document.getElementById('add_cs_Live_Tv_div').setAttribute("hidden", "");
-        document.getElementById('add_cs_Web_Series_div').setAttribute("hidden", "");
-    }
+    //     }
+    // }
+    // else{
+    //     document.getElementById('add_cs_Live_Tv_div').setAttribute("hidden", "");
+    //     document.getElementById('add_cs_Web_Series_div').setAttribute("hidden", "");
+    // }
     $("#add_slider_type").change(function () {        
         // alert($(this).val())
         $('.select').val('').trigger('change'); // Clear previous selection

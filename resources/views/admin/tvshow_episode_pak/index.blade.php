@@ -1,6 +1,6 @@
 @extends('layout.default')
 @section('mytitle', 'Admin List')
-@section('page', 'Channels  /  List')
+@section('page', 'Show Episodes Pak  /  List')
 
 @section('content')
 <div class="layout-px-spacing">
@@ -10,7 +10,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Total Episodes</small></p>
+                            <p class=""><small>Total Episodes Pak</small></p>
                             <h6 class="value" id="totalRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -29,7 +29,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Active Episodes</small></p>
+                            <p class=""><small>Active Episodes Pak</small></p>
                             <h6 class="value" id="activeRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -48,7 +48,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Inactive Episodes</small></p>
+                            <p class=""><small>Inactive Episodes Pak</small></p>
                             <h6 class="value" id="inactiveRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -67,7 +67,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Deleted Episodes</small></p>
+                            <p class=""><small>Deleted Episodes Pak</small></p>
                             <h6 class="value" id="deletedRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -101,91 +101,73 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif   
-                <div class="row d-flex justify-content-start align-items-center">
-                    <div class="col-md-3">
-                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
-                            <option value="">--Filter by Playlist Id--</option>
-                            @foreach ($playlist_ids as $item)
-                                <option value="{{$item}}">{{$item}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
-                            <option value="">--Filter by Status--</option>
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
-                    </div>
-                </div>              
-                <div class="text-left" style="margin:10px 0; padding-top:20px;">
+                @endif  
+                
+                <?php                     
+                    $season = \App\Models\TvShowSeasonPak::where('id', $id)->first();
+                    $show = \App\Models\TvShowPak::where('id', $season->show_id)->first();
+                    $channel = \App\Models\TvChannelPak::where('id', $show->tv_channel_id)->first();
+                ?>
+
+                <div class="text-left">
                     <p>
-                        <a href="{{route('admin.webseries')}}">{{strtoupper('Webseries')}}</a>&nbsp; &gt;
-                        <a href="{{route('admin.webseries.seasons', base64_encode($webseries->id)) }}">{{strtoupper($webseries->name)}}</a>&nbsp; &gt;
-                        <a href="{{route('admin.webseries.seasons.episodes', base64_encode($season->id))}}">{{ strtoupper($season->Session_Name)}}</a> 
+                        <a href="{{route('admin.tvchannel')}}">{{strtoupper('TV Channels Pak')}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshow', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshow.season', base64_encode($show->id))}}">{{strtoupper($show->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshow.episode', base64_encode($id))}}">{{strtoupper($season->title)}}</a>
                     </p>
                 </div>
-                <div class="text-right">
-                    <a href="{{url('webseriesepisodes-order/'.base64_encode($id))}}" class="btn btn-primary mb-2">Order Episodes</a>
-                    <a href="{{url('add-web-series-season-episode/'.base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
-                    <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
-                        Import from Playlist
-                    </button>  
+                
+                <div class="text-right" style="display: flex; justify-content:flex-end;align-items:center; gap:10px;">                    
+                    <a href="{{ route('admin.tvshowepisode.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
+                    <a href="{{route('addTvShowEpisodepak', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    <div class="text-left">
+                        <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
+                            Import from Playlist
+                        </button>   
+                    </div>                    
                 </div>
                 <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                        
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addContentModalLabel">Add Movies From Playlist</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        
-                        <div class="modal-body">                                
-                            <form id="importmoviesForm" method="POST" action="{{route('importPlaylistsereis')}}">
-                            @csrf
-                            <input type="text" name="seadon_id" id="seadson_id_playlist" value="{{$season->id}}">
-                                <div class="form-group">
-                                    <label for="networkName">Playlits Id</label>                                    
-                                    <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
-                                </div>                                
-                                <div class="form-group">        
-                                    <label for="status">Type</label>
-                                    <select name="type" id="type" class="form-control select">
-                                        <option value="0">Free</option>
-                                        <option value="1">Premium</option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        @error('size') {{ $message }} @enderror
-                                    </div>
-                                </div>                                                            
-                            </form>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="submit" form="importmoviesForm" class="btn btn-success">Save</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-                        
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                            
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addContentModalLabel">Add Movies From Playlist</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            
+                            <div class="modal-body">                                
+                                <form id="importmoviesForm" method="POST" action="{{route('importtvshowsepisodeplaylits')}}">
+                                @csrf
+                                <input type="hidden" name="id" value="{{$id}}">
+                                    <div class="form-group">
+                                        <label for="networkName">Playlits Id</label>                                    
+                                        <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
+                                    </div>                                                                                              
+                                </form>
+                            </div>
+                            
+                            <div class="modal-footer">
+                                <button type="submit" form="importmoviesForm" class="btn btn-success">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                            
+                            </div>
                         </div>
                     </div>
-                </div>
                 <div class="table-responsive mb-4 mt-4">
                     
-                    <table id="multi-column-ordering" class="table table-hover" data-table="web_series_episoade">
+                    <table id="multi-column-ordering" class="table table-hover" data-table="shows_episodes">
                         <thead>
-                            <tr>
-                                <th class="editable-th" data-column="Episoade_Name">Name</th>                                                                                                                         
-                                <th>Thumbnail</th>
-                                <th>Status</th>
-                                <th>Playlist Id</th>
-                                <th>Source</th>
-                                <th>Url</th>
-                                {{-- <th>Downloadable</th> --}}
-                                {{-- <th>Type</th> --}}
+                            <tr>                                
+                                <th class="editable-th" data-column="title">Title</th>                                                                                                                         
+                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                     
+                                <th>Status</th> 
+                                <th>Play</th>                                                                                                                                                                                                                                                                                                                          
+                                <th>Duration</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                <th>Playlist_id</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                    
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -194,15 +176,13 @@
                             
                         </tbody>
                         <tfoot>
-                            <tr>
-                                <th>Name</th>                                                                                                                                
-                                <th>Thumbnail</th>
-                                <th>Status</th>
-                                <th>Playlist Id</th>
-                                <th>Source</th>
-                                <th>Url</th>
-                                {{-- <th>Downloadable</th> --}}
-                                {{-- <th>Type</th> --}}
+                            <tr>                                
+                                <th>Title</th>                                                                                                                         
+                                <th>Thumbnail</th> 
+                                <th>Status</th>  
+                                <th>Play</th>                                                                                                                                                                                                                                                                                                                            
+                                <th>Duration</th>
+                                <th>Playlist_id</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -296,74 +276,60 @@
     $(document).ready(function(){        
       // DataTable
       $('#multi-column-ordering').DataTable({
-            processing: true,
-            serverSide: true,
-            destroy: true, // destroy on re-initialize
-            stateSave: true, 
-            order: [[0, 'asc']],        
-            ajax: {
-                url: "{{route('getWebseriesEpisodesList', $id)}}",
-                data: function(d) {
-                    d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
-                    d.status = $('#select_status').val(); // pass the selected network
-                }
-            },
-            columns: [
-            { data: 'Episoade_Name' },                        
-            { data: 'image',orderable: false, searchable: false },                        
-            { data: 'status',orderable: false, searchable: false  },
-            { data: 'playlist_id'},                        
-            { data: 'source' },
-            { data: 'url' },
-            // { data: 'downloadable',orderable: false, searchable: false  },
-            // { data: 'type',orderable: false, searchable: false  },
+         processing: true,
+         serverSide: true,
+         order: [[4, 'desc']],
+         ajax: "{{route('getTvShowEpisodeListPak', $id)}}",
+         columns: [            
+            { data: 'title' },                                                          
+            { data: 'thumbnail',orderable: false, searchable: false },                                                                                      
+            { data: 'status' },            
+            { data: 'play_btn' },            
+            { data: 'duration' },            
+            { data: 'playlist_id' },            
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
-            ],
-            columnDefs: [
-                {
-                    targets: 0, // index of 'name' column
-                    createdCell: function(td, cellData, rowData, row, col) {
-                        // $(td).addClass('editable');
-                        $(td).attr('data-id', rowData.id); // Set data-id attribute
-                    }
-                },            
-            ],
-            drawCallback: function (settings) { 
+         ],
+         columnDefs: [
+            {
+                targets: 0, // index of 'name' column
+                createdCell: function(td, cellData, rowData, row, col) {
+                    // $(td).addClass('editable');
+                    $(td).attr('data-id', rowData.id); // Set data-id attribute
+                }
+            },            
+        ],
+         drawCallback: function (settings) { 
             
-                var response = settings.json;
-                $('#totalRecords').text(response.totalRecords);
-                $('#activeRecords').text(response.activeRecords);
-                $('#inactiveRecords').text(response.inactiveRecords);
-                $('#deletedRecords').text(response.deletedRecords);
-                console.log(response);
-                $('[data-toggle="tooltip"]').tooltip();
-                updateIcon()
+            var response = settings.json;
+            $('#totalRecords').text(response.totalRecords);
+            $('#activeRecords').text(response.activeRecords);
+            $('#inactiveRecords').text(response.inactiveRecords);
+            $('#deletedRecords').text(response.deletedRecords);
+            console.log(response);
+            $('[data-toggle="tooltip"]').tooltip();
+            updateIcon()
+            setTimeout(() => {        
                 setEditable();
-            },
-        });      
+            }, 500);
+        },
+      });        
     });
 
-    $('#select_status').on('change', function() {        
-        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
+    function setEditable(){
+    $('#multi-column-ordering thead th').each(function (index) {            
+            
+        if ($(this).hasClass('editable-th')) {                    
+            $('#tableItem tr').each(function () {
+                $(this).find('td').eq(index).addClass('editable');                                
+            });
+        }
     });
+}
 
-    $('#select_playlist_id').on('change', function() {
-        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
-    });
-
-    function setEditable(){                
-        $('#multi-column-ordering thead th').each(function (index) {                                    
-            if ($(this).hasClass('editable-th')) {                           
-                $('#tableItem tr').each(function () {                                        
-                    $(this).find('td').eq(index).addClass('editable');                                
-                });
-            }
-        });
-    }
 
     function deleteRowModal(id){ 
-        $('#d_title').text('Websereis Episode')
+        $('#d_title').text('TV Shows Episode Pak')
         $('#d_id').val(id);
         $('#delete_modal').modal('show');        
     }
@@ -372,7 +338,7 @@
         var id = $('#d_id').val();
         $.ajax({
             type: 'POST',
-            url: "{{route('webseries-episode.destroy')}}",
+            url: "{{route('tvshowepisodepak.destroy')}}",
             data: {
                 _token: '{{ csrf_token() }}',
                 id:id
@@ -439,6 +405,7 @@
                                 setTimeout(() => {
                                     $('#alert-success').hide();
                                 }, 2000);
+                                // $('#multi-column-ordering').DataTable().ajax.reload();
                             }
                             else{
                                 const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);

@@ -110,14 +110,25 @@
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
                 @endif
-                <div class="text-left" style="display: flex; justify-content:flex-end;align-items:center; gap:10px; width:30%;">
-                    <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
-                        <option value="">--Filter by Playlist Id--</option>
-                        @foreach ($playlist_ids as $item)
-                            <option value="{{$item}}">{{$item}}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <div class="row d-flex justify-content-start align-items-center">
+                    <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>                                    
+                {{-- <div class="text-left" style="display: flex; justify-content:flex-end;align-items:center; gap:10px; width:30%;">
+                </div> --}}
                 <div class="text-right" style="display: flex; justify-content:flex-end;align-items:center; gap:10px;">
                     {{-- <select name="content_network" id="content_network" class="form-control w-25" style="width: 200px !important;" onchange="updateTable(this);">
                         <option value="">--Select--</option>
@@ -187,6 +198,7 @@
                                 <th class="editable-th" data-column="name">Name</th>                                                                                                                         
                                 <th>Banner Image</th>                                                                                                                         
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -200,6 +212,7 @@
                                 <th>Name</th>  
                                 <th>Banner Image</th>                                                                                                                                                                                                                                                       
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -216,88 +229,8 @@
 @endsection
 
 @section('footer')
-<!-- <script>
-    $(document).ready(function() { 
-      var table = $('#multi-column-ordering').DataTable({ 
-            // "aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-            "processing": true, //Feature control the processing indicator.
-            "serverSide": true, //Feature control DataTables' server-side processing mode.
-            "order": [], //Initial no order.
-             "language": {
-                "infoFiltered": '' 
-            },
-     
-            // Load data for the table's content from an Ajax source
-            "ajax": { 
-                "url": "{{route('getAdminList')}}",
-                // "type": "POST",
-                "data": function ( d ) {
-                    console.log(d);
-                    // d.parent_cat = $("#parent_cat").val();
-                            
-                }
-            },
 
-            columns: [
-                {data: 'name', name: 'name'},
-                {data: 'email', name: 'email'},
-                {data: 'mobile', name: 'mobile'},
-                {data: 'address', name: 'address'},
-                {data: 'city', name: 'city'},
-                {data: 'country', name: 'country'},
-                {data: 'company_name', name: 'company_name'},
-                {data: 'status', name: 'status'},
-                {data: 'created_at', name: 'created_at'},
-                {data: 'action', name: 'action', orderable: false, searchable: false}
-            ],
-          
-        });
-
-      $("input#search").on("keyup", function (event) {
-            if ($('#search').val().length >= 3 || $('#search').val().length == 0) {
-                table.draw(), event.preventDefault()
-            }
-        });
-        $("#btn-search").click(function (a) {
-            table.draw(), a.preventDefault()
-        });
-
-    });
-    </script> -->
-
-    <script src="cdn.datatables.net/plug-ins/1.12.1/sorting/date-uk.js"></script>
-
-{{-- <script type="text/javascript">
-    $(document).ready(function(){        
-      // DataTable
-      $('#multi-column-ordering').DataTable({
-         processing: true,
-         serverSide: true,
-         order: [[0, 'desc']],
-         ajax: "{{route('getMovieList')}}",
-         columns: [
-            { data: 'name' },                        
-            { data: 'banner', orderable: false, searchable: false  },                        
-            { data: 'status', orderable: false, searchable: false  },
-            { data: 'created_at' },
-            { data: 'action', orderable: false, searchable: false },
-         ],
-         drawCallback: function (settings) { 
-            
-            var response = settings.json;
-            $('#totalRecords').text(response.totalRecords);
-            $('#activeRecords').text(response.activeRecords);
-            $('#inactiveRecords').text(response.inactiveRecords);
-            $('#deletedRecords').text(response.deletedRecords);
-            console.log(response);
-            $('[data-toggle="tooltip"]').tooltip();
-            updateIcon()
-        },
-      });
-    });
-</script> --}}
-
-
+<script src="cdn.datatables.net/plug-ins/1.12.1/sorting/date-uk.js"></script>
 
 <script type="text/javascript">
 let dataTable;
@@ -307,17 +240,20 @@ function initializeDataTable(network_id = '') {
         processing: true,
         serverSide: true,
         destroy: true, // destroy on re-initialize
-        order: [[4, 'desc']],
+        stateSave: true, 
+        order: [[5, 'desc']],
         ajax: {
             url: "{{ route('getMovieList') }}",
             data: function(d) {
                 d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
+                d.status = $('#select_status').val(); // pass the selected network
             }
         },
         columns: [
-            { data: 'name', width: '400px'},                        
+            { data: 'name', width: '300px'},                        
             { data: 'banner', orderable: false, searchable: false },                        
             { data: 'status', orderable: false, searchable: false },
+            { data: 'play_btn', orderable: false, searchable: false },
             { data: 'playlist_id', orderable: true, searchable: true },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
@@ -333,6 +269,8 @@ function initializeDataTable(network_id = '') {
         ],
         drawCallback: function(settings) {
             var response = settings.json;
+            console.log('Datatabel reload !!');
+            
             $('#totalRecords').text(response.totalRecords);
             $('#activeRecords').text(response.activeRecords);
             $('#inactiveRecords').text(response.inactiveRecords);
@@ -346,9 +284,7 @@ function initializeDataTable(network_id = '') {
 
 function setEditable(){
     $('#multi-column-ordering thead th').each(function (index) {            
-            
-        if ($(this).hasClass('editable-th')) {
-            console.log('hii');                
+        if ($(this).hasClass('editable-th')) {                           
             $('#tableItem tr').each(function () {
                 $(this).find('td').eq(index).addClass('editable');                                
             });
@@ -362,9 +298,13 @@ $(document).ready(function() {
         setEditable();
     }, 500); 
 
+    $('#select_status').on('change', function() {        
+        dataTable.ajax.reload(null, false);
+    });
+
 
     $('#select_playlist_id').on('change', function() {
-        dataTable.ajax.reload();
+        dataTable.ajax.reload(null, false);
     });
 });
 
@@ -442,6 +382,22 @@ document.addEventListener('dblclick', function (event){
         });    
     }
 })
+
+function updateMovieStatus(url) {    
+    var request = $.ajax({
+                    url: url,
+                    method: "GET"
+                    });
+
+    request.done(function( val ) {        
+        var data = jQuery.parseJSON(val);
+        $("#delete_blog_modal").modal('hide');
+        $( "#delete_bd_ms" ).html(data.message);
+        // $('#multi-column-ordering').DataTable().ajax.reload();
+        // setTimeout(function(){location.reload(true);}, 2000);
+
+    });
+}
 
 </script>
 

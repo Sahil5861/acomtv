@@ -107,6 +107,31 @@
         </li>
 
         <li class="menu">
+            <a href="#tvapppak" data-toggle="collapse" <?php if(request()->is('*pak-tv-channel*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
+                <div class="">
+                    {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg> --}}
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    <span>TV Show Pak</span>
+                </div>
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*pak-tv-channel*')){ echo 'show';} ?>" id="tvapppak" data-parent="#accordionExample">
+                <li class="<?php if(request()->is('*tvchannel')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.tvchannelpak')}}"> Channels List </a>
+                </li>
+                <li class="<?php if(request()->is('*tvchannel-order')){ echo 'active';} ?>">
+                    <a href="{{route('admin.tvchannel.order')}}"> Channels Order </a>
+                </li>
+                {{-- <li class="<?php if(request()->is('*tvshow')){ echo 'active';} ?>" >
+                    <a href="{{route('admin.tvshow')}}"> Show List </a>
+                </li> --}}
+            </ul>
+            
+        </li>
+
+        <li class="menu">
             <a href="#kidsapp" data-toggle="collapse" <?php if(request()->is('*kids-channel*') || request()->is('*kids-shows*') || request()->is('*kid-shows-season*') || request()->is('*kid-shows-episode*')){ echo 'aria-expanded="true" data-active="true"';}else{echo 'aria-expanded="false"';} ?> class="dropdown-toggle">
                 <div class="">
                     {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layout"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg> --}}

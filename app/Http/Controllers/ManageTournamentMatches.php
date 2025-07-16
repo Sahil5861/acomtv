@@ -116,7 +116,20 @@ class ManageTournamentMatches extends Controller
                 "desc" => $record->description,                                                            
                 "streaming_info" => $record->streaming_info,                                                            
                 "match_datetime" => $matchdateTime,                                                            
-                "status" => $status,                
+                "status" => $status, 
+                "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->video_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
+     width="20" height="20" 
+     viewBox="0 0 24 24" 
+     fill="none" 
+     stroke="currentColor" 
+     stroke-width="2" 
+     stroke-linecap="round" 
+     stroke-linejoin="round" 
+     class="feather feather-eye">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+</svg>
+</a>',                
                 "start_date" => $record->start_date,                
                 "end_date" => $record->end_date,                
                 "logo" => '<img src="'.$record->logo.'" width="100px;">',                                                                              

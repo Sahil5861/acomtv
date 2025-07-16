@@ -113,11 +113,11 @@ class ManageSlider extends Controller
 
     public function addslider(){
 
-        $movies = Movie::whereNull('deleted_at')->get();
-        $livechannels = Channel::whereNull('deleted_at')->get();
-        $serieses  = WebSeries::whereNull('deleted_at')->get();
+        // $movies = Movie::whereNull('deleted_at')->get();
+        // $livechannels = Channel::whereNull('deleted_at')->get();
+        // $serieses  = WebSeries::whereNull('deleted_at')->get();
 
-        return view('admin.slider.add', compact('movies', 'livechannels', 'serieses'));
+        return view('admin.slider.add');
     }
 
     public function updateStatus($id){
@@ -137,34 +137,29 @@ class ManageSlider extends Controller
         
         $request->validate([
             'title' => 'required',
-            'content_type' =>'required',
-            'content_id_movie' =>'sometimes',
-            'content_id_channel' =>'sometimes',
-            'content_id_series' =>'sometimes',
+            // 'url' => 'required',                        
             'image' =>'required',
         ]);
 
-
-
-        $content_id = '';
-        if ($request->has('content_id_movie') && $request->content_id_movie != '') {
-            $content_id = $request->content_id_movie;
-        }
-        else if ($request->has('content_id_series') && $request->content_id_series != '') {
-            $content_id = $request->content_id_series;
-        }
-        else{
-            $content_id = $request->content_id_channel;
-        }
+        // $content_id = '';
+        // if ($request->has('content_id_movie') && $request->content_id_movie != '') {
+        //     $content_id = $request->content_id_movie;
+        // }
+        // else if ($request->has('content_id_series') && $request->content_id_series != '') {
+        //     $content_id = $request->content_id_series;
+        // }
+        // else{
+        //     $content_id = $request->content_id_channel;
+        // }
 
         if(!empty($request->id)){
             $slider = slider::firstwhere('id',$request->id);            
             $slider->banner = $request->image;
             $slider->title = $request->title;            
-            $slider->content_type = $request->content_type;            
-            $slider->content_id = $content_id;   
-            $slider->source_type = $request->source_type;            
-            $slider->url = $request->url;      
+            $slider->content_type = 1;            
+            // $slider->content_id = $content_id;   
+            $slider->source_type = $request->source_type ?? null;            
+            $slider->url = $request->url ?? null;      
             $slider->status = $request->status;
             if($slider->save()){
                 return back()->with('message','Slider updated successfully');
@@ -177,10 +172,10 @@ class ManageSlider extends Controller
 
             $slider->banner = $request->image;
             $slider->title = $request->title;            
-            $slider->content_type = $request->content_type;            
-            $slider->content_id = $content_id;  
-            $slider->source_type = $request->source_type;            
-            $slider->url = $request->url;      
+            $slider->content_type = 1;                      
+            // $slider->content_id = $content_id;  
+            $slider->source_type = $request->source_type ?? null;         
+            $slider->url = $request->url ?? null;      
             $slider->status = $request->status;
             if($slider->save()){
                 return back()->with('message','Slider added successfully');
@@ -192,11 +187,12 @@ class ManageSlider extends Controller
     }
 
     public function editSlider($id){
-        $this->data['slider'] = Slider::where('id',base64_decode($id))->first();
+        $slider = Slider::where('id',base64_decode($id))->first();
+        $this->data['slider'] = $slider;        
         // print_r($this->data['slider']);die;
-        $this->data['movies'] = Movie::whereNull('deleted_at')->get();
-        $this->data['livechannels'] = Channel::whereNull('deleted_at')->get();
-        $this->data['serieses'] = WebSeries::whereNull('deleted_at')->get();
+        // $this->data['movies'] = Movie::whereNull('deleted_at')->get();
+        // $this->data['livechannels'] = Channel::whereNull('deleted_at')->get();
+        // $this->data['serieses'] = WebSeries::whereNull('deleted_at')->get();
 
         return view('admin.slider.add',$this->data);
     }

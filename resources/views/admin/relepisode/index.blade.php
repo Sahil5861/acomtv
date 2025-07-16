@@ -161,6 +161,7 @@
                                 <th class="editable-th" data-column="title">Title</th>                                                                                                                         
                                 <th>Thumbnail</th>
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Source</th>                                
                                 <th>Playlist Id</th>
                                 <th>Downloadable</th>
@@ -177,6 +178,7 @@
                                 <th>Title</th>                                                                                                                                
                                 <th>Thumbnail</th>
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Source</th>                                
                                 <th>Playlist Id</th>
                                 <th>Downloadable</th>
@@ -282,6 +284,7 @@
             { data: 'title', width: '400px'},                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
+            { data: 'play_btn' },
             { data: 'source' },            
             { data: 'playlist_id' },
             { data: 'downloadable',orderable: false, searchable: false  },

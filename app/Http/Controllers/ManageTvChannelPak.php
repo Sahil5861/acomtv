@@ -3,17 +3,35 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\TvChannel;
+use App\Models\TvChannelPak;
 use App\Models\Language;
 
-class TournamentMatche extends Controller
+class ManageTvChannelPak extends Controller
 {
     public function index()
     {
-        return view('admin.tvchannel.index');
+        return view('admin.tvchannelpak.index');
     }
 
-    public function getTvChannelList(Request $request)
+    public function getTvChannelPakOrderList()
+    {
+        $this->data['tvchannels'] = TvChannelPak::whereNull('deleted_at')->orderBy('order', 'asc')->get();
+
+        $allTvChannelPaks = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['tvchannels'] as $tvchannel) {
+            $allTvChannelPaks[] = $tvchannel->order;
+            $dataForLoop[$tvchannel->order] = $tvchannel;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allTvChannelsPak'] = $allTvChannels;
+
+        return view('admin.tvchannel.dragdrop', $this->data);
+    }
+
+    public function getTvChannelpakList(Request $request)
     {
         $columns = [
             0 => 'id',
@@ -21,7 +39,7 @@ class TournamentMatche extends Controller
             2 => 'created_at',
         ];
 
-        $totalData = TvChannel::whereNull('deleted_at')->count();
+        $totalData = TvChannelPak::whereNull('deleted_at')->count();
         $totalFiltered = $totalData;
 
         $limit = $request->input('length');
@@ -30,7 +48,7 @@ class TournamentMatche extends Controller
         $dir = $request->input('order.0.dir') ?? 'desc';
 
         if (empty($request->input('search.value'))) {
-            $tvchannels = TvChannel::whereNull('deleted_at')
+            $tvchannels = TvChannelPak::whereNull('deleted_at')
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
@@ -38,7 +56,7 @@ class TournamentMatche extends Controller
         } else {
             $search = $request->input('search.value');
 
-            $tvchannels = TvChannel::where(function($query) use ($search) {
+            $tvchannels = TvChannelPak::where(function($query) use ($search) {
                     $query->where('id', 'LIKE', "%{$search}%")
                           ->orWhere('name', 'LIKE', "%{$search}%");
                 })
@@ -48,7 +66,7 @@ class TournamentMatche extends Controller
                 ->orderBy($order, $dir)
                 ->get();
 
-            $totalFiltered = TvChannel::where(function($query) use ($search) {
+            $totalFiltered = TvChannelPak::where(function($query) use ($search) {
                 $query->where('id', 'LIKE', "%{$search}%")
                       ->orWhere('name', 'LIKE', "%{$search}%");
             })
@@ -57,27 +75,14 @@ class TournamentMatche extends Controller
         }
 
         $data = [];
-        foreach ($tvchannels as $tvchannel) {
-            $tvchannelsData['id'] = $tvchannel->id;
+        foreach ($tvchannels as  $key => $tvchannel) {
+            $tvchannelsData['id'] = $key + 1;
             $tvchannelsData['name'] = $tvchannel->name;
-            $tvchannelsData['logo'] = $tvchannel->image ?? '';
+            $tvchannelsData['logo'] = $tvchannel->logo ?? '';
             $tvchannelsData['language'] = $tvchannel->language ?? '';
             $tvchannelsData['description'] = $tvchannel->description ?? '';
-            $tvchannelsData['play_btn'] = '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->video_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
-     width="20" height="20" 
-     viewBox="0 0 24 24" 
-     fill="none" 
-     stroke="currentColor" 
-     stroke-width="2" 
-     stroke-linecap="round" 
-     stroke-linejoin="round" 
-     class="feather feather-eye">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-</svg>
-</a>';
 
-            $statusUrl = url('tvchannel/update-status', base64_encode($tvchannel->id));
+            $statusUrl = url('tv-channel-pak/update-status', base64_encode($tvchannel->id));
             $checked = $tvchannel->status == 1 ? 'checked' : '';
             $tvchannelsData['status'] = '<a onchange="updateStatus(\'' . $statusUrl . '\')" href="javascript:void(0);">
                 <label class="switch s-primary mr-2">
@@ -87,13 +92,13 @@ class TournamentMatche extends Controller
             </a>';
 
             $tvchannelsData['action'] = '<div class="action-btn">
-                                            <a href="edit-tvchannel/' . base64_encode($tvchannel->id) . '">
+                                            <a href="edit-tvchannel-pak/' . base64_encode($tvchannel->id) . '">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                             </a>
 
-                                            <a href="tvshow/'.base64_encode($tvchannel->id).'" title="Manage Shows"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"></path><path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"></path></svg></a>
+                                            <a href="tv-show-pak/'.base64_encode($tvchannel->id).'" title="Manage Shows"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"></path><path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"></path></svg></a>
 
-                                            <a href="javascript:;" onclick="delete_item(\''.base64_encode($tvchannel->id) . '\',\'tvchannel\')">
+                                            <a href="javascript:;" onclick="deleteRowModal(\''.base64_encode($tvchannel->id) . '\')">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                             </a>
                                         </div>';
@@ -112,17 +117,17 @@ class TournamentMatche extends Controller
     public function addtvchannel()
     {
         $languages = Language::all();
-        return view('admin.tvchannel.add', compact('languages'));
+        return view('admin.tvchannelpak.add', compact('languages'));
     }
 
     public function updateStatus($id)
     {
-        $tvchannel = TvChannel::find(base64_decode($id));
+        $tvchannel = TvChannelPak::find(base64_decode($id));
 
         if ($tvchannel) {
             $tvchannel->status = $tvchannel->status == 1 ? 0 : 1;
             $tvchannel->save();
-            return response()->json(['message' => 'TvChannel status updated successfully']);
+            return response()->json(['message' => 'TvChannelPak status updated successfully']);
         }
 
         return response()->json(['message' => 'Something went wrong!!']);
@@ -135,13 +140,14 @@ class TournamentMatche extends Controller
         ]);
 
         if (!empty($request->id)) {
-            $tvchannel = TvChannel::find($request->id);
+            $tvchannel = TvChannelPak::find($request->id);
         } else {
-            $tvchannel = new TvChannel();
+            $tvchannel = new TvChannelPak();
         }
 
         $tvchannel->name = $request->name;
         $tvchannel->language = $request->language ?? null;
+        $tvchannel->logo = $request->logo ?? null;
         $tvchannel->description = $request->description ?? null;
         $tvchannel->status = $request->status;
 
@@ -157,7 +163,7 @@ class TournamentMatche extends Controller
             
         } else {
             if ($tvchannel->save()) {
-                return redirect()->route('admin.tvshow', base64_encode($id))->with('message', 'TV channel added Successfully !');
+                return redirect()->route('admin.tvshowpak', base64_encode($tvchannel->id))->with('message', 'TV channel added Successfully !');
             }
             else{
                 return back()->with('message', 'TV channel not added Successfully !');
@@ -166,39 +172,34 @@ class TournamentMatche extends Controller
         
     }
 
-    public function editTvChannel($id)
+    public function editTvChannelPak($id)
     {
-        $this->data['tvchannel'] = TvChannel::find(base64_decode($id));
+        $this->data['tvchannel'] = TvChannelPak::find(base64_decode($id));
         $this->data['languages'] = Language::all();
-        return view('admin.tvchannel.add', $this->data);
+        return view('admin.tvchannelpak.add', $this->data);
     }
 
     public function destroy(Request $request)
     {
-        $tvchannel = TvChannel::find(base64_decode($request->id));
+        $tvchannel = TvChannelPak::find(base64_decode($request->id));
         $tvchannel->deleted_at = time();
 
         if ($tvchannel->save()) {
-            return response()->json(['message' => 'TvChannel deleted successfully']);
+            return response()->json(['message' => 'TvChannelPak deleted successfully']);
         } else {
-            return response()->json(['message' => 'TvChannel not deleted']);
+            return response()->json(['message' => 'TvChannelPak not deleted']);
         }
     }
-
-    public function getTvChannelOrderList()
+    public function saveTvChannelPakOrder(Request $request)
     {
-        $this->data['tvchannels'] = TvChannel::orderBy('index', 'asc')->get();
-        return view('admin.tvchannel.dragdrop', $this->data);
-    }
+        $ids = $request->ids;
 
-    public function saveTvChannelOrders(Request $request)
-    {
-        foreach ($request->numbers as $key => $id) {
-            $tvchannel = TvChannel::find($id);
-            $tvchannel->index = $key + 1;
-            $tvchannel->save();
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                TvChannelPak::where('id', $id)->update(['order' => $index + 1]);
+            }
         }
 
-        return back()->with('message', 'TvChannel ordered successfully');
+        return redirect()->back()->with('success', 'Tv Channel order updated successfully.');
     }
 }

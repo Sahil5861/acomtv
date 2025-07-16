@@ -84,6 +84,25 @@
         <!--  BEGIN CONTENT AREA  -->
         <div id="content" class="main-content">
             @yield('content')
+            
+            <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+                    <div class="modal-content">                    
+                    
+                    <div class="modal-body">                                
+                        <div class="container-fluid p-3 bg-dark">
+                            <iframe frameborder="0" class="w-100" style="height: 600px;" id="video-player" allowfullscreen allow="autoplay" ></iframe>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">                        
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                    
+                    </div>
+                </div>
+            </div>
+
 
             <div class="footer-wrapper">
                 <div class="footer-section f-section-1">
@@ -142,6 +161,36 @@
         });
     });
 </script>
+
+<script>
+    function openVideoModal(element) {
+        const videoId = element.getAttribute('data-video-id');        
+        const videoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+
+        const iframe = document.getElementById('video-player');
+        iframe.src = videoSrc;
+
+        // const modal = new bootstrap.Modal(document.getElementById('videoModal'));
+        // modal.show();
+        $('#videoModal').modal('show');
+
+        // // Stop video on modal close
+        $('#videoModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            iframe.src = ''; // clear iframe to stop video
+        });
+
+        
+    }
+
+    $('.close-video-modal').on('click', function (){        
+        alert('hii');
+        const iframe = document.getElementById('video-player');
+        iframe.src = '';
+        $('#videoModal').modal('hide');
+    })
+
+</script>
+
     <script src="{{asset('theme/assets/js/custom.js')}}"></script>
     <!-- END GLOBAL MANDATORY SCRIPTS -->
 
@@ -173,7 +222,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="d_title"></h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" class="close close-video-modal" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -235,7 +284,13 @@
                 var data = jQuery.parseJSON(val);
                 $("#delete_blog_modal").modal('hide');
                 $( "#delete_bd_ms" ).html(data.message);
-                $('#multi-column-ordering').DataTable().ajax.reload();
+                // $('#multi-column-ordering').DataTable().ajax.reload();
+                if ($.fn.DataTable.isDataTable('#multi-column-ordering')) {
+                    $('#multi-column-ordering').DataTable().ajax.reload(null, false); // ✅ stay on same page
+                } else {
+                    // fallback: reload full page
+                    window.location.reload();
+                }
                 // setTimeout(function(){location.reload(true);}, 2000);
 
             });

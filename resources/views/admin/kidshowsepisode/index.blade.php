@@ -120,7 +120,7 @@
                                 <th>Thumbnail</th>
                                 <th>Status</th>
                                 <th>Source</th>
-                                <th>Url</th>
+                                <th>Play</th>
                                 <th>Downloadable</th>
                                 <th>Type</th>
                                 <th>Created Date</th>
@@ -136,7 +136,7 @@
                                 <th>Thumbnail</th>
                                 <th>Status</th>
                                 <th>Source</th>
-                                <th>Url</th>
+                                <th>Play</th>
                                 <th>Downloadable</th>
                                 <th>Type</th>
                                 <th>Created Date</th>
@@ -234,14 +234,14 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[0, 'asc']],
+         order: [[7, 'desc']],
          ajax: "{{route('getKidsShowEpisodesList', $id)}}",
          columns: [
             { data: 'Episoade_Name' },                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
             { data: 'source' },
-            { data: 'url' },
+            { data: 'play_btn' },
             { data: 'downloadable',orderable: false, searchable: false  },
             { data: 'type',orderable: false, searchable: false  },
             { data: 'created_at' },

@@ -116,6 +116,15 @@
                         <a href="{{route('admin.tvshow.season', base64_encode($show->id))}}">{{strtoupper($show->name)}}</a>&nbsp; &gt;                        
                         <a href="{{route('admin.tvshow.episode', base64_encode($id))}}">{{strtoupper($season->title)}}</a>
                     </p>
+
+                    <div class="text-left" style="display: flex; justify-content:flex-end;align-items:center; gap:10px; width:30%;">
+                    <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                        <option value="">--Filter by Playlist Id--</option>
+                        @foreach ($playlist_ids as $item)
+                            <option value="{{$item}}">{{$item}}</option>
+                        @endforeach
+                    </select>
+                </div>
                 </div>
                 
                 <div class="text-right" style="display: flex; justify-content:flex-end;align-items:center; gap:10px;">                    
@@ -161,10 +170,12 @@
                     
                     <table id="multi-column-ordering" class="table table-hover" data-table="shows_episodes">
                         <thead>
-                            <tr>                                
+                            <tr>                  
+                                <th>S.no</th>              
                                 <th class="editable-th" data-column="title">Title</th>                                                                                                                         
                                 <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                     
-                                <th>Status</th>                                                                                                                                                                                                                                                                                                                     
+                                <th>Status</th>              
+                                <th>Play</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
                                 <th>Duration</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                    
                                 <th>Playlist_id</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                    
                                 <th>Created Date</th>
@@ -175,10 +186,12 @@
                             
                         </tbody>
                         <tfoot>
-                            <tr>                                
+                            <tr>      
+                                <th>S.no</th>             
                                 <th>Title</th>                                                                                                                         
                                 <th>Thumbnail</th> 
                                 <th>Status</th>                                                                                                                                                                                                                                                                                                                        
+                                <th>Play</th>                                                                                                                                                                                                                                                                                                                        
                                 <th>Duration</th>
                                 <th>Playlist_id</th>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
                                 <th>Created Date</th>
@@ -276,12 +289,20 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[4, 'desc']],
-         ajax: "{{route('getTvShowEpisodeList', $id)}}",
-         columns: [            
+         stateSave: true, 
+         order: [[0, 'asc']],
+         ajax: {
+            url :  "{{route('getTvShowEpisodeList', $id)}}",
+            data: function(d) {
+                d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
+            }
+        },
+         columns: [  
+            { data: 'episode_number' },                                                          
             { data: 'title' },                                                          
             { data: 'thumbnail',orderable: false, searchable: false },                                                                                      
             { data: 'status' },            
+            { data: 'play_btn' },            
             { data: 'duration' },            
             { data: 'playlist_id' },            
             { data: 'created_at' },
@@ -289,7 +310,7 @@
          ],
          columnDefs: [
             {
-                targets: 0, // index of 'name' column
+                targets: 1, // index of 'name' column
                 createdCell: function(td, cellData, rowData, row, col) {
                     // $(td).addClass('editable');
                     $(td).attr('data-id', rowData.id); // Set data-id attribute
@@ -306,11 +327,16 @@
             console.log(response);
             $('[data-toggle="tooltip"]').tooltip();
             updateIcon()
+            setTimeout(() => {        
+                setEditable();
+            }, 500);
         },
       });
-        setTimeout(() => {        
-            setEditable();
-        }, 500);
+
+      $('#select_playlist_id').on('change', function() {
+            $('#multi-column-ordering').DataTable().ajax.reload();
+        });
+        
     });
 
     function setEditable(){
@@ -342,7 +368,13 @@
             },
             success: function(data){
                 $('#delete_modal').modal('hide');
-                $('#multi-column-ordering').DataTable().ajax.reload();
+                // $('#multi-column-ordering').DataTable().ajax.reload();
+                if ($.fn.DataTable.isDataTable('#multi-column-ordering')) {
+                    $('#multi-column-ordering').DataTable().ajax.reload(null, false); // ✅ stay on same page
+                } else {
+                    // fallback: reload full page
+                    window.location.reload();
+                }
             }
         })
     }

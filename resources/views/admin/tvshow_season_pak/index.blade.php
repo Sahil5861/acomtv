@@ -1,6 +1,6 @@
 @extends('layout.default')
 @section('mytitle', 'Admin List')
-@section('page', 'Seasons Matches  /  List')
+@section('page', 'Show SeasonsPak  /  List')
 
 @section('content')
 <div class="layout-px-spacing">
@@ -10,7 +10,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Total Matches</small></p>
+                            <p class=""><small>Total SeasonsPak</small></p>
                             <h6 class="value" id="totalRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -29,7 +29,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Active Matches</small></p>
+                            <p class=""><small>Active SeasonsPak</small></p>
                             <h6 class="value" id="activeRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -48,7 +48,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Inactive Matches</small></p>
+                            <p class=""><small>Inactive SeasonsPak</small></p>
                             <h6 class="value" id="inactiveRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -67,7 +67,7 @@
                 <div class="widget-content">
                     <div class="w-content">
                         <div class="w-info">
-                            <p class=""><small>Deleted Matches</small></p>
+                            <p class=""><small>Deleted SeasonsPak</small></p>
                             <h6 class="value" id="deletedRecords">--</h6>
                             <!-- <p class=""><small>Total Channels</small></p> -->
                         </div>
@@ -81,7 +81,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
             
             <div class="widget-content widget-content-area br-6">
@@ -92,40 +91,33 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif
-
-                <?php 
-                    $sesonId = $id;
-                    $season = \App\Models\TournamentSeason::where('id', $id)->first();
-                    $tournament = \App\Models\SportsTournament::where('id', $season->sports_tournament_id)->first();
-                    $sport = \App\Models\SportsCategory::where('id', $tournament->sports_category_id )->first();
-                ?> 
+                @endif  
                 
+                <?php 
+                    $show = \App\Models\TvShowPak::where('id', $id)->first();
+                    $channel = \App\Models\TvChannelPak::where('id', $show->tv_channel_id)->first();
+                    $season = \App\Models\TvShowSeasonPak::where('show_id', $show->id)->first();
+                ?>
+
                 <div class="text-left">
                     <p>
-                        <a href="{{route('admin.sportscategory')}}">{{strtoupper('Sports')}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.sporttournament', base64_encode($sport->id))}}">{{strtoupper($sport->title)}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.sporttournamentseasons', base64_encode($tournament->id))}}">{{strtoupper($tournament->title)}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.sporttournamentseasonsepisodes', base64_encode($season->id))}}">{{strtoupper($season->season_title)}}</a>                        
+                        <a href="{{route('admin.tvchannelpak')}}">{{strtoupper('TV Channels Pak')}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshowpak', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshowpak.season', base64_encode($show->id))}}">{{strtoupper($show->name)}}</a>&nbsp; &gt;                        
                     </p>
                 </div>
                 
-                <div class="text-right">                    
-                    <a href="{{ route('admin.tournamentmatches.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Matches</a>
-                    <a href="{{route('addsportstournamentseasonepisodes', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                <div class="text-right">
+                    <a href="{{ route('admin.tvshowseason.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order SeasonsPak</a>
+                    <a href="{{route('addTvShowSeasonpak', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
                     <table id="multi-column-ordering" class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Match Title</th>                                                                                                                                
-                                <th>Match Type</th>                                                                                                                                
-                                <th>Streaming Info</th> 
-                                <th>Date Time</th>                                                                                                                                                                          
-                                <th>Status</th>   
-                                <th>Play</th>                                                                                                                                                                                       
-                                <th>Description</th>                                                                
+                                <th>Name</th>                                                                                                                                                                                                                                                                                                                      
+                                <th>Status</th>                                                                                                                             
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -135,13 +127,8 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>Match Title</th>                                                                                                                                
-                                <th>Match Type</th>                                                                                                                                
-                                <th>Streaming Info</th> 
-                                <th>Date Time</th>                                                                                                                                                                          
-                                <th>Status</th>  
-                                <th>Play</th>                                                                                                                                                                                        
-                                <th>Description</th>                                                                
+                                <th>Name</th>                                                                                                                                                                 
+                                <th>Status</th>                                                                                                                                                                                                                                                                                        
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -229,29 +216,22 @@
     });
     </script> -->
 
-<script src="cdn.datatables.net/plug-ins/1.12.1/sorting/date-uk.js"></script>
+    <script src="cdn.datatables.net/plug-ins/1.12.1/sorting/date-uk.js"></script>
 
-<script type="text/javascript">
+  <script type="text/javascript">
     $(document).ready(function(){        
       // DataTable
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
          order: [[0, 'asc']],
-         ajax: "{{route('get-sports-tournament-episodesList', $id)}}",
+         ajax: "{{route('getTvShowSeasonPakList', $id)}}",
          columns: [
-            { data: 'match_title' },                                                          
-            { data: 'match_type'},                                                
-            { data: 'streaming_info'},                                                
-            { data: 'match_datetime'},                                                
-            { data: 'status' },            
-            { data: 'play_btn' },            
-            { data: 'desc' },
+            { data: 'title' },                                                                      
+            { data: 'status' },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
-
-        
          drawCallback: function (settings) { 
             
             var response = settings.json;
@@ -267,7 +247,7 @@
     });
 
     function deleteRowModal(id){ 
-        $('#d_title').text('Match')
+        $('#d_title').text('TV Shows Sesons')
         $('#d_id').val(id);
         $('#delete_modal').modal('show');        
     }
@@ -276,7 +256,7 @@
         var id = $('#d_id').val();
         $.ajax({
             type: 'POST',
-            url: "{{route('sportstournamentseasonepisodes.destroy')}}",
+            url: "{{route('tvshowseason.destroy')}}",
             data: {
                 _token: '{{ csrf_token() }}',
                 id:id

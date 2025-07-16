@@ -12,8 +12,10 @@ class WebseriesEpisodes extends Controller
         $id = base64_decode($id); 
         $season = WebSeriesSeason::where('id', $id)->first();
         $webseries = \App\Models\WebSeries::where('id',$season->web_series_id)->first();
+
+        $playlist_ids = WebSeriesEpisode::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();        
            
-        return view('admin.webseriesepisode.index', compact('id', 'season', 'webseries'));
+        return view('admin.webseriesepisode.index', compact('id', 'season', 'webseries', 'playlist_ids'));
     }
     public function getWebseriesEpisodesOrderList($id)
     {
@@ -51,29 +53,59 @@ class WebseriesEpisodes extends Controller
         $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
+        $playlist_id = $request->input('playlist_id');
+        $status = number_format($request->input('status'));        
+
+        $query = WebSeriesEpisode::query()->whereNull('web_series_episoade.deleted_at');
+        if (!empty($playlist_id)) {            
+            $query->where('playlist_id', $playlist_id);
+        }
+
+        if (!empty($status)) {                     
+            $query->where('status', $status);
+        }
+
         // Total records
         // Total records
-        $totalRecords = WebSeriesEpisode::select('count(*) as allcount')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id)->count();
-        $inactiveRecords = WebSeriesEpisode::select('count(*) as allcount')->where('status','0')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id)->count();
-        $activeRecords = WebSeriesEpisode::select('count(*) as allcount')->where('status','1')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id)->count();
-        $deletedRecords = WebSeriesEpisode::select('count(*) as allcount')->whereNotNull('web_series_episoade.deleted_at')->where('season_id', $id)->count();
+        $totalRecords = WebSeriesEpisode::select('count(*) as allcount')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id);
+        $inactiveRecords = WebSeriesEpisode::select('count(*) as allcount')->where('status','0')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id);
+        $activeRecords = WebSeriesEpisode::select('count(*) as allcount')->where('status','1')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id);
+        $deletedRecords = WebSeriesEpisode::select('count(*) as allcount')->whereNotNull('web_series_episoade.deleted_at')->where('season_id', $id);
+
+        if (!empty($playlist_id)) {
+            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
+            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
+            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
+            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+        }
+
+        if (!empty($status)) {
+            $totalRecords = $totalRecords->where('status', $status);
+            $inactiveRecords = $inactiveRecords->where('status', $status);
+            $activeRecords = $activeRecords->where('status', $status);                   
+            $deletedRecords = $deletedRecords->where('status', $status);
+        }
+
+        $totalRecords = $totalRecords->count();
+        $inactiveRecords = $inactiveRecords->count();
+        $activeRecords = $activeRecords->count();
+        $deletedRecords = $deletedRecords->count();
 
 
-        $totalRecordswithFilter = WebSeriesEpisode::select('count(*) as allcount')
-        ->where('Episoade_Name', 'like', '%' . $searchValue . '%')
-        // ->where('channels.status', '=', 1)
-        ->whereNull('web_series_episoade.deleted_at')->where('season_id', $id)
+        $totalRecordswithFilter = $query->where(function ($query) use ($searchValue){
+            $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
+        })                
+        ->where('season_id', $id)
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = WebSeriesEpisode::orderBy($columnName, $columnSortOrder)
-            // ->where('channels.status', '=', 1)
-            ->whereNull('web_series_episoade.deleted_at')
-            ->where('web_series_episoade.Episoade_Name', 'like', '%' . $searchValue . '%')
-            ->where('season_id', $id)
-
-            // ->orWhere('channels.description', 'like', '%' . $searchValue . '%')
-            // ->orWhere('channels.contact_email', 'like', '%' . $searchValue . '%')
+        $records = $query->orderBy($columnName, $columnSortOrder)
+                ->where(function ($query) use ($searchValue){
+                            $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
+                                    ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
+                        })->where('season_id', $id)
+            
             ->select('web_series_episoade.*')->orderBy('web_series_episoade.created_at','asc')            
             ->skip($start)
             ->take($rowperpage)
@@ -98,9 +130,11 @@ class WebseriesEpisodes extends Controller
             $downloadable = $record->downloadable == 1 ? 'Yes' : 'No';
 
             $data_arr[] = array(
+                "id" => $record->id,
                 "Episoade_Name" => $record->Episoade_Name,                                                            
                 "status" => $status,                
                 "image" => '<img src="'.$record->episoade_image.'" width="100px;">',                
+                "playlist_id" => $record->playlist_id,
                 "source" => $record->source,                
                 "downloadable" => '<span class="badge bg-primary">'.$downloadable.'</span>',                
                 "type" => '<span class="badge bg-primary">'.$type.'</span>',                
@@ -231,5 +265,93 @@ class WebseriesEpisodes extends Controller
         }else{
             echo json_encode(['message','Something went wrong!!']);
         }
+    }
+
+    public function importPlaylist(Request $request){
+        $request->validate([
+            'playlist_id' => 'required',            
+        ]);
+        // print_r($request->all()); exit;
+        $playlistId = $request->input('playlist_id');
+        $seadon_id = $request->input('seadon_id');
+        $type = $request->type;
+
+        $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
+        $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
+        $nextPageToken = null;
+
+        do {
+            $url = $baseurl;
+            if ($nextPageToken) {
+                $url .= "&pageToken=" . $nextPageToken;
+            }
+
+            $ch = curl_init($url);
+    
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+            $response = curl_exec($ch);
+    
+            if(curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return response()->json(['success' => false, 'error' => $error_msg], 500);
+            }
+            curl_close($ch);
+            
+            $data = json_decode($response, true);        
+
+            if (!isset($data['items'])) break;
+
+            foreach ($data['items'] as $key => $item) {    
+                $snippet = $item['snippet'];
+                $seriesName = $snippet['title'] ?? null;
+                $series_url = $snippet['resourceId']['videoId'] ?? null;
+
+                if ($this->checkIsExist($seriesName, $series_url) || trim($seriesName) == 'Private video') {
+                    continue;
+                }
+
+                $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+                $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                        
+                $episode = new WebSeriesEpisode();
+
+                $channel_number = WebSeriesEpisode::whereNull('deleted_at')->count();
+                $formated_number = $channel_number + 1;   
+
+                $episode->Episoade_Name = $seriesName;            
+                $episode->episoade_image = $cleanBannerUrl ?? null;            
+                $episode->episoade_description = $snippet['description'] ?? null;
+                $episode->episoade_order = $formated_number;            
+                $episode->season_id = $seadon_id;            
+                $episode->downloadable = 0;            
+                $episode->type = $type;            
+                $episode->status = 0;            
+                $episode->source = 'Youtube';            
+                $episode->url = $series_url;            
+                $episode->skip_available =  0;            
+                $episode->intro_start = null;            
+                $episode->intro_end = null;
+                $episode->playlist_id = $playlistId;
+
+                $episode->save();                
+            }
+
+            $nextPageToken = $data['nextPageToken'] ?? null;                    
+        } while ($nextPageToken); 
+        
+        return back()->with('message','Playlist Uploaded successfully');
+
+    }
+
+    public function checkIsExist($episode_name, $url){
+        return WebSeriesEpisode::where(function ($query) use ($episode_name, $url){
+            $query->whereRaw('LOWER(TRIM(Episoade_Name)) = ?', [strtolower(trim($episode_name))])
+                    ->orWhereRaw('LOWER(TRIM(url)) = ?', [strtolower(trim($url))]);
+        })
+        ->whereNull('deleted_at')
+        ->first();
     }
 }

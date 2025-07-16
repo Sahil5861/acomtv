@@ -3,25 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\TvShowEpisode;
+use App\Models\TvShowEpisodePak;
 use App\Models\Genre;
 use App\Models\ContentNetwork;
 
-class ManageTvShowEpisode extends Controller
+class ManageTvShowEpisodePak extends Controller
 {
     public function index($id)    
     {        
         $id = base64_decode($id);   
         $content_networks = ContentNetwork::where('status', 1)->get();
-        $genres = Genre::where('status',1)->get(); 
-        $playlist_ids = TvShowEpisode::where('playlist_id', '!=', null)->where('season_id', $id)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();            
-        return view('admin.tvshow_episode.index', compact('id', 'content_networks', 'genres', 'playlist_ids'));
+        $genres = Genre::where('status',1)->get();     
+        return view('admin.tvshow_episode_pak.index', compact('id', 'content_networks', 'genres'));
     }
 
     public function getTvShowEpisodesOrderList($id)
     {
         $id = base64_decode($id);
-        $this->data['tvshowepisode'] = TvShowEpisode::whereNull('deleted_at')->where('season_id', $id)->orderBy('episoade_order', 'asc')->get();
+        $this->data['tvshowepisode'] = TvShowEpisodePak::whereNull('deleted_at')->where('season_id', $id)->orderBy('episoade_order', 'asc')->get();
 
         $this->data['id'] = $id;
         $allTvShowEpisodes = [];
@@ -53,66 +52,38 @@ class ManageTvShowEpisode extends Controller
         $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
-        $playlist_id = $request->input('playlist_id');
-        $status = $request->input('status');
-        $status = number_format($status);
-        
-
         // Total records
         // Total records
-        $query = TvShowEpisode::select('count(*) as allcount')->whereNull('deleted_at');
+        $query = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at');
 
-        if (!empty($playlist_id)) {            
-            $query->where('playlist_id', $playlist_id);
-        }
-        if (!empty($status)) {                     
-            $query->where('status', $status);
-        }
+        $totalRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->count();
+        $inactiveRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 0)->count();
+        $activeRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 1)->count();
+        $deletedRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNotNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->count();
 
-        $totalRecords = TvShowEpisode::select('count(*) as allcount')->whereNull('deleted_at')->where('season_id', $id);
-        $inactiveRecords = TvShowEpisode::select('count(*) as allcount')->whereNull('deleted_at')->where('season_id', $id)->where('status', 0);
-        $activeRecords = TvShowEpisode::select('count(*) as allcount')->whereNull('deleted_at')->where('season_id', $id)->where('status', 1);
-        $deletedRecords = TvShowEpisode::select('count(*) as allcount')->whereNotNull('deleted_at')->where('season_id', $id);
-
-        if (!empty($playlist_id)) {
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if (!empty($status)) {
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
-
-        $totalRecords = $totalRecords->count();
-        $inactiveRecords = $inactiveRecords->count();
-        $activeRecords = $activeRecords->count();
-        $deletedRecords = $deletedRecords->count();
         
 
         $totalRecordswithFilter = $query->where(function($query) use ($searchValue){
-                $query->where('shows_episodes.title', 'like', '%' . $searchValue . '%')
-                    ->orWhere('shows_episodes.playlist_id', 'like', '%' . $searchValue . '%');
-        })         
-        ->where('season_id', $id)
+                $query->where('shows_episodes_pak.title', 'like', '%' . $searchValue . '%')
+                    ->orWhere('shows_episodes_pak.playlist_id', 'like', '%' . $searchValue . '%');
+        }) 
+        // ->where('channels.status', '=', 1)
+        ->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = $query->orderBy($columnName, $columnSortOrder)
-            // ->where('channels.status', '=', 1)            
+        $records = TvShowEpisodePak::orderBy($columnName, $columnSortOrder)
+            // ->where('channels.status', '=', 1)
+            ->whereNull('shows_episodes_pak.deleted_at')
             ->where(function($query) use ($searchValue){
-                $query->where('shows_episodes.title', 'like', '%' . $searchValue . '%')
-                    ->orWhere('shows_episodes.playlist_id', 'like', '%' . $searchValue . '%');
+                $query->where('shows_episodes_pak.title', 'like', '%' . $searchValue . '%')
+                    ->orWhere('shows_episodes_pak.playlist_id', 'like', '%' . $searchValue . '%');
             })        
             ->where('season_id', $id)
 
             // ->orWhere('channels.description', 'like', '%' . $searchValue . '%')
             // ->orWhere('channels.contact_email', 'like', '%' . $searchValue . '%')
-            ->select('shows_episodes.*')->orderBy('shows_episodes.created_at','asc')            
+            ->select('shows_episodes_pak.*')->orderBy('shows_episodes_pak.created_at','asc')            
             ->skip($start)
             ->take($rowperpage)
             ->get();
@@ -121,7 +92,7 @@ class ManageTvShowEpisode extends Controller
 
         foreach ($records as $record) {
             if($record->status == 1){
-                $status = '<a onchange="updateStatus(\''.url('tvshow-episode/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
+                $status = '<a onchange="updateStatus(\''.url('tv-show-pak-episode/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
             }else{
                 $status = '<a onchange="updateStatus(\''.url('tvshow-episode/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
             }
@@ -139,13 +110,13 @@ class ManageTvShowEpisode extends Controller
             $duration = $hours > 0 ?  $hours.' h '.$minutes : $minutes;
 
             $data_arr[] = array(
-                "id" => $record->id,                
+                "id" => $record->id,
                 "title" => $record->title,    
                 "playlist_id" => $record->playlist_id,                                                                                                       
                 "episode_number" => $record->episode_number,                                                                                                           
                 "duration" => $duration,                                                                                                           
                 "status" => $status,                                                                                                           
-                "url" => $record->video_url,     
+                "url" => $record->video_url,  
                 "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->video_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
      width="20" height="20" 
      viewBox="0 0 24 24" 
@@ -158,11 +129,11 @@ class ManageTvShowEpisode extends Controller
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
     <circle cx="12" cy="12" r="3"></circle>
 </svg>
-</a>',                                                                                                      
+</a>',                                                                                                           
                 "thumbnail" => '<img src="'.$record->thumbnail.'" width="100px;">',                                                                              
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">
-                        <a href="'.route("editTvShowEpisode",base64_encode($record->id)).'" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>                        
+                        <a href="'.route("editTvShowEpisodepak",base64_encode($record->id)).'" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>                        
                         <a href="javascript:;" onclick="deleteRowModal(\''.base64_encode($record->id).'\')">'.$del_icon.'</a>
                       </div>',
             );
@@ -172,7 +143,7 @@ class ManageTvShowEpisode extends Controller
             "draw" => intval($draw),
             "iTotalRecords" => $totalRecords,
             "iTotalDisplayRecords" => $totalRecordswithFilter,
-            "aaData" => $data_arr,            
+            "aaData" => $data_arr,
             "totalRecords" => number_format($totalRecords),
             "activeRecords" => number_format($activeRecords),
             "inactiveRecords" => number_format($inactiveRecords),
@@ -185,17 +156,17 @@ class ManageTvShowEpisode extends Controller
     {
         $id = base64_decode($id);               
 
-        return view('admin.tvshow_episode.add', compact('id'));
+        return view('admin.tvshow_episode_pak.add', compact('id'));
     }
 
     public function updateStatus($id)
     {
-        $tvshow = TvShowEpisode::find(base64_decode($id));
+        $tvshow = TvShowEpisodePak::find(base64_decode($id));
 
         if ($tvshow) {
             $tvshow->status = $tvshow->status == 1 ? 0 : 1;
             $tvshow->save();
-            return response()->json(['message' => 'TvShowEpisode status updated successfully']);
+            return response()->json(['message' => 'Tv Show Episode Pak status updated successfully']);
         }
 
         return response()->json(['message' => 'Something went wrong!!']);
@@ -208,9 +179,9 @@ class ManageTvShowEpisode extends Controller
         ]);
 
         if (!empty($request->id)) {
-            $episode = TvShowEpisode::find($request->id);
+            $episode = TvShowEpisodePak::find($request->id);
         } else {
-            $episode = new TvShowEpisode();
+            $episode = new TvShowEpisodePak();
         }
 
         // print_r($request->all()); exit;
@@ -244,21 +215,21 @@ class ManageTvShowEpisode extends Controller
 
     public function editTvShowEpisode($id)
     {
-        $episode = TvShowEpisode::find(base64_decode($id));
+        $episode = TvShowEpisodePak::find(base64_decode($id));
         $this->data['episode'] = $episode;
         $this->data['id'] = $episode->season_id;
-        return view('admin.tvshow_episode.add', $this->data);
+        return view('admin.tvshow_episode_pak.add', $this->data);
     }
 
     public function destroy(Request $request)
     {
-        $tvshow = TvShowEpisode::find(base64_decode($request->id));
+        $tvshow = TvShowEpisodePak::find(base64_decode($request->id));
         $tvshow->deleted_at = time();
 
         if ($tvshow->save()) {
-            return response()->json(['message' => 'TvShowEpisode deleted successfully']);
+            return response()->json(['message' => 'TvShowEpisodePak deleted successfully']);
         } else {
-            return response()->json(['message' => 'TvShowEpisode not deleted']);
+            return response()->json(['message' => 'TvShowEpisodePak not deleted']);
         }
     }
 
@@ -267,7 +238,7 @@ class ManageTvShowEpisode extends Controller
         $ids = $request->ids; 
         if (!empty($ids)) {
             foreach ($ids as $index => $id) {
-                TvShowEpisode::where('id', $id)->update(['episoade_order' => $index + 1]);
+                TvShowEpisodePak::where('id', $id)->update(['episoade_order' => $index + 1]);
             }
         }
 
@@ -318,19 +289,18 @@ class ManageTvShowEpisode extends Controller
                 $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
                 $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
                         
-                $episode = new TvShowEpisode();
+                $episode = new TvShowEpisodePak();
 
-                $count = TvShowEpisode::whereNull('deleted_at')->where('season_id', $season_id)->count();
+                $count = TvShowEpisodePak::whereNull('deleted_at')->where('season_id', $season_id)->count();
                 $count = $count + 1;
 
                 $episode->title = $title;
                 $episode->episode_number = $count;
-                $episode->episoade_order = $count;
                 $episode->season_id = $season_id;
                 $episode->video_url = $url;
                 $episode->status = 0;
                 $episode->streaming_type = 'youtube';
-                $episode->description = $title;
+                $episode->description = $snippet['description'] ?? null;
                 $episode->thumbnail = $cleanBannerUrl;        
                 $episode->duration = 0;
                 $episode->playlist_id = $playlistId;
@@ -348,7 +318,7 @@ class ManageTvShowEpisode extends Controller
     }
 
     public function checkIsExist($movie_name, $url, $season_id){
-        return TvShowEpisode::where(function ($query) use ($movie_name, $url) {
+        return TvShowEpisodePak::where(function ($query) use ($movie_name, $url) {
                 $query->whereRaw('LOWER(TRIM(title)) = ?', [strtolower(trim($movie_name))])
                     ->orWhereRaw('LOWER(TRIM(video_url)) = ?', [strtolower(trim($url))]);
             })
