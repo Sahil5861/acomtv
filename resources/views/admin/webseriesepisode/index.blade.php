@@ -181,6 +181,7 @@
                                 <th class="editable-th" data-column="Episoade_Name">Name</th>                                                                                                                         
                                 <th>Thumbnail</th>
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Source</th>
                                 <th>Url</th>
@@ -198,6 +199,7 @@
                                 <th>Name</th>                                                                                                                                
                                 <th>Thumbnail</th>
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Source</th>
                                 <th>Url</th>
@@ -312,6 +314,7 @@
             { data: 'Episoade_Name' },                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
+            { data: 'play_btn', orderable: false, searchable: false },
             { data: 'playlist_id'},                        
             { data: 'source' },
             { data: 'url' },

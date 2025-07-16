@@ -109,7 +109,25 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif                
+                @endif  
+                
+                <div class="row d-flex justify-content-start align-items-center">
+                    <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>  
                 <div class="text-right" style="display: flex; justify-content:flex-end;align-items:center; gap:10px;">
                     {{-- <select name="content_network" id="content_network" class="form-control w-25" style="width: 200px !important;" onchange="updateTable(this);">
                         <option value="">--Select--</option>
@@ -179,6 +197,7 @@
                                 <th class="editable-th" data-column="name">Name</th>                                                                                                                         
                                 <th>Banner Image</th>                                                                                                                         
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -192,6 +211,7 @@
                                 <th>Name</th>  
                                 <th>Banner Image</th>                                                                                                                                                                                                                                                       
                                 <th>Status</th>
+                                <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -239,17 +259,20 @@ function initializeDataTable(network_id = '') {
         processing: true,
         serverSide: true,
         destroy: true, // destroy on re-initialize
+        stateSave: true,         
         order: [[4, 'desc']],
         ajax: {
             url: "{{ route('getLaughterShowsList') }}",
-            data: function(d) {
+            data: function(d) {                
                 d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
+                d.status = $('#select_status').val(); // pass the selected network
             }
         },
         columns: [
             { data: 'name', width: '400px'},                        
             { data: 'banner', orderable: false, searchable: false },                        
             { data: 'status', orderable: false, searchable: false },
+            { data: 'play_btn', orderable: false, searchable: false },
             { data: 'playlist_id', orderable: true, searchable: true },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
@@ -316,13 +339,18 @@ $(document).ready(function() {
     initializeDataTable();   
     setTimeout(() => {        
         setEditable();
-    }, 500); 
-
+    }, 500);     
 
     $('#select_playlist_id').on('change', function() {
         dataTable.ajax.reload();
     });
+
+
+    $('#select_status').on('change', function() {         
+        dataTable.ajax.reload(null, false);
+    });
 });
+
 
 
 document.addEventListener('dblclick', function (event){

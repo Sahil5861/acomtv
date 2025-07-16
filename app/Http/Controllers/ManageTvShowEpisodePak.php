@@ -13,8 +13,9 @@ class ManageTvShowEpisodePak extends Controller
     {        
         $id = base64_decode($id);   
         $content_networks = ContentNetwork::where('status', 1)->get();
-        $genres = Genre::where('status',1)->get();     
-        return view('admin.tvshow_episode_pak.index', compact('id', 'content_networks', 'genres'));
+        $genres = Genre::where('status',1)->get();    
+        $playlist_ids = TvShowEpisodePak::where('playlist_id', '!=', null)->pluck('playlist_id')->unique()->values();         
+        return view('admin.tvshow_episode_pak.index', compact('id', 'content_networks', 'genres', 'playlist_ids'));
     }
 
     public function getTvShowEpisodesOrderList($id)
@@ -54,13 +55,44 @@ class ManageTvShowEpisodePak extends Controller
 
         // Total records
         // Total records
+
+        $playlist_id = $request->input('playlist_id');
+        $status = $request->input('status');
+        $status = number_format($status);   
+
+        
         $query = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at');
+        if (!empty($playlist_id)) {            
+            $query->where('playlist_id', $playlist_id);
+        }
 
-        $totalRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->count();
-        $inactiveRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 0)->count();
-        $activeRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 1)->count();
-        $deletedRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNotNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->count();
+        if (!empty($status)) {                     
+            $query->where('status', $status);
+        }
 
+        $totalRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id);
+        $inactiveRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 0);
+        $activeRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 1);
+        $deletedRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNotNull('shows_episodes_pak.deleted_at')->where('season_id', $id);
+
+        if (!empty($playlist_id)) {
+            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
+            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
+            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
+            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+        }
+
+        if (!empty($status)) {
+            $totalRecords = $totalRecords->where('status', $status);
+            $inactiveRecords = $inactiveRecords->where('status', $status);
+            $activeRecords = $activeRecords->where('status', $status);
+            $deletedRecords = $deletedRecords->where('status', $status);
+        }
+
+        $totalRecords = $totalRecords->count();
+        $inactiveRecords = $inactiveRecords->count();
+        $activeRecords = $activeRecords->count();
+        $deletedRecords = $deletedRecords->count();
         
 
         $totalRecordswithFilter = $query->where(function($query) use ($searchValue){
@@ -72,9 +104,8 @@ class ManageTvShowEpisodePak extends Controller
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = TvShowEpisodePak::orderBy($columnName, $columnSortOrder)
-            // ->where('channels.status', '=', 1)
-            ->whereNull('shows_episodes_pak.deleted_at')
+        $records = $query->orderBy($columnName, $columnSortOrder)
+            // ->where('channels.status', '=', 1)            
             ->where(function($query) use ($searchValue){
                 $query->where('shows_episodes_pak.title', 'like', '%' . $searchValue . '%')
                     ->orWhere('shows_episodes_pak.playlist_id', 'like', '%' . $searchValue . '%');

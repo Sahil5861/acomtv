@@ -102,6 +102,24 @@
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
                 @endif  
+
+                <div class="row d-flex justify-content-start align-items-center">
+                    <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div> 
                 
                 <?php                     
                     $season = \App\Models\TvShowSeasonPak::where('id', $id)->first();
@@ -109,7 +127,7 @@
                     $channel = \App\Models\TvChannelPak::where('id', $show->tv_channel_id)->first();
                 ?>
 
-                <div class="text-left">
+                <div class="text-left" style="margin: 10px 0;">
                     <p>
                         <a href="{{route('admin.tvchannel')}}">{{strtoupper('TV Channels Pak')}}</a>&nbsp; &gt;                        
                         <a href="{{route('admin.tvshow', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
@@ -139,7 +157,7 @@
                             </div>
                             
                             <div class="modal-body">                                
-                                <form id="importmoviesForm" method="POST" action="{{route('importtvshowsepisodeplaylits')}}">
+                                <form id="importmoviesForm" method="POST" action="{{route('importtvshowsepisodepakplaylits')}}">
                                 @csrf
                                 <input type="hidden" name="id" value="{{$id}}">
                                     <div class="form-group">
@@ -278,8 +296,14 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[4, 'desc']],
-         ajax: "{{route('getTvShowEpisodeListPak', $id)}}",
+         order: [[4, 'desc']],         
+         ajax: {
+            url: "{{route('getTvShowEpisodeListPak', $id)}}",
+            data: function(d) {                
+                d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
+                d.status = $('#select_status').val(); // pass the selected network
+            }
+        },
          columns: [            
             { data: 'title' },                                                          
             { data: 'thumbnail',orderable: false, searchable: false },                                                                                      
@@ -317,15 +341,24 @@
     });
 
     function setEditable(){
-    $('#multi-column-ordering thead th').each(function (index) {            
-            
-        if ($(this).hasClass('editable-th')) {                    
-            $('#tableItem tr').each(function () {
-                $(this).find('td').eq(index).addClass('editable');                                
-            });
-        }
+        $('#multi-column-ordering thead th').each(function (index) {            
+                
+            if ($(this).hasClass('editable-th')) {                    
+                $('#tableItem tr').each(function () {
+                    $(this).find('td').eq(index).addClass('editable');                                
+                });
+            }
+        });
+    }
+
+    $('#select_playlist_id').on('change', function() {
+        $('#multi-column-ordering').DataTable().ajax.reload();
     });
-}
+
+
+    $('#select_status').on('change', function() {         
+        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
+    });
 
 
     function deleteRowModal(id){ 

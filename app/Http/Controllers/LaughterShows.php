@@ -60,10 +60,16 @@ class LaughterShows extends Controller
 
 
         $playlist_id = $request->input('playlist_id');
+        $status = $request->input('status');
+        $status = number_format($status);   
 
         $movieQuery = Laughterhow::query()->whereNull('laughter_show.deleted_at');
         if (!empty($playlist_id)) {            
             $movieQuery->where('playlist_id', $playlist_id);
+        }
+
+        if (!empty($status)) {                     
+            $movieQuery->where('status', $status);
         }
 
         $totalRecords = Laughterhow::select('count(*) as allcount')->whereNull('deleted_at');
@@ -76,6 +82,13 @@ class LaughterShows extends Controller
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+        }
+
+        if (!empty($status)) {
+            $totalRecords = $totalRecords->where('status', $status);
+            $inactiveRecords = $inactiveRecords->where('status', $status);
+            $activeRecords = $activeRecords->where('status', $status);
+            $deletedRecords = $deletedRecords->where('status', $status);
         }
 
         $totalRecords = $totalRecords->count();
@@ -122,6 +135,19 @@ class LaughterShows extends Controller
                 "name" => $record->name,                                                            
                 "status" => $status, 
                 'playlist_id' => $record->playlist_id ?? '',               
+                "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->movie_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
+                    width="20" height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    class="feather feather-eye">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </a>',
                 "banner" => '<img src="'.$record->banner.'" width="100px">',
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">

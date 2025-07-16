@@ -261,7 +261,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         
         Route::get('/tv-channel-pak/update-status/{id}', [ManageTvChannelPak::class,'updateStatus'])->name('tvchannel-pak.update-status');
         Route::get('/tv-channel-pak-order', [ManageTvChannelPak::class, 'getTvChannelOrderList'])->name('admin.tvchannel.orderpak');
-        Route::post('/save-tvchannel-pak-orders', [ManageTvChannelPak::class,'saveTvChannelOrder'])->name('saveTvChannelOrderpak');
+        Route::post('/save-tvchannel-pak-orders', [ManageTvChannelPak::class,'saveTvChannelOrder'])->name('saveTvChannelOrderpak');        
 
 
         // tvshow pak

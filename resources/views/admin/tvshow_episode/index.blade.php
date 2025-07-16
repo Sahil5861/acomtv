@@ -101,7 +101,25 @@
                         <button type="button" class="close" data-dismiss="alert">×</button>    
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
-                @endif  
+                @endif 
+                
+                <div class="row d-flex justify-content-start align-items-center">
+                    <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>  
                 
                 <?php                     
                     $season = \App\Models\TvShowSeason::where('id', $id)->first();
@@ -109,7 +127,7 @@
                     $channel = \App\Models\TvChannel::where('id', $show->tv_channel_id)->first();
                 ?>
 
-                <div class="text-left">
+                <div class="text-left" style="margin: 10px 0;">
                     <p>
                         <a href="{{route('admin.tvchannel')}}">{{strtoupper('TV Channels')}}</a>&nbsp; &gt;                        
                         <a href="{{route('admin.tvshow', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
@@ -117,13 +135,7 @@
                         <a href="{{route('admin.tvshow.episode', base64_encode($id))}}">{{strtoupper($season->title)}}</a>
                     </p>
 
-                    <div class="text-left" style="display: flex; justify-content:flex-end;align-items:center; gap:10px; width:30%;">
-                    <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
-                        <option value="">--Filter by Playlist Id--</option>
-                        @foreach ($playlist_ids as $item)
-                            <option value="{{$item}}">{{$item}}</option>
-                        @endforeach
-                    </select>
+                    <div class="text-left" style="display: flex; justify-content:flex-end;align-items:center; gap:10px; width:30%;">                    
                 </div>
                 </div>
                 
@@ -295,6 +307,7 @@
             url :  "{{route('getTvShowEpisodeList', $id)}}",
             data: function(d) {
                 d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
+                d.status = $('#select_status').val(); // pass the selected network
             }
         },
          columns: [  
@@ -333,8 +346,12 @@
         },
       });
 
-      $('#select_playlist_id').on('change', function() {
+        $('#select_playlist_id').on('change', function() {
             $('#multi-column-ordering').DataTable().ajax.reload();
+        });
+
+        $('#select_status').on('change', function() {         
+            $('#multi-column-ordering').DataTable().ajax.reload(null, false);
         });
         
     });

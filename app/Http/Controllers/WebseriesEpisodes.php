@@ -103,7 +103,7 @@ class WebseriesEpisodes extends Controller
         $records = $query->orderBy($columnName, $columnSortOrder)
                 ->where(function ($query) use ($searchValue){
                             $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
-                                    ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
+                                    ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');                                    
                         })->where('season_id', $id)
             
             ->select('web_series_episoade.*')->orderBy('web_series_episoade.created_at','asc')            
@@ -135,6 +135,19 @@ class WebseriesEpisodes extends Controller
                 "status" => $status,                
                 "image" => '<img src="'.$record->episoade_image.'" width="100px;">',                
                 "playlist_id" => $record->playlist_id,
+                "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
+                    width="20" height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    class="feather feather-eye">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </a>',
                 "source" => $record->source,                
                 "downloadable" => '<span class="badge bg-primary">'.$downloadable.'</span>',                
                 "type" => '<span class="badge bg-primary">'.$type.'</span>',                
