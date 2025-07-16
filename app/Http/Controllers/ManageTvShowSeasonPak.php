@@ -13,7 +13,7 @@ class ManageTvShowSeasonPak extends Controller
         return view('admin.tvshow_season_pak.index', compact('id'));
     }
     
-    public function getShowSeasonsOrderList($id)
+    public function getShowSeasonsPakOrderList($id)
     {
         $id = base64_decode($id);
         $this->data['tvshowseasons'] = TvShowSeasonPak::whereNull('deleted_at')
@@ -33,7 +33,7 @@ class ManageTvShowSeasonPak extends Controller
         $this->data['dataForLoop'] = $dataForLoop;
         $this->data['allTvShowSeasons'] = $allTvShowSeasons;
 
-        return view('admin.tvshow_season.dragdrop', $this->data);
+        return view('admin.tvshow_season_pak.dragdrop', $this->data);
     }
 
     public function getTvShowSeasonPakList(Request $request, $id){
@@ -197,7 +197,7 @@ class ManageTvShowSeasonPak extends Controller
         }
     }
 
-    public function saveTvShowSeasonOrders(Request $request)
+    public function saveTvShowPakSeasonOrders(Request $request)
     {
         $ids = $request->ids;
         if (!empty($ids)) {

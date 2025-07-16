@@ -17,7 +17,7 @@
 <div class="layout-px-spacing">
     <div class="row" id="cancel-row">
         <div class="col-lg-12 layout-spacing layout-top-spacing">
-            <form id="order-form" method="post" action="{{ route('saveTvChannelOrder') }}" enctype="multipart/form-data" novalidate class="simple-example">
+            <form id="order-form" method="post" action="{{ route('saveTvChannelPakOrder') }}" enctype="multipart/form-data" novalidate class="simple-example">
                 @csrf
                 <div class="statbox widget box box-shadow">
                     <div class="widget-header">

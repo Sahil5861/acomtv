@@ -260,8 +260,13 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/tvchannel-pak/destroy', [ManageTvChannelPak::class,'destroy'])->name('tvchannelpak.destroy');
         
         Route::get('/tv-channel-pak/update-status/{id}', [ManageTvChannelPak::class,'updateStatus'])->name('tvchannel-pak.update-status');
+<<<<<<< HEAD
         Route::get('/tv-channel-pak-order', [ManageTvChannelPak::class, 'getTvChannelOrderList'])->name('admin.tvchannel.orderpak');
         Route::post('/save-tvchannel-pak-orders', [ManageTvChannelPak::class,'saveTvChannelOrder'])->name('saveTvChannelOrderpak');        
+=======
+        Route::get('/tv-channel-pak-order', [ManageTvChannelPak::class, 'getTvChannelPakOrderList'])->name('admin.tvchannelpak.order');
+        Route::post('/save-tvchannel-pak-orders', [ManageTvChannelPak::class,'saveTvChannelPakOrder'])->name('saveTvChannelPakOrder');
+>>>>>>> aca519dc47ee2cd9b4bc13837fd4a3b9063f9324
 
 
         // tvshow pak
@@ -275,7 +280,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
         Route::get('/tv-show-pak/update-status/{id}', [ManageTvShowPak::class,'updateStatus'])->name('tvshowpak.update-status');
         Route::get('/tv-show-pak-order/{id}', [ManageTvShowPak::class, 'getTvShowOrderList'])->name('admin.tvshowpak.order');
-        Route::post('/save-tv-show-pak-orders', [ManageTvShowPak::class, 'saveTvshowOrder'])->name('saveTvshowpakOrder');
+        Route::post('/save-tv-show-pak-orders', [ManageTvShowPak::class, 'saveTvShowPakOrder'])->name('saveTvShowPakOrder');
 
 
         // TV Show seasons Pak
@@ -286,8 +291,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/edit-tv-show-season-pak/{id}', [ManageTvShowSeasonPak::class, 'editTvShowSeason'])->name('editTvShowSeasonpak');
         Route::get('/tv-show-season-pak/update-status/{id}', [ManageTvShowSeasonPak::class,'updateStatus'])->name('tvshowseasonpak.update-status');        
         Route::post('/tv-shows-season-pak/destroy', [ManageTvShowSeasonPak::class,'destroy'])->name('tvshowseasonpak.destroy');
-        Route::get('/tv-show-season-pak-order/{id}', [ManageTvShowSeasonPak::class, 'getShowSeasonsOrderList'])->name('admin.tvshowseasonpak.order');
-        Route::post('/save-tv-showseasons-pak-orders', [ManageTvShowSeasonPak::class,'saveTvShowSeasonOrders'])->name('saveTvShowSeasonpakOrders');
+        Route::get('/tv-show-season-pak-order/{id}', [ManageTvShowSeasonPak::class, 'getShowSeasonsPakOrderList'])->name('admin.tvshowseasonpak.order');
+        Route::post('/save-tv-showseasons-pak-orders', [ManageTvShowSeasonPak::class,'saveTvShowPakSeasonOrders'])->name('saveTvShowPakSeasonOrders');
 
         // TV Show episodes Pak
         Route::get('/tv-show-pak-episode/{id}', [ManageTvShowEpisodePak::class, 'index'])->name('admin.tvshowpak.episode');

@@ -26,9 +26,9 @@ class ManageTvChannelPak extends Controller
         }
 
         $this->data['dataForLoop'] = $dataForLoop;
-        $this->data['allTvChannelsPak'] = $allTvChannels;
+        $this->data['allTvChannelsPak'] = $allTvChannelPaks;
 
-        return view('admin.tvchannel.dragdrop', $this->data);
+        return view('admin.tvchannelpak.dragdrop', $this->data);
     }
 
     public function getTvChannelpakList(Request $request)
@@ -200,6 +200,6 @@ class ManageTvChannelPak extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Tv Channel order updated successfully.');
+        return redirect()->back()->with('success', 'Tv Channel Pak order updated successfully.');
     }
 }

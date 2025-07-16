@@ -122,7 +122,7 @@
                     <a href="{{route('admin.tvchannelpak')}}"> Channels List </a>
                 </li>
                 <li class="<?php if(request()->is('*tvchannel-order')){ echo 'active';} ?>">
-                    <a href="{{route('admin.tvchannel.order')}}"> Channels Order </a>
+                    <a href="{{route('admin.tvchannelpak.order')}}"> Channels Order </a>
                 </li>
                 {{-- <li class="<?php if(request()->is('*tvshow')){ echo 'active';} ?>" >
                     <a href="{{route('admin.tvshow')}}"> Show List </a>

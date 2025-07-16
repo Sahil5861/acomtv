@@ -16,7 +16,7 @@
                 @endif
 
                 <div class="text-right">
-                    <a href="{{url('tvchannel-order')}}" class="btn btn-primary mb-2">Order Channels</a>
+                    <a href="{{url('tv-channel-pak-order')}}" class="btn btn-primary mb-2">Order Channels</a>
                     <a href="{{ url('add-tv-channel-pak') }}" class="btn btn-primary mb-2">Add +</a>
                 </div>
 
