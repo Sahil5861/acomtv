@@ -99,14 +99,14 @@
                         </div>
 
                         <!-- Description -->
-                        <div class="col-md-12 mb-4">
+                        {{-- <div class="col-md-12 mb-4">
                             <label for="description">Description</label>
                             <textarea class="form-control" id="description" name="description"
                                 placeholder="Description">{{ old('description', $season->description ?? '') }}</textarea>
                             <div class="invalid-feedback">
                                 @error('description') {{ $message }} @enderror
                             </div>
-                        </div>
+                        </div> --}}
                         
                     </div>
 

@@ -178,7 +178,7 @@
                     <table id="multi-column-ordering" class="table table-hover" data-table="web_series_episoade">
                         <thead>
                             <tr>
-                                <th class="editable-th" data-column="Episoade_Name">Name</th>                                                                                                                         
+                                <th class="editable-th" style="width: 300px;" data-column="Episoade_Name">Name</th>                                                                                                                         
                                 <th>Thumbnail</th>
                                 <th>Status</th>
                                 <th>Play</th>
@@ -311,11 +311,11 @@
                 }
             },
             columns: [
-            { data: 'Episoade_Name' },                        
+            { data: 'Episoade_Name', width: '300'},                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
             { data: 'play_btn', orderable: false, searchable: false },
-            { data: 'playlist_id'},                        
+            { data: 'playlist_id', width: '200px'},                        
             { data: 'source' },
             { data: 'url' },
             // { data: 'downloadable',orderable: false, searchable: false  },

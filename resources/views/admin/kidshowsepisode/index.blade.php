@@ -110,6 +110,47 @@
                 <div class="text-right"> 
                     <a href="{{ route('admin.kidsshowepisode.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
                     <a href="{{url('add-kid-shows-episode/'.base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
+                        Import from Playlist
+                    </button> 
+                </div>
+                <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addContentModalLabel">Add Movies From Playlist</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">                                
+                            <form id="importmoviesForm" method="POST" action="{{route('importkidshowsepisode')}}">
+                            @csrf
+                            <input type="hidden" name="season_id" id="season_id" value="{{$season->id}}">
+                                <div class="form-group">
+                                    <label for="networkName">Playlits Id</label>                                    
+                                    <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="networkName">Type</label>                                    
+                                    <select name="type" id="type" class="form-control select">
+                                        <option value="0" @if(isset($episode) && $episode->type == 0){{'selected'}}@endif>Free</option>
+                                        <option value="1" @if(isset($episode) && $episode->type == 1){{'selected'}}@endif>Premium</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" form="importmoviesForm" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        
+                        </div>
+                    </div>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     

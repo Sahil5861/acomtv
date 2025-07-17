@@ -678,6 +678,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/kids-showepisode-order/{id}', [KidsShowEpisodes::class, 'getKidsShowEpisodesOrderList'])->name('admin.kidsshowepisode.order');
         Route::post('/save-kids-showepisode-orders', [KidsShowEpisodes::class,'saveKidsShowEpisodesOrders'])->name('saveKidsShowEpisodesOrders');
 
+        Route::post('import-kidshows-episode-playlits', [KidsShowEpisodes::class, 'importPlaylist'])->name('importkidshowsepisode');
+
 
         // Religious Channels
         Route::get('/religious-channel', [ManageRelChannel::class, 'index'])->name('admin.RelChannel');
