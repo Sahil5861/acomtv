@@ -64,11 +64,12 @@ class LaughterShows extends Controller
         $status = number_format($status);   
 
         $movieQuery = Laughterhow::query()->whereNull('laughter_show.deleted_at');
-        if (!empty($playlist_id)) {            
+
+        if ($request->has('playlist_id') && $playlist_id != '') {           
             $movieQuery->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {                     
+        if ($request->has('status') && $status != '') {                    
             $movieQuery->where('status', $status);
         }
 
@@ -77,14 +78,14 @@ class LaughterShows extends Controller
         $activeRecords = Laughterhow::select('count(*) as allcount')->whereNull('deleted_at')->where('status','1');
         $deletedRecords = Laughterhow::select('count(*) as allcount')->where('deleted_at', '!=', null);
 
-        if (!empty($playlist_id)) {
+        if ($request->has('playlist_id') && $playlist_id != '') { 
             $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {
+        if ($request->has('status') && $status != '') {  
             $totalRecords = $totalRecords->where('status', $status);
             $inactiveRecords = $inactiveRecords->where('status', $status);
             $activeRecords = $activeRecords->where('status', $status);

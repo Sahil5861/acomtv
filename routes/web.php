@@ -268,7 +268,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/tv-show-pak/{id}', [ManageTvShowPak::class, 'index'])->name('admin.tvshowpak');
         Route::get('/getTvShowPakList/{id}', [ManageTvShowPak::class, 'getTvShowPakList'])->name('getTvShowPakList');
         Route::get('/add-tv-show-pak/{id}', [ManageTvShowPak::class,'addTvShow'])->name('addTvShowpak');
-        Route::post('/addTvShow', [ManageTvShowPak::class,'add'])->name('saveTvShowpak');
+        Route::post('/addTvShowpak', [ManageTvShowPak::class,'add'])->name('saveTvShowpak');
         Route::get('/edit-tv-show-pak/{id}', [ManageTvShowPak::class, 'editTvShow'])->name('editTvShowpak');
         Route::post('/tv-show-pak/destroy', [ManageTvShowPak::class,'destroy'])->name('tvshowpak.destroy');
         Route::get('/tv-show-pak/update-status/{id}', [ManageTvShowPak::class,'updateStatus'])->name('tvshowpak.update-status');        

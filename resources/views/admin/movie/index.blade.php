@@ -298,7 +298,7 @@ $(document).ready(function() {
         setEditable();
     }, 500); 
 
-    $('#select_status').on('change', function() {        
+    $('#select_status').on('change', function() {              
         dataTable.ajax.reload(null, false);
     });
 

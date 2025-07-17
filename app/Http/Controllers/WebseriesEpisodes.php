@@ -57,11 +57,11 @@ class WebseriesEpisodes extends Controller
         $status = number_format($request->input('status'));        
 
         $query = WebSeriesEpisode::query()->whereNull('web_series_episoade.deleted_at');
-        if (!empty($playlist_id)) {            
+        if ($request->has('playlist_id') && $playlist_id != '') {            
             $query->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {                     
+        if ($request->has('status') && $status != '') {                    
             $query->where('status', $status);
         }
 
@@ -72,14 +72,14 @@ class WebseriesEpisodes extends Controller
         $activeRecords = WebSeriesEpisode::select('count(*) as allcount')->where('status','1')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id);
         $deletedRecords = WebSeriesEpisode::select('count(*) as allcount')->whereNotNull('web_series_episoade.deleted_at')->where('season_id', $id);
 
-        if (!empty($playlist_id)) {
+        if ($request->has('playlist_id') && $playlist_id != '') {  
             $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {
+        if ($request->has('status') && $status != '') {    
             $totalRecords = $totalRecords->where('status', $status);
             $inactiveRecords = $inactiveRecords->where('status', $status);
             $activeRecords = $activeRecords->where('status', $status);                   

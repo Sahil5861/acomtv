@@ -68,11 +68,11 @@ class StageShowsPak extends Controller
         
 
         $movieQuery = StageshowPak::query()->whereNull('stage_shows_pak.deleted_at');
-        if (!empty($playlist_id)) {            
+        if ($request->has('playlist_id') && $playlist_id != '') {           
             $movieQuery->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {                     
+        if ($request->has('status') && $status != '') {                        
             $movieQuery->where('status', $status);
         }
 
@@ -81,14 +81,14 @@ class StageShowsPak extends Controller
         $activeRecords = StageshowPak::select('count(*) as allcount')->whereNull('stage_shows_pak.deleted_at')->where('status','1');
         $deletedRecords = StageshowPak::select('count(*) as allcount')->whereNotNull('stage_shows_pak.deleted_at');
 
-        if (!empty($playlist_id)) {
+        if (!empty($playlist_id) || $playlist_id != '') { 
             $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {
+        if (!empty($status) || $status != '') {    
             $totalRecords = $totalRecords->where('status', $status);
             $inactiveRecords = $inactiveRecords->where('status', $status);
             $activeRecords = $activeRecords->where('status', $status);
