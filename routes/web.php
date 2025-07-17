@@ -260,13 +260,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/tvchannel-pak/destroy', [ManageTvChannelPak::class,'destroy'])->name('tvchannelpak.destroy');
         
         Route::get('/tv-channel-pak/update-status/{id}', [ManageTvChannelPak::class,'updateStatus'])->name('tvchannel-pak.update-status');
-<<<<<<< HEAD
-        Route::get('/tv-channel-pak-order', [ManageTvChannelPak::class, 'getTvChannelOrderList'])->name('admin.tvchannel.orderpak');
-        Route::post('/save-tvchannel-pak-orders', [ManageTvChannelPak::class,'saveTvChannelOrder'])->name('saveTvChannelOrderpak');        
-=======
         Route::get('/tv-channel-pak-order', [ManageTvChannelPak::class, 'getTvChannelPakOrderList'])->name('admin.tvchannelpak.order');
         Route::post('/save-tvchannel-pak-orders', [ManageTvChannelPak::class,'saveTvChannelPakOrder'])->name('saveTvChannelPakOrder');
->>>>>>> aca519dc47ee2cd9b4bc13837fd4a3b9063f9324
 
 
         // tvshow pak

@@ -143,6 +143,7 @@ class ManageTvChannel extends Controller
             $tvchannel = TvChannel::find($request->id);
         } else {
             $tvchannel = new TvChannel();
+            $tvchannel->order = $request->order ?? 0;
         }
 
         $tvchannel->name = $request->name;
@@ -150,6 +151,8 @@ class ManageTvChannel extends Controller
         $tvchannel->logo = $request->logo ?? null;
         $tvchannel->description = $request->description ?? null;
         $tvchannel->status = $request->status;
+       
+        
 
         
 

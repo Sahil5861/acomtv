@@ -432,7 +432,7 @@
                             table : table,
                             column : column,  
                             value : input.value, 
-                            _token: "{{ csrf_token() }}" // ✅ Add this line                     
+                            _token: "{{ csrf_token() }}"                
                         },
                         success: function(response){
                             if (response.success) {

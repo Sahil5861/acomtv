@@ -417,6 +417,7 @@ class Movies extends Controller
             $movie->release_date = $request->release_date ?? null;                                                                    
             $movie->status = $request->status;
             $movie->index = $request->index ?? 0;
+            $movie->movie_order = $request->index ?? 0;
             $movie->source_type = $request->source_type;
             $movie->youtube_trailer = $request->trailer_url ?? null;
             $movie->movie_url = $request->movie_url ?? null;
@@ -461,6 +462,7 @@ class Movies extends Controller
             $movie->release_date = $request->release_date ?? null;                                                                    
             $movie->status = $request->status;
             $movie->index = $request->index ?? 0;
+            $movie->movie_order = $request->index ?? 0;
             $movie->source_type = $request->source_type;    
             $movie->youtube_trailer = $request->trailer_url ?? null;
             $movie->movie_url = $request->movie_url ?? null;
@@ -626,6 +628,7 @@ class Movies extends Controller
                 $movie->movie_url = $movie_url;
                 $movie->genres = $genres;
                 $movie->index = $formated_number;
+                $movie->movie_order = $formated_number;
                 $movie->playlist_id = $playlistId;
 
                 if ($movie->save()) {
