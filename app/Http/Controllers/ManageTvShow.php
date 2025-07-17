@@ -213,7 +213,6 @@ class ManageTvShow extends Controller
     {
         $id = base64_decode($id);
         $genres = Genre::all();
-
         return view('admin.tvshow.add', compact('id', 'genres'));
     }
 

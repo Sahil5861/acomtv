@@ -39,14 +39,6 @@
                     <input type="hidden" name="tv_channel_id" id="tv_channel_id" value="{{$id}}">
 
                     <div class="form-row">
-                        @php
-                            $maxOrder = \App\Models\TvShow::whereNull('deleted_at')->max('order') ?? 0;
-                            $nextOrder = $maxOrder + 1;
-                        @endphp
-
-                        <input type="hidden" name="order" value="{{ old('order', isset($tv_shows) ? $tv_shows->order : $nextOrder) }}">
-                        @error('order') <div class="invalid-feedback">{{ $message }}</div> @enderror
-
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
                             <label for="name">Name*</label>
@@ -55,7 +47,17 @@
                                 @error('channel_name') {{ $message }} @enderror
                             </div>                            
                         </div>
+                        
+                        {{-- Sets order: uses existing value for edit, or calculates next order based on channel for add --}}
+                        @php
+                            $order = isset($tv_shows)
+                                ? $tv_shows->order
+                                : (\App\Models\TvShow::where('tv_channel_id', $id)
+                                    ->whereNull('deleted_at')
+                                    ->max('order') ?? 0) + 1;
+                        @endphp
 
+                        <input type="hidden" name="order" value="{{ old('order', $order) }}">
 
                         <!-- Logo -->
                         <div class="col-md-6 mb-4">

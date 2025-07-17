@@ -298,7 +298,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/tv-show-pak-episode/update-status/{id}', [ManageTvShowEpisodePak::class,'updateStatus'])->name('tvshowepisodepak.update-status');        
         Route::post('/tv-shows-pak-episode/destroy', [ManageTvShowEpisodePak::class,'destroy'])->name('tvshowepisodepak.destroy');
         
-        Route::get('/tvshowepisodepak-order/{id}', [ManageTvShowEpisodePak::class, 'getTvShowEpisodesOrderList'])->name('admin.tvshowepisode.order');
+        Route::get('/tvshowepisodepak-order/{id}', [ManageTvShowEpisodePak::class, 'getTvShowEpisodesOrderList'])->name('admin.tvshowepisodepak.order');
         Route::post('/save-tvshowepisodepak-orders', [ManageTvShowEpisodePak::class,'saveTvShowEpisodesOrders'])->name('saveTvShowEpisodesOrders');
 
         Route::post('import-tv-shows-pak-episode-playlits', [ManageTvShowEpisodePak::class, 'importPlaylist'])->name('importtvshowsepisodepakplaylits');

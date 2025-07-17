@@ -137,7 +137,7 @@
                 </div>
                 
                 <div class="text-right" style="display: flex; justify-content:flex-end;align-items:center; gap:10px;">                    
-                    <a href="{{ route('admin.tvshowepisode.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
+                    <a href="{{ route('admin.tvshowepisodepak.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
                     <a href="{{route('addTvShowEpisodepak', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
                     <div class="text-left">
                         <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">

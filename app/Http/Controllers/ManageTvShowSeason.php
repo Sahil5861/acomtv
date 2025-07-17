@@ -123,8 +123,12 @@ class ManageTvShowSeason extends Controller
     public function addtvshow(Request $request, $id)
     {
         $id = base64_decode($id);                
-
-        return view('admin.tvshow_season.add', compact('id'));
+        // Get next available order for this channel
+        $maxOrder = TvShowSeason::where('show_id', $id)
+                    ->whereNull('deleted_at')
+                    ->max('season_order') ?? 0;
+        $nextOrder = $maxOrder + 1;
+        return view('admin.tvshow_season.add', compact('id','nextOrder'));
     }
 
     public function updateStatus($id)
@@ -150,6 +154,7 @@ class ManageTvShowSeason extends Controller
             $tvshow = TvShowSeason::find($request->id);
         } else {
             $tvshow = new TvShowSeason();
+            $tvshow->season_order = $request->season_order ?? 0;
         }
 
         // print_r($request->all()); exit;

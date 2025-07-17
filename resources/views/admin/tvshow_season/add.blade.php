@@ -49,6 +49,14 @@
                             </div>
                         </div>
 
+                    {{-- Sets season order: existing value for edit, or next available based on show ID for add --}}
+                    @php
+                        $showId = $id; // decoded and passed from controller
+                        $seasonOrder = isset($season)
+                            ? $season->season_order
+                            : (\App\Models\TvShowSeason::where('show_id', $showId)->whereNull('deleted_at')->max('season_order') ?? 0) + 1;
+                    @endphp
+                    <input type="hidden" name="season_order" value="{{ old('season_order', $seasonOrder) }}">
 
                         {{-- <!-- Language -->
                         <div class="col-md-6 mb-4">
