@@ -153,14 +153,14 @@ class Movies extends Controller
 
         $playlist_id = $request->input('playlist_id');
         $status = $request->input('status');
-        $status = number_format($status);
+        // $status = number_format($status);
 
         $movieQuery = Movie::query()->whereNull('movies.deleted_at');
-        if (!empty($playlist_id)) {            
+        if ($request->has('playlist_id') && $playlist_id != '') {         
             $movieQuery->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {                     
+        if ($request->has('status') && $status != '') {             
             $movieQuery->where('status', $status);
         }
 
@@ -176,14 +176,14 @@ class Movies extends Controller
         $activeRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->where('status','1');
         $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at');
 
-        if (!empty($playlist_id)) {
+        if ($request->has('playlist_id') && $playlist_id != '') {  
             $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {
+        if ($request->has('status') && $status != '') { 
             $totalRecords = $totalRecords->where('status', $status);
             $inactiveRecords = $inactiveRecords->where('status', $status);
             $activeRecords = $activeRecords->where('status', $status);
@@ -645,7 +645,7 @@ class Movies extends Controller
                             }
                         }
                     }
-                }            
+                }                
             }
 
             $nextPageToken = $data['nextPageToken'] ?? null;                    
@@ -662,8 +662,7 @@ class Movies extends Controller
         return Movie::where(function ($query) use ($movie_name, $url){
             $query->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($movie_name))])
                     ->orWhereRaw('LOWER(TRIM(movie_url)) = ?', [strtolower(trim($url))]);
-        })
-        ->whereNull('deleted_at')
+        })        
         ->first();
     }
 

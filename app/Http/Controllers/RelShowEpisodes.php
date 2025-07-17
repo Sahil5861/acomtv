@@ -58,12 +58,42 @@ class RelShowEpisodes extends Controller
         // Total records
         // Total records
 
-        $query = RelshowsEpisode::select('count(*) as allcount')->whereNull('rel_episodes.deleted_at');
+        $playlist_id = $request->input('playlist_id');
+        $status = number_format($request->input('status'));        
 
-        $totalRecords = RelshowsEpisode::select('count(*) as allcount')->whereNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
-        $inactiveRecords = RelshowsEpisode::select('count(*) as allcount')->where('status','0')->whereNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
-        $activeRecords = RelshowsEpisode::select('count(*) as allcount')->where('status','1')->whereNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
-        $deletedRecords = RelshowsEpisode::select('count(*) as allcount')->whereNotNull('rel_episodes.deleted_at')->where('show_id', $id)->count();
+        $query = RelshowsEpisode::select('count(*) as allcount')->whereNull('rel_episodes.deleted_at');
+        if ($request->has('playlist_id') && $playlist_id != '') {        
+            $query->where('playlist_id', $playlist_id);
+        }
+
+        if ($request->has('status') && $status != '') {                     
+            $query->where('status', $status);
+        }
+
+        $totalRecords = RelshowsEpisode::select('count(*) as allcount')->whereNull('rel_episodes.deleted_at')->where('show_id', $id);
+        $inactiveRecords = RelshowsEpisode::select('count(*) as allcount')->where('status','0')->whereNull('rel_episodes.deleted_at')->where('show_id', $id);
+        $activeRecords = RelshowsEpisode::select('count(*) as allcount')->where('status','1')->whereNull('rel_episodes.deleted_at')->where('show_id', $id);
+        $deletedRecords = RelshowsEpisode::select('count(*) as allcount')->whereNotNull('rel_episodes.deleted_at')->where('show_id', $id);
+
+        if ($request->has('playlist_id') && $playlist_id != '') {  
+            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
+            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
+            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
+            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+        }
+
+        if ($request->has('status') && $status != '') {   
+            $totalRecords = $totalRecords->where('status', $status);
+            $inactiveRecords = $inactiveRecords->where('status', $status);
+            $activeRecords = $activeRecords->where('status', $status);                   
+            $deletedRecords = $deletedRecords->where('status', $status);
+        }
+
+        $totalRecords = $totalRecords->count();
+        $inactiveRecords = $inactiveRecords->count();
+        $activeRecords = $activeRecords->count();
+        $deletedRecords = $deletedRecords->count();
+        
 
 
 
@@ -76,9 +106,7 @@ class RelShowEpisodes extends Controller
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = RelshowsEpisode::orderBy($columnName, $columnSortOrder)
-            // ->where('channels.status', '=', 1)
-            ->whereNull('rel_episodes.deleted_at')
+        $records = $query->orderBy($columnName, $columnSortOrder)                        
             ->where(function ($query) use ($searchValue){
                 $query->where('rel_episodes.title', 'like', '%' . $searchValue . '%')
                         ->orWhere('rel_episodes.playlist_id', 'like', '%' . $searchValue . '%');
@@ -121,18 +149,18 @@ class RelShowEpisodes extends Controller
                 "type" => '<span class="badge bg-primary">'.$type.'</span>',                
                 "url" => $record->url,
                 "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
-     width="20" height="20" 
-     viewBox="0 0 24 24" 
-     fill="none" 
-     stroke="currentColor" 
-     stroke-width="2" 
-     stroke-linecap="round" 
-     stroke-linejoin="round" 
-     class="feather feather-eye">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-</svg>
- </a>',                  
+                    width="20" height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    class="feather feather-eye">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </a>',                  
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">
                         <a href="'.route("rel_episodes.edit",base64_encode($record->id)).'" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></a>

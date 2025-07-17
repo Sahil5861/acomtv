@@ -62,11 +62,11 @@ class ManageTvShowEpisodePak extends Controller
 
         
         $query = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at');
-        if (!empty($playlist_id)) {            
+        if ($request->has('playlist_id') && $playlist_id != '') {          
             $query->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {                     
+        if ($request->has('status') && $status != '') {                           
             $query->where('status', $status);
         }
 
@@ -75,14 +75,14 @@ class ManageTvShowEpisodePak extends Controller
         $activeRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 1);
         $deletedRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNotNull('shows_episodes_pak.deleted_at')->where('season_id', $id);
 
-        if (!empty($playlist_id)) {
+        if ($request->has('playlist_id') && $playlist_id != '') {  
             $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {
+        if ($request->has('status') && $status != '') {        
             $totalRecords = $totalRecords->where('status', $status);
             $inactiveRecords = $inactiveRecords->where('status', $status);
             $activeRecords = $activeRecords->where('status', $status);
@@ -125,7 +125,7 @@ class ManageTvShowEpisodePak extends Controller
             if($record->status == 1){
                 $status = '<a onchange="updateStatus(\''.url('tv-show-pak-episode/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary mr-2"><input type="checkbox" value="1" checked id="accountSwitch{{$record->id}}"><span class="slider round"></span></label> </a>';
             }else{
-                $status = '<a onchange="updateStatus(\''.url('tvshow-episode/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
+                $status = '<a onchange="updateStatus(\''.url('tv-show-pak-episode/update-status',base64_encode($record->id)).'\')" href="javascript:void(0);"><label class="switch s-primary   mr-2"><input type="checkbox" value="0" id="accountSwitch{{$record->id}}"><span class="slider round"></span></label></a>';
             }
 
             if($record->deleted_at){

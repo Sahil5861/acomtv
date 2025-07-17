@@ -62,10 +62,10 @@ class ManageTvShowEpisode extends Controller
         // Total records
         $query = TvShowEpisode::select('count(*) as allcount')->whereNull('deleted_at');
 
-        if (!empty($playlist_id)) {            
+        if ($request->has('playlist_id') && $playlist_id != '') {                 
             $query->where('playlist_id', $playlist_id);
         }
-        if (!empty($status)) {                     
+        if ($request->has('status') && $status != '') {                      
             $query->where('status', $status);
         }
 
@@ -74,14 +74,14 @@ class ManageTvShowEpisode extends Controller
         $activeRecords = TvShowEpisode::select('count(*) as allcount')->whereNull('deleted_at')->where('season_id', $id)->where('status', 1);
         $deletedRecords = TvShowEpisode::select('count(*) as allcount')->whereNotNull('deleted_at')->where('season_id', $id);
 
-        if (!empty($playlist_id)) {
+        if ($request->has('playlist_id') && $playlist_id != '') {       
             $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
         }
 
-        if (!empty($status)) {
+        if ($request->has('status') && $status != '') {  
             $totalRecords = $totalRecords->where('status', $status);
             $inactiveRecords = $inactiveRecords->where('status', $status);
             $activeRecords = $activeRecords->where('status', $status);
