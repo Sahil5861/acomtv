@@ -85,6 +85,16 @@
             
             <div class="widget-content widget-content-area br-6">
 
+                <div class="alert alert-success alert-block" id="alert-success" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="success-message"></strong>
+                </div>
+
+                <div class="alert alert-danger alert-block" id="alert-danger" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="error-message"></strong>
+                </div>
+
                 <div id="delete_bd_ms"></div>
                 @if(session()->has('message'))
                     <div class="alert alert-success alert-block">
@@ -92,6 +102,24 @@
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
                 @endif 
+
+                <div class="row d-flex justify-content-start align-items-center">
+                    <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div> 
                 
                 <?php
                     $season = \App\Models\KidShowsSeason::where('id',$id)->first();
@@ -99,7 +127,7 @@
                     $channel = \App\Models\KidsChannel::where('id',$show->kid_channel_id)->first();
                     // $channel = \App\Models\KidsChannel::where('id',$show->kid_channel_id)->first();
                 ?>
-                <div class="text-left">
+                <div class="text-left" style="margin: 10px 0;">
                     <p>
                         <a href="{{route('admin.kidschannel')}}">{{strtoupper('Kids Channels')}}</a>&nbsp; &gt;                        
                         <a href="{{route('admin.kidsshows', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
@@ -110,13 +138,54 @@
                 <div class="text-right"> 
                     <a href="{{ route('admin.kidsshowepisode.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Episode</a>
                     <a href="{{url('add-kid-shows-episode/'.base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
+                        Import from Playlist
+                    </button> 
+                </div>
+                <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addContentModalLabel">Add Movies From Playlist</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">                                
+                            <form id="importmoviesForm" method="POST" action="{{route('importkidshowsepisode')}}">
+                            @csrf
+                            <input type="hidden" name="season_id" id="season_id" value="{{$season->id}}">
+                                <div class="form-group">
+                                    <label for="networkName">Playlits Id</label>                                    
+                                    <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="networkName">Type</label>                                    
+                                    <select name="type" id="type" class="form-control select">
+                                        <option value="0" @if(isset($episode) && $episode->type == 0){{'selected'}}@endif>Free</option>
+                                        <option value="1" @if(isset($episode) && $episode->type == 1){{'selected'}}@endif>Premium</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" form="importmoviesForm" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        
+                        </div>
+                    </div>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
-                    <table id="multi-column-ordering" class="table table-hover">
+                    <table id="multi-column-ordering" class="table table-hover" data-table="kids_shows_episodes">
                         <thead>
                             <tr>
-                                <th>Name</th>                                                                                                                         
+                                <th class="editable-th" data-column="Episoade_Name">Name</th>                                                                                                                         
                                 <th>Thumbnail</th>
                                 <th>Status</th>
                                 <th>Source</th>
@@ -234,8 +303,23 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[7, 'desc']],
-         ajax: "{{route('getKidsShowEpisodesList', $id)}}",
+         order: [[7, 'desc']],         
+         ajax: {
+            url: "{{route('getKidsShowEpisodesList', $id)}}",
+            data: function(d) {
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
+                }
+
+                if (status !== '') {
+                    d.status = status;
+                }
+            }
+        },
          columns: [
             { data: 'Episoade_Name' },                        
             { data: 'image',orderable: false, searchable: false },                        
@@ -247,6 +331,15 @@
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
+         columnDefs: [
+            {
+                targets: 0, // index of 'name' column
+                createdCell: function(td, cellData, rowData, row, col) {
+                    // $(td).addClass('editable');
+                    $(td).attr('data-id', rowData.id); // Set data-id attribute
+                }
+            },            
+        ],
          drawCallback: function (settings) { 
             
             var response = settings.json;
@@ -256,10 +349,34 @@
             $('#deletedRecords').text(response.deletedRecords);
             console.log(response);
             $('[data-toggle="tooltip"]').tooltip();
-            updateIcon()
+            updateIcon();
+            setEditable();
         },
       });
+
+
     });
+
+    function setEditable(){
+        $('#multi-column-ordering thead th').each(function (index) {            
+            if ($(this).hasClass('editable-th')) {                           
+                $('#tableItem tr').each(function () {
+                    $(this).find('td').eq(index).addClass('editable');                                
+                });
+            }
+        });
+    }
+
+    $('#select_status').on('change', function() {              
+        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
+    });
+
+
+    $('#select_playlist_id').on('change', function() {
+        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
+    });
+
+
 
     function deleteRowModal(id){ 
         $('#d_title').text('Kid shows Episode')
@@ -282,6 +399,80 @@
             }
         })
     }
+
+    document.addEventListener('dblclick', function (event){
+        const target = event.target
+        if (target.classList.contains('editable')) {        
+            if (target.querySelector('input')) return;
+            const currentText = target.textContent.trim();
+            const input = document.createElement('input'); 
+            const id = target.getAttribute('data-id');       
+
+            input.type = 'text';
+            input.value = currentText;
+            input.style.width = '100%';
+            input.classList.add('form-control');
+            input.setAttribute('data-id', id);
+
+            target.textContent = '';
+            target.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', function () {
+                const newValue = input.value.trim();
+                target.textContent = newValue || currentText; // fallback to old value if empty
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    input.blur(); // triggers blur above
+                    const table = document.getElementById('multi-column-ordering').getAttribute('data-table');                
+                    const td = input.closest('td');
+
+
+                    const column = document.querySelector('.editable-th').getAttribute('data-column');
+                    let id = input.getAttribute('data-id');
+
+                    console.log(id, table, column);
+                    // return false;
+                    
+
+                    $.ajax({
+                        method : 'POST',
+                        url : "{{route('update-column')}}",                    
+                        data: {
+                            id : id,                        
+                            table : table,
+                            column : column,  
+                            value : input.value, 
+                            _token: "{{ csrf_token() }}" // ✅ Add this line                     
+                        },
+                        success: function(response){
+                            if (response.success) {
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.success-message').html(`${capitalizedColumn} updated successfully !`);
+                                $('#alert-success').show();
+                                setTimeout(() => {
+                                    $('#alert-success').hide();
+                                }, 2000);
+                            }
+                            else{
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.error-message').html(response.message);
+                                $('#alert-danger').show();
+                                setTimeout(() => {
+                                    $('#alert-danger').hide();
+                                }, 2000);
+                                target.textContent = currentText;
+                                // $('#multi-column-ordering').DataTable().ajax.reload();
+                            }
+                        }
+                    })
+                    
+                }
+            });    
+        }
+    })
     </script>
 
    

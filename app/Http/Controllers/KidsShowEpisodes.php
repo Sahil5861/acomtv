@@ -16,8 +16,10 @@ class KidsShowEpisodes extends Controller
         $id = base64_decode($id); 
         $season = KidShowsSeason::where('id', $id)->first();
         $tvshow = KidsShow::where('id',$season->web_series_id)->first();
+
+        $playlist_ids = KidshowsEpisode::where('playlist_id', '!=', null)->whereNull('deleted_at')->where('season_id', $id)->pluck('playlist_id')->unique()->values();        
            
-        return view('admin.kidshowsepisode.index', compact('id', 'season', 'tvshow'));
+        return view('admin.kidshowsepisode.index', compact('id', 'season', 'tvshow', 'playlist_ids'));
     }
 
     public function getKidsShowEpisodesOrderList($id)
@@ -73,34 +75,17 @@ class KidsShowEpisodes extends Controller
         // Total records
         // Total records
         $totalRecords = KidshowsEpisode::select('count(*) as allcount')->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
-        $inactiveRecords = KidshowsEpisode::select('count(*) as allcount')->where('status','0')->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
-        $activeRecords = KidshowsEpisode::select('count(*) as allcount')->where('status','1')->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
+        $inactiveRecords = KidshowsEpisode::select('count(*) as allcount')->where('status',0)->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
+        $activeRecords = KidshowsEpisode::select('count(*) as allcount')->where('status',1)->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
         $deletedRecords = KidshowsEpisode::select('count(*) as allcount')->whereNotNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
-
-        if ($request->has('playlist_id') && $playlist_id != '') {  
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if ($request->has('status') && $status != '') {        
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
-
+        
         
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
         $activeRecords = $activeRecords->count();
         $deletedRecords = $deletedRecords->count();
-        
-
-
-
-        $totalRecordswithFilter = $query->where(function ($query) use ($searchValue){
+    
+        $totalRecordswithFilter = (clone $query)->where(function ($query) use ($searchValue){
                 $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
                         ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
         })        
@@ -108,7 +93,7 @@ class KidsShowEpisodes extends Controller
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = $query->orderBy($columnName, $columnSortOrder)
+        $records = (clone $query)->orderBy($columnName, $columnSortOrder)
                 ->where(function ($query) use ($searchValue){
                     $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
                             ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
@@ -141,6 +126,7 @@ class KidsShowEpisodes extends Controller
             $downloadable = $record->downloadable == 1 ? 'Yes' : 'No';
 
             $data_arr[] = array(
+                "id" => $record->id,
                 "Episoade_Name" => $record->Episoade_Name,                                                            
                 "status" => $status,                
                 "image" => '<img src="'.$record->episoade_image.'" width="100px;">',                
@@ -148,6 +134,7 @@ class KidsShowEpisodes extends Controller
                 "downloadable" => '<span class="badge bg-primary">'.$downloadable.'</span>',                
                 "type" => '<span class="badge bg-primary">'.$type.'</span>',                
                 "url" => $record->url,  
+                "playlist_id" => $record->playlist_id,
                 "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
                     width="20" height="20" 
                     viewBox="0 0 24 24" 
@@ -286,5 +273,88 @@ class KidsShowEpisodes extends Controller
         }else{
             echo json_encode(['message','Something went wrong!!']);
         }
+    }
+
+    public function importPlaylist(Request $request){
+        $request->validate([
+            'playlist_id' => 'required',            
+            'type' => 'required'
+        ]);
+        $playlistId = $request->input('playlist_id');
+        $type = $request->type;
+        $seson_id = $request->season_id;
+
+        $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
+        $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
+        $nextPageToken = null;
+
+        do {
+            $url = $baseurl;
+            if ($nextPageToken) {
+                $url .= "&pageToken=" . $nextPageToken;
+            }
+
+            $ch = curl_init($url);
+    
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+            $response = curl_exec($ch);
+    
+            if(curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return response()->json(['success' => false, 'error' => $error_msg], 500);
+            }
+            curl_close($ch);
+            
+            $data = json_decode($response, true);        
+
+            if (!isset($data['items'])) break;
+
+            foreach ($data['items'] as $key => $item) {    
+                $snippet = $item['snippet'];
+                $Episoade_Name = $snippet['title'] ?? null;
+                $url = $snippet['resourceId']['videoId'] ?? null;
+
+                if ($this->checkIsExist($Episoade_Name, $url) || trim($Episoade_Name) == 'Private video') {
+                    continue;
+                }
+
+                $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+                $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                        
+                $episode = new KidshowsEpisode();
+
+                $channel_number = KidshowsEpisode::whereNull('deleted_at')->count();
+                $formated_number = $channel_number + 1;   
+
+                $episode->Episoade_Name = $Episoade_Name;            
+                $episode->episoade_image = $cleanBannerUrl;            
+                $episode->episoade_description = $snippet['description'] ?? null;
+                $episode->episoade_order = $formated_number;            
+                $episode->season_id = $seson_id;            
+                $episode->downloadable = 0;            
+                $episode->type = $type;            
+                $episode->status = 0;            
+                $episode->source = 'Youtube';            
+                $episode->url = $url;            
+                $episode->skip_available = 0;                            
+                $episode->playlist_id = $playlistId;
+                $episode->save();             
+            }
+
+            $nextPageToken = $data['nextPageToken'] ?? null;                    
+        } while ($nextPageToken);  
+
+        return back()->with('message','Playlist Uploaded successfully');
+    }
+
+    public function checkIsExist($movie_name, $url){
+        return KidshowsEpisode::where(function ($query) use ($movie_name, $url){
+            $query->whereRaw('LOWER(TRIM(Episoade_Name)) = ?', [strtolower(trim($movie_name))])
+                    ->orWhereRaw('LOWER(TRIM(url)) = ?', [strtolower(trim($url))]);
+        })        
+        ->first();
     }
 }

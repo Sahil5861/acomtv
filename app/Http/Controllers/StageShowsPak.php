@@ -81,20 +81,6 @@ class StageShowsPak extends Controller
         $activeRecords = StageshowPak::select('count(*) as allcount')->whereNull('stage_shows_pak.deleted_at')->where('status','1');
         $deletedRecords = StageshowPak::select('count(*) as allcount')->whereNotNull('stage_shows_pak.deleted_at');
 
-        if (!empty($playlist_id) || $playlist_id != '') { 
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if (!empty($status) || $status != '') {    
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
-
 
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
@@ -102,14 +88,14 @@ class StageShowsPak extends Controller
         $deletedRecords = $deletedRecords->count();
 
 
-        $totalRecordswithFilter = $movieQuery->where(function($query) use ($searchValue) {
+        $totalRecordswithFilter = (clone $movieQuery)->where(function($query) use ($searchValue) {
                                                         $query->where('stage_shows_pak.name', 'like', '%' . $searchValue . '%')
                                                             ->orWhere('stage_shows_pak.playlist_id', 'like', '%' . $searchValue . '%');
                                                     }) 
                                             ->count();
 
         // Get records, also we have included search filter as well
-        $records = $movieQuery->orderBy($columnName, $columnSortOrder)
+        $records = (clone $movieQuery)->orderBy($columnName, $columnSortOrder)
             // ->where('channels.status', '=', 1)            
             ->where(function($query) use ($searchValue) {
                 $query->where('stage_shows_pak.name', 'like', '%' . $searchValue . '%')

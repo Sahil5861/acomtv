@@ -75,19 +75,6 @@ class ManageTvShowEpisodePak extends Controller
         $activeRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNull('shows_episodes_pak.deleted_at')->where('season_id', $id)->where('status', 1);
         $deletedRecords = TvShowEpisodePak::select('count(*) as allcount')->whereNotNull('shows_episodes_pak.deleted_at')->where('season_id', $id);
 
-        if ($request->has('playlist_id') && $playlist_id != '') {  
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if ($request->has('status') && $status != '') {        
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
 
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
@@ -95,7 +82,7 @@ class ManageTvShowEpisodePak extends Controller
         $deletedRecords = $deletedRecords->count();
         
 
-        $totalRecordswithFilter = $query->where(function($query) use ($searchValue){
+        $totalRecordswithFilter = (clone $query)->where(function($query) use ($searchValue){
                 $query->where('shows_episodes_pak.title', 'like', '%' . $searchValue . '%')
                     ->orWhere('shows_episodes_pak.playlist_id', 'like', '%' . $searchValue . '%');
         }) 
@@ -104,7 +91,7 @@ class ManageTvShowEpisodePak extends Controller
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = $query->orderBy($columnName, $columnSortOrder)
+        $records = (clone $query)->orderBy($columnName, $columnSortOrder)
             // ->where('channels.status', '=', 1)            
             ->where(function($query) use ($searchValue){
                 $query->where('shows_episodes_pak.title', 'like', '%' . $searchValue . '%')
@@ -149,18 +136,18 @@ class ManageTvShowEpisodePak extends Controller
                 "status" => $status,                                                                                                           
                 "url" => $record->video_url,  
                 "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->video_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
-     width="20" height="20" 
-     viewBox="0 0 24 24" 
-     fill="none" 
-     stroke="currentColor" 
-     stroke-width="2" 
-     stroke-linecap="round" 
-     stroke-linejoin="round" 
-     class="feather feather-eye">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-</svg>
-</a>',                                                                                                           
+                    width="20" height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    class="feather feather-eye">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </a>',                                                                                                           
                 "thumbnail" => '<img src="'.$record->thumbnail.'" width="100px;">',                                                                              
                 "created_at" => date('j M Y h:i a',strtotime($record->updated_at)),
                 "action" => '<div class="action-btn">

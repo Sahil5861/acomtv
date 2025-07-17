@@ -365,6 +365,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/tournament-match-order/{id}', [ManageTournamentMatches::class, 'getTournamentMatchesOrderList'])->name('admin.tournamentmatches.order');
         Route::post('/save-tournament-match-orders', [ManageTournamentMatches::class,'saveTournamentMatchesOrders'])->name('saveTournamentMatchesOrders');
 
+        Route::post('import-sports-playlits', [ManageTvShowEpisodePak::class, 'importPlaylist'])->name('importsportsplaylits');
+
         
 
         // slider
@@ -677,6 +679,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/kid-shows-episode/destroy', [KidsShowEpisodes::class,'destroy'])->name('kid-shows-episode.destroy');
         Route::get('/kids-showepisode-order/{id}', [KidsShowEpisodes::class, 'getKidsShowEpisodesOrderList'])->name('admin.kidsshowepisode.order');
         Route::post('/save-kids-showepisode-orders', [KidsShowEpisodes::class,'saveKidsShowEpisodesOrders'])->name('saveKidsShowEpisodesOrders');
+
+        Route::post('import-kidshows-episode-playlits', [KidsShowEpisodes::class, 'importPlaylist'])->name('importkidshowsepisode');
 
 
         // Religious Channels

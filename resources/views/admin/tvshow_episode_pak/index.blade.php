@@ -299,9 +299,18 @@
          order: [[4, 'desc']],         
          ajax: {
             url: "{{route('getTvShowEpisodeListPak', $id)}}",
-            data: function(d) {                
-                d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
-                d.status = $('#select_status').val(); // pass the selected network
+            data: function(d) {
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
+                }
+
+                if (status !== '') {
+                    d.status = status;
+                }
             }
         },
          columns: [            

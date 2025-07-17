@@ -178,7 +178,7 @@
                     <table id="multi-column-ordering" class="table table-hover" data-table="web_series_episoade">
                         <thead>
                             <tr>
-                                <th class="editable-th" data-column="Episoade_Name">Name</th>                                                                                                                         
+                                <th class="editable-th" style="width: 300px;" data-column="Episoade_Name">Name</th>                                                                                                                         
                                 <th>Thumbnail</th>
                                 <th>Status</th>
                                 <th>Play</th>
@@ -306,16 +306,25 @@
             ajax: {
                 url: "{{route('getWebseriesEpisodesList', $id)}}",
                 data: function(d) {
-                    d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
-                    d.status = $('#select_status').val(); // pass the selected network
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
                 }
+
+                if (status !== '') {
+                    d.status = status;
+                }
+            }
             },
             columns: [
-            { data: 'Episoade_Name' },                        
+            { data: 'Episoade_Name', width: '300'},                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
             { data: 'play_btn', orderable: false, searchable: false },
-            { data: 'playlist_id'},                        
+            { data: 'playlist_id', width: '200px'},                        
             { data: 'source' },
             { data: 'url' },
             // { data: 'downloadable',orderable: false, searchable: false  },

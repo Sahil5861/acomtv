@@ -94,6 +94,24 @@
                     </div>
                 @endif
 
+                <div class="row d-flex justify-content-start align-items-center">
+                    {{-- <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div> --}}
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
                 <?php 
                     $sesonId = $id;
                     $season = \App\Models\TournamentSeason::where('id', $id)->first();
@@ -101,7 +119,7 @@
                     $sport = \App\Models\SportsCategory::where('id', $tournament->sports_category_id )->first();
                 ?> 
                 
-                <div class="text-left">
+                <div class="text-left" style="margin: 10px 0;">
                     <p>
                         <a href="{{route('admin.sportscategory')}}">{{strtoupper('Sports')}}</a>&nbsp; &gt;                        
                         <a href="{{route('admin.sporttournament', base64_encode($sport->id))}}">{{strtoupper($sport->title)}}</a>&nbsp; &gt;                        
@@ -113,6 +131,39 @@
                 <div class="text-right">                    
                     <a href="{{ route('admin.tournamentmatches.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Matches</a>
                     <a href="{{route('addsportstournamentseasonepisodes', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
+                    {{-- <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
+                        Import from Playlist
+                    </button>   --}}
+                </div>
+
+                <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addContentModalLabel">Add Tournament Matches From Playlist</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">                                
+                            <form id="importStageShowsForm" method="POST" action="{{route('importsportsplaylits')}}">
+                            @csrf
+                                <div class="form-group">
+                                    <label for="networkName">Playlits Id</label>                                    
+                                    <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
+                                </div>                                                                                         
+                            </form>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" form="importStageShowsForm" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        
+                        </div>
+                    </div>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
@@ -237,8 +288,23 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[0, 'asc']],
-         ajax: "{{route('get-sports-tournament-episodesList', $id)}}",
+         order: [[0, 'asc']],         
+         ajax: {
+            url: "{{route('get-sports-tournament-episodesList', $id)}}",
+            data: function(d) {
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
+                }
+
+                if (status !== '') {
+                    d.status = status;
+                }
+            }
+        },
          columns: [
             { data: 'match_title' },                                                          
             { data: 'match_type'},                                                
@@ -250,6 +316,15 @@
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
+         columnDefs: [
+            {
+                targets: 0, // index of 'name' column
+                createdCell: function(td, cellData, rowData, row, col) {
+                    // $(td).addClass('editable');
+                    $(td).attr('data-id', rowData.id); // Set data-id attribute
+                }
+            },            
+        ],
 
         
          drawCallback: function (settings) { 
@@ -264,6 +339,13 @@
             updateIcon()
         },
       });
+    });
+
+    $('#select_playlist_id').on('change', function() {
+        $('#multi-column-ordering').DataTable().ajax.reload();
+    });
+    $('#select_status').on('change', function() {         
+        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
     });
 
     function deleteRowModal(id){ 
