@@ -71,28 +71,14 @@ class WebseriesEpisodes extends Controller
         $inactiveRecords = WebSeriesEpisode::select('count(*) as allcount')->where('status','0')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id);
         $activeRecords = WebSeriesEpisode::select('count(*) as allcount')->where('status','1')->whereNull('web_series_episoade.deleted_at')->where('season_id', $id);
         $deletedRecords = WebSeriesEpisode::select('count(*) as allcount')->whereNotNull('web_series_episoade.deleted_at')->where('season_id', $id);
-
-        if ($request->has('playlist_id') && $playlist_id != '') {  
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if ($request->has('status') && $status != '') {    
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);                   
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
-
+        
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
         $activeRecords = $activeRecords->count();
         $deletedRecords = $deletedRecords->count();
 
 
-        $totalRecordswithFilter = $query->where(function ($query) use ($searchValue){
+        $totalRecordswithFilter = (clone $query)->where(function ($query) use ($searchValue){
             $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
                     ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
         })                
@@ -100,7 +86,7 @@ class WebseriesEpisodes extends Controller
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = $query->orderBy($columnName, $columnSortOrder)
+        $records = (clone $query)->orderBy($columnName, $columnSortOrder)
                 ->where(function ($query) use ($searchValue){
                             $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
                                     ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');                                    

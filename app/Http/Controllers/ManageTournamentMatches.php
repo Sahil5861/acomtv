@@ -18,8 +18,9 @@ class ManageTournamentMatches extends Controller
     {   
         // echo $id; exit;     
         $id = base64_decode($id);
+        $playlist_ids = TournamentMatches::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->where('tournament_season_id', $id)->unique()->values();        
         
-        return view('admin.tournamentmatches.index', compact('id'));
+        return view('admin.tournamentmatches.index', compact('id', 'playlist_ids'));
     }
 
     public function getTournamentMatchesOrderList($id)
@@ -57,26 +58,50 @@ class ManageTournamentMatches extends Controller
         $columnName = $columnName_arr[$columnIndex]['data']; // Column name
         $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
+
+        // $playlist_id = $request->input('playlist_id');
+        $status = $request->input('status');
+        $status = number_format($status);  
+
+        $myquery = TournamentMatches::query()->whereNull('tournament_matches.deleted_at');
+        if ($request->has('playlist_id') && $playlist_id != '') {           
+            $myquery->where('playlist_id', $playlist_id);
+        }
+
+        if ($request->has('status') && $status != '') {                        
+            $myquery->where('status', $status);
+        }
         
-        $totalRecords = TournamentMatches::select('count(*) as allcount')->whereNull('tournament_matches.deleted_at')->where('tournament_season_id', $id)->count();
-        $inactiveRecords = TournamentMatches::select('count(*) as allcount')->whereNull('tournament_matches.deleted_at')->where('tournament_season_id', $id)->where('status', 0)->count();
-        $activeRecords = TournamentMatches::select('count(*) as allcount')->whereNull('tournament_matches.deleted_at')->where('tournament_season_id', $id)->where('status', 1)->count();
-        $deletedRecords = TournamentMatches::select('count(*) as allcount')->whereNotNull('tournament_matches.deleted_at')->where('tournament_season_id', $id)->count();
+        $totalRecords = TournamentMatches::select('count(*) as allcount')->whereNull('tournament_matches.deleted_at')->where('tournament_season_id', $id);
+        $inactiveRecords = TournamentMatches::select('count(*) as allcount')->whereNull('tournament_matches.deleted_at')->where('tournament_season_id', $id)->where('status', 0);
+        $activeRecords = TournamentMatches::select('count(*) as allcount')->whereNull('tournament_matches.deleted_at')->where('tournament_season_id', $id)->where('status', 1);
+        $deletedRecords = TournamentMatches::select('count(*) as allcount')->whereNotNull('tournament_matches.deleted_at')->where('tournament_season_id', $id);
 
 
-        $totalRecordswithFilter = TournamentMatches::select('count(*) as allcount')
+        $totalRecords = $totalRecords->count();
+        $inactiveRecords = $inactiveRecords->count();
+        $activeRecords = $activeRecords->count();
+        $deletedRecords = $deletedRecords->count();
+
+
+        
+        
+
+
+        $totalRecordswithFilter = (clone $myquery)->select('count(*) as allcount')
         ->where('match_title', 'like', '%' . $searchValue . '%')
         // ->where('channels.status', '=', 1)
-        ->whereNull('tournament_matches.deleted_at')->where('tournament_season_id', $id)
+        ->where('tournament_season_id', $id)
         ->count();
 
+
+
         // Get records, also we have included search filter as well
-        $records = TournamentMatches::where(function ($query) use ($searchValue) {
+        $records = (clone $myquery)->where(function ($query) use ($searchValue) {
                 $query->where('tournament_matches.match_title', 'like', '%' . $searchValue . '%')
                     ->orWhere('tournament_matches.match_type', 'like', '%' . $searchValue . '%')
                     ->orWhere('tournament_matches.streaming_info', 'like', '%' . $searchValue . '%');
-            })
-            ->whereNull('tournament_matches.deleted_at')
+            })            
             ->where('tournament_season_id', $id)
             ->orderBy($columnName, $columnSortOrder)
             ->orderBy('tournament_matches.created_at', 'asc')
@@ -118,18 +143,18 @@ class ManageTournamentMatches extends Controller
                 "match_datetime" => $matchdateTime,                                                            
                 "status" => $status, 
                 "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->video_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
-     width="20" height="20" 
-     viewBox="0 0 24 24" 
-     fill="none" 
-     stroke="currentColor" 
-     stroke-width="2" 
-     stroke-linecap="round" 
-     stroke-linejoin="round" 
-     class="feather feather-eye">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-</svg>
-</a>',                
+                    width="20" height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    class="feather feather-eye">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </a>',                
                 "start_date" => $record->start_date,                
                 "end_date" => $record->end_date,                
                 "logo" => '<img src="'.$record->logo.'" width="100px;">',                                                                              
@@ -250,5 +275,93 @@ class ManageTournamentMatches extends Controller
         }
 
         return redirect()->back()->with('success', 'Matches order updated successfully.');
+    }
+
+    public function importstageshows(Request $request){
+        $request->validate([
+            'playlist_id' => 'required',            
+        ]);
+        $playlistId = $request->input('playlist_id');
+        $genres = implode(',', $request->genre) ?? '';
+
+        $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
+        $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
+        $nextPageToken = null;
+
+        do {
+            $url = $baseurl;
+            if ($nextPageToken) {
+                $url .= "&pageToken=" . $nextPageToken;
+            }
+
+            $ch = curl_init($url);
+    
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+            $response = curl_exec($ch);
+    
+            if(curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return response()->json(['success' => false, 'error' => $error_msg], 500);
+            }
+            curl_close($ch);
+            
+            $data = json_decode($response, true);        
+
+            if (!isset($data['items'])) break;
+
+            foreach ($data['items'] as $key => $item) {    
+                $snippet = $item['snippet'];
+                $movieName = $snippet['title'] ?? null;
+                $movie_url = $snippet['resourceId']['videoId'] ?? null;
+
+                if ($this->checkIsExist($movieName, $movie_url) || trim($movieName) == 'Private video') {
+                    continue;
+                }
+
+                $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+                $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                        
+                $movie = new TournamentMatches();
+
+                $channel_number = TournamentMatches::whereNull('deleted_at')->count();
+                $formated_number = $channel_number + 1;   
+
+                $movie->name = $movieName;
+                $movie->description = $snippet['description'] ?? null;
+                
+                $movie->banner = $cleanBannerUrl;
+                $movie->status = 0;
+                $movie->source_type = 'YoutubeLive';            
+                $movie->youtube_trailer = '' ?? null;
+                $movie->movie_url = $movie_url;
+                $movie->genres = $genres;
+                $movie->index = $formated_number;
+                $movie->playlist_id = $playlistId;
+
+                $movie->save();
+
+                        
+            }
+
+            $nextPageToken = $data['nextPageToken'] ?? null;                    
+        } while ($nextPageToken);  
+
+        
+
+        return back()->with('message','Playlist Uploaded successfully');
+
+    }
+
+
+    public function checkIsExist($movie_name, $url){
+        return TournamentMatches::where(function ($query) use ($movie_name, $url){
+            $query->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($movie_name))])
+                    ->orWhereRaw('LOWER(TRIM(movie_url)) = ?', [strtolower(trim($url))]);
+        })
+        ->whereNull('deleted_at')
+        ->first();
     }
 }

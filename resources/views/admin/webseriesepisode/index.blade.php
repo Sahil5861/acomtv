@@ -306,9 +306,18 @@
             ajax: {
                 url: "{{route('getWebseriesEpisodesList', $id)}}",
                 data: function(d) {
-                    d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
-                    d.status = $('#select_status').val(); // pass the selected network
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
                 }
+
+                if (status !== '') {
+                    d.status = status;
+                }
+            }
             },
             columns: [
             { data: 'Episoade_Name', width: '300'},                        

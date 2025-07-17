@@ -102,12 +102,30 @@
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
                 @endif 
+
+                <div class="row d-flex justify-content-start align-items-center">
+                    <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div> 
                 <?php 
                     $show = \App\Models\RelShow::where('id', $id)->first();
                     $channel = \App\Models\RelChannel::where('id', $show->channel_id)->first();            
                 ?>
 
-                <div class="text-left">
+                <div class="text-left" style="margin: 10px 0;">
                     <p>
                         <a href="{{route('admin.RelChannel')}}">{{strtoupper('Religious Channels')}}</a>&nbsp; &gt;                                                
                         <a href="{{route('admin.Relshows', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
@@ -278,8 +296,24 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[0, 'asc']],
-         ajax: "{{route('getRelShowEpisodesList', $id)}}",
+         order: [[0, 'asc']],         
+         ajax: {
+            url: "{{route('getRelShowEpisodesList', $id)}}",
+            data: function(d) {
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
+                }
+
+                if (status !== '') {
+                    d.status = status;
+                }
+            }
+        },
+         
          columns: [
             { data: 'title', width: '400px'},                        
             { data: 'image',orderable: false, searchable: false },                        
@@ -322,16 +356,25 @@
         $('#delete_modal').modal('show');        
     }
     function setEditable(){
-    $('#multi-column-ordering thead th').each(function (index) {            
-            
-        if ($(this).hasClass('editable-th')) {
-            console.log('hii');                
-            $('#tableItem tr').each(function () {
-                $(this).find('td').eq(index).addClass('editable');                                
-            });
-        }
+        $('#multi-column-ordering thead th').each(function (index) {            
+                
+            if ($(this).hasClass('editable-th')) {
+                console.log('hii');                
+                $('#tableItem tr').each(function () {
+                    $(this).find('td').eq(index).addClass('editable');                                
+                });
+            }
+        });    
+    }
+
+    $('#select_playlist_id').on('change', function() {
+        $('#multi-column-ordering').DataTable().ajax.reload();
     });
-}
+
+
+    $('#select_status').on('change', function() {         
+        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
+    });
 
     function delete_row(){
         var id = $('#d_id').val();

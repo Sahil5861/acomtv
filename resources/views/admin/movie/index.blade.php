@@ -245,8 +245,17 @@ function initializeDataTable(network_id = '') {
         ajax: {
             url: "{{ route('getMovieList') }}",
             data: function(d) {
-                d.playlist_id = $('#select_playlist_id').val(); // pass the selected network
-                d.status = $('#select_status').val(); // pass the selected network
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
+                }
+
+                if (status !== '') {
+                    d.status = status;
+                }
             }
         },
         columns: [
@@ -296,9 +305,10 @@ $(document).ready(function() {
     initializeDataTable();   
     setTimeout(() => {        
         setEditable();
-    }, 500); 
+    }, 500);     
+});
 
-    $('#select_status').on('change', function() {              
+    $('#select_status').on('change', function() {                    
         dataTable.ajax.reload(null, false);
     });
 
@@ -306,7 +316,6 @@ $(document).ready(function() {
     $('#select_playlist_id').on('change', function() {
         dataTable.ajax.reload(null, false);
     });
-});
 
 
 document.addEventListener('dblclick', function (event){

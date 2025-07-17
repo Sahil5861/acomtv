@@ -15,8 +15,9 @@ class RelShowEpisodes extends Controller
 {
     public function index(Request $request, $id){
         $id = base64_decode($id); 
-        $show = RelShow::where('id', $id)->first();                   
-        return view('admin.relepisode.index', compact('id', 'show'));
+        $show = RelShow::where('id', $id)->first(); 
+        $playlist_ids = RelshowsEpisode::where('playlist_id', '!=', null)->whereNull('deleted_at')->where('show_id', $id)->pluck('playlist_id')->unique()->values();                          
+        return view('admin.relepisode.index', compact('id', 'show', 'playlist_ids'));
     }
 
     public function getRelShowEpisodesOrderList($id)
@@ -75,19 +76,6 @@ class RelShowEpisodes extends Controller
         $activeRecords = RelshowsEpisode::select('count(*) as allcount')->where('status','1')->whereNull('rel_episodes.deleted_at')->where('show_id', $id);
         $deletedRecords = RelshowsEpisode::select('count(*) as allcount')->whereNotNull('rel_episodes.deleted_at')->where('show_id', $id);
 
-        if ($request->has('playlist_id') && $playlist_id != '') {  
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if ($request->has('status') && $status != '') {   
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);                   
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
 
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
@@ -97,16 +85,15 @@ class RelShowEpisodes extends Controller
 
 
 
-        $totalRecordswithFilter = RelshowsEpisode::select('count(*) as allcount')
-        ->where(function ($query) use ($searchValue){
+        $totalRecordswithFilter = (clone $query)->where(function ($query) use ($searchValue){
                 $query->where('rel_episodes.title', 'like', '%' . $searchValue . '%')
                 ->orWhere('rel_episodes.playlist_id', 'like', '%' . $searchValue . '%');
         })        
-        ->whereNull('rel_episodes.deleted_at')->where('show_id', $id)
+        ->where('show_id', $id)
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = $query->orderBy($columnName, $columnSortOrder)                        
+        $records = (clone $query)->orderBy($columnName, $columnSortOrder)                        
             ->where(function ($query) use ($searchValue){
                 $query->where('rel_episodes.title', 'like', '%' . $searchValue . '%')
                         ->orWhere('rel_episodes.playlist_id', 'like', '%' . $searchValue . '%');

@@ -161,34 +161,15 @@ class Movies extends Controller
         }
 
         if ($request->has('status') && $status != '') {             
-            $movieQuery->where('status', $status);
+            $movieQuery->where('movies.status', (int)$status);                        
         }
 
-        // Total records
-        // Total records
-        // $totalRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->count();
-        // $inactiveRecords = Movie::select('count(*) as allcount')->where('status','0')->whereNull('movies.deleted_at')->count();
-        // $activeRecords = Movie::select('count(*) as allcount')->where('status','1')->whereNull('movies.deleted_at')->count();
-        // $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at')->count();
+        
 
         $totalRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at');
         $inactiveRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->where('status','0');
         $activeRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->where('status','1');
         $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at');
-
-        if ($request->has('playlist_id') && $playlist_id != '') {  
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if ($request->has('status') && $status != '') { 
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
 
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
@@ -196,24 +177,26 @@ class Movies extends Controller
         $deletedRecords = $deletedRecords->count();
 
 
-        $totalRecordswithFilter = $movieQuery->where(function($query) use ($searchValue) {
-                                                        $query->where('movies.name', 'like', '%' . $searchValue . '%')
-                                                            ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
-                                                    }) 
-                                            ->count();
+        $totalRecordswithFilter = (clone $movieQuery)
+        ->where(function($query) use ($searchValue) {
+            $query->where('movies.name', 'like', '%' . $searchValue . '%')
+                ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
+        })
+        ->count();
 
         // Get records, also we have included search filter as well
-        $records = $movieQuery->orderBy($columnName, $columnSortOrder)
-            // ->where('channels.status', '=', 1)            
-            ->where(function($query) use ($searchValue) {
-                $query->where('movies.name', 'like', '%' . $searchValue . '%')
-                    ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
-            })                      
-            ->select('movies.*')->orderBy('movies.updated_at','desc')            
-            ->skip($start)
-            ->take($rowperpage)
-            ->get();
-
+        
+        $records = (clone $movieQuery)
+                    ->where(function($query) use ($searchValue) {
+                        $query->where('movies.name', 'like', '%' . $searchValue . '%')
+                            ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
+                    })
+                    ->orderBy($columnName, $columnSortOrder)
+                    ->select('movies.*')
+                    ->orderBy('movies.updated_at', 'desc')
+                    ->skip($start)
+                    ->take($rowperpage)
+                    ->get();
         $data_arr = array();
 
         foreach ($records as $record) {
@@ -553,7 +536,7 @@ class Movies extends Controller
     public function updateStatus($id){
         $movie = Movie::find(base64_decode($id));        
         if($movie){
-            $movie->status = $movie->status == '1' ? '0' : '1';
+            $movie->status = $movie->status == 1 ? 0 : 1;
             $movie->save();
             echo json_encode(['message','Movie status updated successfully']);
         }else{
@@ -677,7 +660,7 @@ class Movies extends Controller
         ]);
 
         // Sanitize table and column names to prevent SQL injection
-        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak', 'web_series_episoade']; // add more if needed
+        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak', 'web_series_episoade', 'kids_shows_episodes']; // add more if needed
         $allowedColumns = ['name', 'title', 'Episoade_Name']; // add other editable columns if needed
 
         if (!in_array($request->table, $allowedTables) || !in_array($request->column, $allowedColumns)) {

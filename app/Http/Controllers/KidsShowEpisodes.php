@@ -16,8 +16,10 @@ class KidsShowEpisodes extends Controller
         $id = base64_decode($id); 
         $season = KidShowsSeason::where('id', $id)->first();
         $tvshow = KidsShow::where('id',$season->web_series_id)->first();
+
+        $playlist_ids = KidshowsEpisode::where('playlist_id', '!=', null)->whereNull('deleted_at')->where('season_id', $id)->pluck('playlist_id')->unique()->values();        
            
-        return view('admin.kidshowsepisode.index', compact('id', 'season', 'tvshow'));
+        return view('admin.kidshowsepisode.index', compact('id', 'season', 'tvshow', 'playlist_ids'));
     }
 
     public function getKidsShowEpisodesOrderList($id)
@@ -73,34 +75,17 @@ class KidsShowEpisodes extends Controller
         // Total records
         // Total records
         $totalRecords = KidshowsEpisode::select('count(*) as allcount')->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
-        $inactiveRecords = KidshowsEpisode::select('count(*) as allcount')->where('status','0')->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
-        $activeRecords = KidshowsEpisode::select('count(*) as allcount')->where('status','1')->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
+        $inactiveRecords = KidshowsEpisode::select('count(*) as allcount')->where('status',0)->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
+        $activeRecords = KidshowsEpisode::select('count(*) as allcount')->where('status',1)->whereNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
         $deletedRecords = KidshowsEpisode::select('count(*) as allcount')->whereNotNull('kids_shows_episodes.deleted_at')->where('season_id', $id);
-
-        if ($request->has('playlist_id') && $playlist_id != '') {  
-            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
-            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
-            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
-            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
-        }
-
-        if ($request->has('status') && $status != '') {        
-            $totalRecords = $totalRecords->where('status', $status);
-            $inactiveRecords = $inactiveRecords->where('status', $status);
-            $activeRecords = $activeRecords->where('status', $status);
-            $deletedRecords = $deletedRecords->where('status', $status);
-        }
-
+        
         
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
         $activeRecords = $activeRecords->count();
         $deletedRecords = $deletedRecords->count();
-        
-
-
-
-        $totalRecordswithFilter = $query->where(function ($query) use ($searchValue){
+    
+        $totalRecordswithFilter = (clone $query)->where(function ($query) use ($searchValue){
                 $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
                         ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
         })        
@@ -108,7 +93,7 @@ class KidsShowEpisodes extends Controller
         ->count();
 
         // Get records, also we have included search filter as well
-        $records = $query->orderBy($columnName, $columnSortOrder)
+        $records = (clone $query)->orderBy($columnName, $columnSortOrder)
                 ->where(function ($query) use ($searchValue){
                     $query->where('Episoade_Name', 'like', '%' . $searchValue . '%')
                             ->orWhere('playlist_id', 'like', '%' . $searchValue . '%');
@@ -141,6 +126,7 @@ class KidsShowEpisodes extends Controller
             $downloadable = $record->downloadable == 1 ? 'Yes' : 'No';
 
             $data_arr[] = array(
+                "id" => $record->id,
                 "Episoade_Name" => $record->Episoade_Name,                                                            
                 "status" => $status,                
                 "image" => '<img src="'.$record->episoade_image.'" width="100px;">',                

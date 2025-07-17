@@ -309,7 +309,7 @@
                 var data = jQuery.parseJSON(val);
                 $("#delete_blog_modal").modal('hide');
                 $( "#delete_bd_ms" ).html(data.message);
-                $('#multi-column-ordering').DataTable().ajax.reload();
+                // $('#multi-column-ordering').DataTable().ajax.reload();
                 // setTimeout(function(){location.reload(true);}, 2000);
 
             });
