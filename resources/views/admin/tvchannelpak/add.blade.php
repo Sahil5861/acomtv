@@ -34,6 +34,14 @@
                     <input type="hidden" name="id" value="{{ $tvchannel->id ?? '' }}">
 
                     <div class="form-row">
+                        @php
+                            $maxOrder = \App\Models\TvChannelPak::whereNull('deleted_at')->max('order') ?? 0;
+                            $nextOrder = $maxOrder + 1;
+                        @endphp
+
+                        <input type="hidden" name="order" value="{{ old('order', isset($tv_channels) ? $tv_channels->order : $nextOrder) }}">
+                        @error('order') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
                             <label for="name">Name</label>

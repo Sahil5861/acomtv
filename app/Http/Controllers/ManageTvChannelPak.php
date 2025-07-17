@@ -143,6 +143,7 @@ class ManageTvChannelPak extends Controller
             $tvchannel = TvChannelPak::find($request->id);
         } else {
             $tvchannel = new TvChannelPak();
+            $tvchannel->order = $request->order ?? 0;
         }
 
         $tvchannel->name = $request->name;

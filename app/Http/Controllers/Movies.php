@@ -25,6 +25,7 @@ class Movies extends Controller
         $playlist_ids = Movie::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();        
         return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
+    
     public function getMovieOrderList()
     {
         $this->data['movies'] = Movie::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
@@ -42,6 +43,7 @@ class Movies extends Controller
 
         return view('admin.movie.dragdrop', $this->data);
     }
+    
     public function deletedChannel(){
         return view('admin.movie.deleted');
     }
