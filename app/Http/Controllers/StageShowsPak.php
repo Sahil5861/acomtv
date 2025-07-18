@@ -309,6 +309,7 @@ class StageShowsPak extends Controller
             $stage_show->release_date = $request->release_date ?? null;                                                                    
             $stage_show->status = $request->status;
             $stage_show->index = $request->index ?? 0;
+            $stage_show->movie_order = $request->index ?? 0;
             $stage_show->source_type = $request->source_type;
             $stage_show->youtube_trailer = $request->trailer_url ?? null;
             $stage_show->movie_url = $request->movie_url ?? null;
@@ -354,6 +355,7 @@ class StageShowsPak extends Controller
             $stage_show->release_date = $request->release_date ?? null;                                                                    
             $stage_show->status = $request->status;
             $stage_show->index = $request->index ?? 0;
+            $stage_show->movie_order = $request->index ?? 0;
             $stage_show->source_type = $request->source_type;                
             $stage_show->movie_url = $request->source_type;                            
             $stage_show->genres = implode(',', $request->movie_genre);

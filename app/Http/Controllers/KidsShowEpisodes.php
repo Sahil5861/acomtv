@@ -206,7 +206,7 @@ class KidsShowEpisodes extends Controller
             $episode->downloadable = $request->downloadable;            
             $episode->type = $request->type;            
             $episode->status = $request->status;            
-            $episode->source = $request->source;            
+            $episode->source = $request->source;
             $episode->url = $request->source_url;            
             $episode->skip_available = $request->skip_available ?? 0;            
             $episode->intro_start = $request->intro_start ?? null;            

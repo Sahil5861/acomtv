@@ -50,6 +50,16 @@ kidsshows
                             </div>
                         </div>
 
+                        {{-- Sets order: uses existing value for edit, or calculates next order based on channel for add --}}
+                        @php
+                            $order = isset($tv_shows)
+                                ? $tv_shows->order
+                                : (\App\Models\KidsShow::where('kid_channel_id', $id)
+                                    ->whereNull('deleted_at')
+                                    ->max('order') ?? 0) + 1;
+                        @endphp
+
+                        <input type="hidden" name="order" value="{{ old('order', $order) }}">
 
                         {{-- <!-- Language -->
                         <div class="col-md-6 mb-4">

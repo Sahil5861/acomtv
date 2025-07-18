@@ -63,15 +63,23 @@
                                 <div class="channel-error"></div>
                             </div>
 
+                            {{-- Sets season order: existing value for edit, or next available based on show ID for add --}}
+                            @php
+                                $showId = $id;
+                                $seasonOrder = isset($season)
+                                    ? $season->season_order
+                                    : (\App\Models\KidShowsSeason::where('show_id', $showId)->whereNull('deleted_at')->max('season_order') ?? 0) + 1;
+                            @endphp
 
                             <div class="col-md-6 mb-4">
-                                <label for="order">Order *</label>
-                                <input type="number" name="order" id="order" class="form-control" value="{{old('order', isset($season) ? $season->season_order : 0)}}" required min="0" placeholder="Order">
+                                <label for="season_order">Order *</label>
+                                <input type="number" name="season_order" id="season_order" class="form-control"
+                                    value="{{ old('season_order', $seasonOrder) }}" placeholder="Order">
                                 <div class="invalid-feedback">
-                                    @error('runtime') {{ $message }} @enderror
+                                    @error('season_order') {{ $message }} @enderror
                                 </div>
-                                <div class="channel-error"></div>
                             </div>
+
 
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Banner*</label>
