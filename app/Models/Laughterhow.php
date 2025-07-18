@@ -12,5 +12,9 @@ class Laughterhow extends Model
 
     protected $table = 'laughter_show';
 
-    use SoftDeletes;    
+    use SoftDeletes;   
+    
+    public function networks(){
+        return $this->belongsToMany(ContentNetwork::class, 'laugter_show_content_network', 'movie_id', 'network_id');
+    }
 }
