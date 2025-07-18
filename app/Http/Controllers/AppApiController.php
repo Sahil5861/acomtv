@@ -25,6 +25,10 @@ use App\Models\SportsCategory;
 use App\Models\SportsTournament;
 use App\Models\TournamentSeason;
 use App\Models\TournamentMatches;
+use App\Models\StageshowPak;
+use App\Models\Laughterhow;
+
+
 
 
 use App\Models\MovieLink;
@@ -1080,16 +1084,17 @@ class AppApiController extends Controller
     public function getAllMovies(Request $request){
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
-        $query = Movie::where('status', 1)
-                ->whereNull('deleted_at')
-                ->with('networks');
+        $query = Movie::where('status', 1)->whereNull('deleted_at');
+
         if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            // echo 'page set'; exit;
             $page = (int) $_GET['page'];
             $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
     
             $movies = $query->paginate($limit, ['*'], 'page', $page);
 
             print_r(json_encode($movies->items()));
+            // print_r(json_encode($movies));
         } else {
 
             if (isset($_GET['records']) && $_GET['records'] > 0) {
@@ -1101,58 +1106,71 @@ class AppApiController extends Controller
             exit;
         }
 
-        // print_r(json_encode(array(
-        //     'status' => true,
-        //     'message' => 'All active Movie.',
-        //     'data' =>$movies
-        // )));
-        
     }
 
     public function getAllWebSeries(Request $request){
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $series = WebSeries::where('status', 1)->where('deleted_at', null)        
-        ->with('networks');
-        if(isset($_GET['records']) && $_GET['records'] > 0){
-            $series = $series->limit($_GET['records'])->get();
-        }else{
-            $series = $series->get();
+        $query = WebSeries::where('status', 1)->where('deleted_at', null)->with('networks');
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $sereis = $query->paginate($limit, ['*'], 'page', $page);
+
+            print_r(json_encode($sereis->items()));
+        }
+        else{
+
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $series = $query->limit($_GET['records'])->get();
+            }else{
+                $series = $query->get();
+            }
+    
+            print_r(json_encode($series));
+            exit;
         }
 
-        // print_r(json_encode(array(
-        //     'status' => true,
-        //     'message' => 'All active Web series.',
-        //     'data' =>$series
-        // )));
-        print_r(json_encode($series));
-        exit;
+
+
     }
 
     public function getSeasons(Request $request, $id){
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $seasons = WebSeriesSeason::where('web_series_id', $id)->whereNull('deleted_at')->get();
+        $seasons = WebSeriesSeason::where('web_series_id', $id)->whereNull('deleted_at');
 
-        if ($seasons) {
-            // print_r(json_encode(array(
-            //     'status' => true,
-            //     'message' => 'All Seasons.',
-            //     'data' =>$seasons
-            // )));    
-            print_r(json_encode($seasons));
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $seasons = $seasons->paginate($limit, ['*'], 'page', $page);
+
+            if (!$seasons->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($seasons->items()));
         }
         else{
-            // print_r(json_encode(array(
-            //     'status' => false,
-            //     'message' => 'No Data found',
-            //     'data' => []
-            // )));
-            print_r(json_encode([]));
-        }
-        
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $seasons = $seasons->limit($_GET['records'])->get();
+            }
+            else{
+                $seasons = $seasons->get();
+            }
+            if (!$seasons) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($seasons));            
+        }        
+
         exit;
     }
 
@@ -1160,25 +1178,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $episodes = WebSeriesEpisode::where('season_id', $id)->whereNull('deleted_at')->get();
+        $episodes = WebSeriesEpisode::where('season_id', $id)->whereNull('deleted_at');
 
-        if ($episodes) {
-            // print_r(json_encode(array(
-            //     'status' => true,
-            //     'message' => 'All Episodes of Season '.$id.' .',
-            //     'data' =>$episodes
-            // )));      
-            print_r(json_encode($episodes));
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $episodes = $episodes->paginate($limit, ['*'], 'page', $page);
+            // echo 'Page Set'; exit;
+
+            if (!$episodes->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($episodes->items()));
         }
         else{
-            // print_r(json_encode(array(
-            //     'status' => false,
-            //     'message' => 'No Data found',
-            //     'data' => []
-            // )));
-            print_r(json_encode([]));
-        }
-        exit;
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $episodes = $episodes->limit($_GET['records'])->get();
+            }
+            else{
+                $episodes = $episodes->get();
+            }
+
+            if (!$episodes) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($episodes));            
+        }        
     }
 
 
@@ -1397,16 +1426,38 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $tvChannels = TvChannel::where('deleted_at', null)->where('status',1)->get();
+        $tvChannels = TvChannel::where('deleted_at', null)->where('status',1);
 
-        if ($tvChannels) {
-            
-            print_r(json_encode($tvChannels));
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvChannels = $tvChannels->paginate($limit, ['*'], 'page', $page);
+            // echo 'Page Set'; exit;
+
+            if (!$tvChannels->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvChannels->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvChannels = $tvChannels->limit($_GET['records'])->get();
+            }
+            else{
+                $tvChannels = $tvChannels->get();
+            }
+
+            if (!$tvChannels) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvChannels));     
+            exit;
         }
-        exit;
+
     }
 
     public function getTvShows(Request $request,$channelId = null){
@@ -1417,16 +1468,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $tvShows = TvShow::where('deleted_at', null)->where('tv_channel_id',$channelId)->where('status',1)->get();
+        $tvShows = TvShow::where('deleted_at', null)->where('tv_channel_id',$channelId)->where('status',1);
 
-        if ($tvShows) {
-            
-            print_r(json_encode($tvShows));
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvShows = $tvShows->paginate($limit, ['*'], 'page', $page);            
+
+            if (!$tvShows->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvShows->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvShows = $tvShows->limit($_GET['records'])->get();
+            }
+            else{
+                $tvShows = $tvShows->get();
+            }
+
+            if (!$tvShows) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvShows));     
+            exit;
         }
-        exit;
     }
 
     public function getTvShowSeasons(Request $request,$showId = null){
@@ -1437,16 +1508,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $tvShowSeasons = TvShowSeason::where('deleted_at', null)->where('show_id',$showId)->where('status',1)->get();
+        $tvShowSeasons = TvShowSeason::where('deleted_at', null)->where('show_id',$showId)->where('status',1);
 
-        if ($tvShowSeasons) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvShowSeasons = $tvShowSeasons->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($tvShowSeasons));
+            if (!$tvShowSeasons->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvShowSeasons->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvShowSeasons = $tvShowSeasons->limit($_GET['records'])->get();
+            }
+            else{
+                $tvShowSeasons = $tvShowSeasons->get();
+            }
+
+            if (!$tvShowSeasons) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvShowSeasons));     
+            exit;
         }
-        exit;
     }
 
 
@@ -1458,16 +1549,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $tvShowEpisodes = TvShowEpisode::where('deleted_at', null)->where('season_id',$seasonId)->where('status',1)->get();
+        $tvShowEpisodes = TvShowEpisode::where('deleted_at', null)->where('season_id',$seasonId)->where('status',1);
 
-        if ($tvShowEpisodes) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvShowEpisodes = $tvShowEpisodes->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($tvShowEpisodes));
+            if (!$tvShowEpisodes->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvShowEpisodes->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvShowEpisodes = $tvShowEpisodes->limit($_GET['records'])->get();
+            }
+            else{
+                $tvShowEpisodes = $tvShowEpisodes->get();
+            }
+
+            if (!$tvShowEpisodes) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvShowEpisodes));     
+            exit;
         }
-        exit;
     }
 
 
@@ -1477,16 +1588,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $relChannels = RelChannel::where('deleted_at', null)->where('status',1)->get();
+        $relChannels = RelChannel::where('deleted_at', null)->where('status',1);
 
-        if ($relChannels) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $relChannels = $relChannels->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($relChannels));
+            if (!$relChannels->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($relChannels->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $relChannels = $relChannels->limit($_GET['records'])->get();
+            }
+            else{
+                $relChannels = $relChannels->get();
+            }
+
+            if (!$relChannels) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($relChannels));     
+            exit;
         }
-        exit;
     }
 
     public function getReligiousShows(Request $request,$channelId = null){
@@ -1497,16 +1628,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $relShows = RelShow::where('deleted_at', null)->where('channel_id',$channelId)->where('status',1)->get();
+        $relShows = RelShow::where('deleted_at', null)->where('channel_id',$channelId)->where('status',1);
 
-        if ($relShows) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $relShows = $relShows->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($relShows));
+            if (!$relShows->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($relShows->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $relShows = $relShows->limit($_GET['records'])->get();
+            }
+            else{
+                $relShows = $relShows->get();
+            }
+
+            if (!$relShows) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($relShows));     
+            exit;
         }
-        exit;
     }
 
     public function getReligiousShowsEpisodes(Request $request,$showId = null){
@@ -1517,16 +1668,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $relShowepisodes = RelshowsEpisode::where('deleted_at', null)->where('show_id',$showId)->where('status',1)->get();
+        $relShowepisodes = RelshowsEpisode::where('deleted_at', null)->where('show_id',$showId)->where('status',1);
 
-        if ($relShowepisodes) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $relShowepisodes = $relShowepisodes->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($relShowepisodes));
+            if (!$relShowepisodes->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($relShowepisodes->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $relShowepisodes = $relShowepisodes->limit($_GET['records'])->get();
+            }
+            else{
+                $relShowepisodes = $relShowepisodes->get();
+            }
+
+            if (!$relShowepisodes) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($relShowepisodes));     
+            exit;
         }
-        exit;
     }
 
 
@@ -1536,14 +1707,34 @@ class AppApiController extends Controller
 
         $categories = SportsCategory::where('deleted_at', null)->where('status',1)->get();
 
-        if ($categories) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $categories = $categories->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($categories));
+            if (!$categories->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($categories->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $categories = $categories->limit($_GET['records'])->get();
+            }
+            else{
+                $categories = $categories->get();
+            }
+
+            if (!$categories) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($categories));     
+            exit;
         }
-        exit;
     }
 
     public function getsportTournament(Request $request,$cateId = null){
@@ -1554,16 +1745,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $tournaments = SportsTournament::where('deleted_at', null)->where('sports_category_id',$cateId)->where('status',1)->get();
+        $tournaments = SportsTournament::where('deleted_at', null)->where('sports_category_id',$cateId)->where('status',1);
 
-        if ($tournaments) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tournaments = $tournaments->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($tournaments));
+            if (!$tournaments->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tournaments->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tournaments = $tournaments->limit($_GET['records'])->get();
+            }
+            else{
+                $tournaments = $tournaments->get();
+            }
+
+            if (!$tournaments) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tournaments));     
+            exit;
         }
-        exit;
     }
 
 
@@ -1575,16 +1786,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $touramentSeasons = TournamentSeason::where('deleted_at', null)->where('sports_tournament_id',$tournamentId)->where('status',1)->get();
+        $touramentSeasons = TournamentSeason::where('deleted_at', null)->where('sports_tournament_id',$tournamentId)->where('status',1);
 
-        if ($touramentSeasons) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $touramentSeasons = $touramentSeasons->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($touramentSeasons));
+            if (!$touramentSeasons->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($touramentSeasons->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $touramentSeasons = $touramentSeasons->limit($_GET['records'])->get();
+            }
+            else{
+                $touramentSeasons = $touramentSeasons->get();
+            }
+
+            if (!$touramentSeasons) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($touramentSeasons));     
+            exit;
         }
-        exit;
     }
 
     public function getTouranamentSeasonsEvents(Request $request,$seasonId = null){
@@ -1595,16 +1826,36 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $touramentSeasonEvents = TournamentMatches::where('deleted_at', null)->where('tournament_season_id',$seasonId)->where('status',1)->get();
+        $touramentSeasonEvents = TournamentMatches::where('deleted_at', null)->where('tournament_season_id',$seasonId)->where('status',1);
 
-        if ($touramentSeasonEvents) {
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $touramentSeasonEvents = $touramentSeasonEvents->paginate($limit, ['*'], 'page', $page);            
             
-            print_r(json_encode($touramentSeasonEvents));
+            if (!$touramentSeasonEvents->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($touramentSeasonEvents->items()));
         }
         else{
-            print_r(json_encode([]));
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $touramentSeasonEvents = $touramentSeasonEvents->limit($_GET['records'])->get();
+            }
+            else{
+                $touramentSeasonEvents = $touramentSeasonEvents->get();
+            }
+
+            if (!$touramentSeasonEvents) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($touramentSeasonEvents));     
+            exit;
         }
-        exit;
     }
 
     public function getAllAbove18Movies(Request $request, $pin){
@@ -1644,5 +1895,386 @@ class AppApiController extends Controller
         //     'data' =>$movies
         // )));
         
+    }
+
+    // 18 july 2025
+
+    // KidsChannel
+    public function getKidsChannels(Request $request){
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $kidsChannels = KidsChannel::where('deleted_at', null)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $kidsChannels = $kidsChannels->paginate($limit, ['*'], 'page', $page);
+            // echo 'Page Set'; exit;
+
+            if (!$kidsChannels->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($kidsChannels->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $kidsChannels = $kidsChannels->limit($_GET['records'])->get();
+            }
+            else{
+                $kidsChannels = $kidsChannels->get();
+            }
+
+            if (!$kidsChannels) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($kidsChannels));     
+            exit;
+        }
+
+    }
+
+
+
+    // KidsShow
+    public function getKidsShows(Request $request,$channelId = null){
+        if(!$channelId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $kidShows = KidsShow::where('deleted_at', null)->where('kid_channel_id',$channelId)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $kidShows = $kidShows->paginate($limit, ['*'], 'page', $page);            
+
+            if (!$kidShows->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($kidShows->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $kidShows = $kidShows->limit($_GET['records'])->get();
+            }
+            else{
+                $kidShows = $kidShows->get();
+            }
+
+            if (!$kidShows) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($kidShows));     
+            exit;
+        }
+    }
+
+
+    // KidShowsSeason
+    public function getKidsShowSeasons(Request $request,$showId = null){
+        if(!$showId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $kidShowSeasons = KidShowsSeason::where('deleted_at', null)->where('show_id',$showId)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $kidShowSeasons = $kidShowSeasons->paginate($limit, ['*'], 'page', $page);            
+            
+            if (!$kidShowSeasons->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($kidShowSeasons->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $kidShowSeasons = $kidShowSeasons->limit($_GET['records'])->get();
+            }
+            else{
+                $kidShowSeasons = $kidShowSeasons->get();
+            }
+
+            if (!$kidShowSeasons) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($kidShowSeasons));     
+            exit;
+        }
+    }
+
+    // KidshowsEpisode
+    public function getKidShowEpisodes(Request $request,$seasonId = null){
+        if(!$seasonId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $kidShowEpisodes = KidshowsEpisode::where('deleted_at', null)->where('season_id',$seasonId)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $kidShowEpisodes = $kidShowEpisodes->paginate($limit, ['*'], 'page', $page);            
+            
+            if (!$kidShowEpisodes->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($kidShowEpisodes->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $kidShowEpisodes = $kidShowEpisodes->limit($_GET['records'])->get();
+            }
+            else{
+                $kidShowEpisodes = $kidShowEpisodes->get();
+            }
+
+            if (!$kidShowEpisodes) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($kidShowEpisodes));     
+            exit;
+        }
+    }
+
+
+
+    // TvChannelPak
+    public function getTvChannelsPak(Request $request){
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvChannels = TvChannelPak::where('deleted_at', null)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvChannels = $tvChannels->paginate($limit, ['*'], 'page', $page);
+            // echo 'Page Set'; exit;
+
+            if (!$tvChannels->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvChannels->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvChannels = $tvChannels->limit($_GET['records'])->get();
+            }
+            else{
+                $tvChannels = $tvChannels->get();
+            }
+
+            if (!$tvChannels) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvChannels));     
+            exit;
+        }
+
+    }
+
+    // TvShowPak
+    public function getTvShowsPak(Request $request,$channelId = null){
+        if(!$channelId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvShows = TvShowPak::where('deleted_at', null)->where('tv_channel_id',$channelId)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvShows = $tvShows->paginate($limit, ['*'], 'page', $page);            
+
+            if (!$tvShows->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvShows->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvShows = $tvShows->limit($_GET['records'])->get();
+            }
+            else{
+                $tvShows = $tvShows->get();
+            }
+
+            if (!$tvShows) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvShows));     
+            exit;
+        }
+    }
+
+    // TvShowSeasonPak
+    public function getTvShowSeasonsPak(Request $request,$showId = null){
+        if(!$showId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvShowSeasons = TvShowSeasonPak::where('deleted_at', null)->where('show_id',$showId)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvShowSeasons = $tvShowSeasons->paginate($limit, ['*'], 'page', $page);            
+            
+            if (!$tvShowSeasons->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvShowSeasons->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvShowSeasons = $tvShowSeasons->limit($_GET['records'])->get();
+            }
+            else{
+                $tvShowSeasons = $tvShowSeasons->get();
+            }
+
+            if (!$tvShowSeasons) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvShowSeasons));     
+            exit;
+        }
+    }
+
+    // TvShowEpisodePak
+    public function getTvShowEpisodesPak(Request $request,$seasonId = null){
+        if(!$seasonId){
+            echo "channel id required ";
+            exit;
+        }
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $tvShowEpisodes = TvShowEpisodePak::where('deleted_at', null)->where('season_id',$seasonId)->where('status',1);
+
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+
+            $tvShowEpisodes = $tvShowEpisodes->paginate($limit, ['*'], 'page', $page);            
+            
+            if (!$tvShowEpisodes->items()) {
+                print_r(json_encode([]));
+                exit;
+            }
+
+            print_r(json_encode($tvShowEpisodes->items()));
+        }
+        else{
+            if(isset($_GET['records']) && $_GET['records'] > 0){
+                $tvShowEpisodes = $tvShowEpisodes->limit($_GET['records'])->get();
+            }
+            else{
+                $tvShowEpisodes = $tvShowEpisodes->get();
+            }
+
+            if (!$tvShowEpisodes) {
+                print_r(json_encode([]));
+                exit;
+            }
+            print_r(json_encode($tvShowEpisodes));     
+            exit;
+        }
+    }
+
+    
+    public function getAllStageShowsPak(Request $request){        
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+        $query = StageshowPak::where('status', 1)->whereNull('deleted_at')->with('networks');
+        
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+    
+            $stageShows = $query->paginate($limit, ['*'], 'page', $page);
+
+            print_r(json_encode($stageShows->items()));
+        } else {
+
+            if (isset($_GET['records']) && $_GET['records'] > 0) {
+                $stageShows = $query->limit($_GET['records'])->get();
+            } else {
+                $stageShows = $query->get();
+            }
+            print_r(json_encode($stageShows));
+            exit;
+        }        
+    }
+
+    public function getAllLaughterShows(Request $request){
+
+        $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+        $query = Laughterhow::where('status', 1)->whereNull('deleted_at')->with('networks');
+        
+        if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+            $page = (int) $_GET['page'];
+            $limit = isset($_GET['records']) && is_numeric($_GET['records']) ? (int) $_GET['records'] : 10;
+    
+            $laughterShows = $query->paginate($limit, ['*'], 'page', $page);
+
+            print_r(json_encode($laughterShows->items()));
+        } else {
+
+            if (isset($_GET['records']) && $_GET['records'] > 0) {
+                $laughterShows = $query->limit($_GET['records'])->get();
+            } else {
+                $laughterShows = $query->get();
+            }
+            print_r(json_encode($laughterShows));
+            exit;
+        }        
     }
 }

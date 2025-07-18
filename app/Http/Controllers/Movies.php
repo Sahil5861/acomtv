@@ -173,10 +173,20 @@ class Movies extends Controller
         $activeRecords = Movie::select('count(*) as allcount')->whereNull('movies.deleted_at')->where('status','1');
         $deletedRecords = Movie::select('count(*) as allcount')->whereNotNull('movies.deleted_at');
 
+        if ($request->has('playlist_id') && $playlist_id != '') {
+
+            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
+            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
+            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
+            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+
+        }
+
         $totalRecords = $totalRecords->count();
         $inactiveRecords = $inactiveRecords->count();
         $activeRecords = $activeRecords->count();
         $deletedRecords = $deletedRecords->count();
+
 
 
         $totalRecordswithFilter = (clone $movieQuery)

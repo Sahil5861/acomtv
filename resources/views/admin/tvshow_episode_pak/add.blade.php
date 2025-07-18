@@ -55,7 +55,7 @@
                         </div>
 
                         <?php                         
-                            $count = \App\Models\TvShowEpisode::whereNull('deleted_at')->where('season_id', $id)->count();
+                            $count = \App\Models\TvShowEpisodePak::whereNull('deleted_at')->where('season_id', $id)->count();
                             $count = $count + 1;
                         ?>
 
