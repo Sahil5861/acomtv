@@ -62,9 +62,24 @@ Route::get('getTouranamentSeasons/{id}', [AppApiController::class, 'getTouraname
 Route::get('getTouranamentSeasonsEvents/{id}', [AppApiController::class, 'getTouranamentSeasonsEvents']);
 
 
-
 Route::get('/getReligiousChannels', [AppApiController::class, 'getReligiousChannel']);
 Route::get('/getReligiousShows/{id}', [AppApiController::class, 'getReligiousShows']);
 Route::get('/getReligiousShowsEpisodes/{id}', [AppApiController::class, 'getReligiousShowsEpisodes']);
 
 Route::get('/getAllAbove18Movies/{pin}', [AppApiController::class, 'getAllAbove18Movies']);
+
+// 18 july 2025
+
+Route::get('/getKidsChannels', [AppApiController::class, 'getKidsChannels']);
+Route::get('/getKidsShows/{id}', [AppApiController::class, 'getKidsShows']);
+Route::get('/getKidsShowSeasons/{id}', [AppApiController::class, 'getKidsShowSeasons']);
+Route::get('/getKidsShowSeasonsEpisodes/{id}', [AppApiController::class, 'getKidShowEpisodes']);
+
+Route::get('/getTvChannelsPak', [AppApiController::class, 'getTvChannelsPak']);
+Route::get('/getTvShowsPak/{id}', [AppApiController::class, 'getTvShowsPak']);
+Route::get('/getShowSeasonsPak/{id}', [AppApiController::class, 'getTvShowSeasonsPak']);
+Route::get('/getShowSeasonsEpisodesPak/{id}', [AppApiController::class, 'getTvShowEpisodesPak']);
+
+Route::get('/getAllStageShowsPak', [AppApiController::class, 'getAllStageShowsPak']);
+Route::get('/getAllLaughterShows', [AppApiController::class, 'getAllLaughterShows']);
+

@@ -65,7 +65,7 @@
                     <a href="{{route('admin.movie.order')}}">Order</a>
                 </li>
 
-                @if (Auth::User()->email == 'above-18@gamil.com')                    
+                @if (Auth::User()->email == 'above-18@gamil.com' || env('IsDEveloper'))                    
                 <li class="<?php if(request()->is('*above-18')){ echo 'active';} ?>" >
                     <a href="{{route('admin.adultmovies')}}"> Above 18 </a>
                 </li>

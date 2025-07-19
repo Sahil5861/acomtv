@@ -85,6 +85,16 @@
             
             <div class="widget-content widget-content-area br-6">
 
+                <div class="alert alert-success alert-block" id="alert-success" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="success-message"></strong>
+                </div>
+
+                <div class="alert alert-danger alert-block" id="alert-danger" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="error-message"></strong>
+                </div>
+
                 <div id="delete_bd_ms"></div>
                 @if(session()->has('message'))
                     <div class="alert alert-success alert-block">
@@ -92,15 +102,85 @@
                         <strong>{{ session()->get('message') }}</strong>
                     </div>
                 @endif
+
+                <div class="row d-flex justify-content-start align-items-center">
+                    <div class="col-md-3">
+                        <select name="select_playlist_id" id="select_playlist_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Playlist Id--</option>
+                            @foreach ($playlist_ids as $item)
+                                <option value="{{$item}}">{{$item}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Status--</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>   
                 <div class="text-right">
                     <a href="{{url('add-above-18')}}" class="btn btn-primary mb-2">Add +</a>
+                    <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
+                        Import from Playlist
+                    </button>   
+                </div>
+                <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addContentModalLabel">Add Movies From Playlist</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">                                
+                            <form id="importmoviesForm" method="POST" action="{{route('importadultmovies')}}">
+                            @csrf
+                                <div class="form-group">
+                                    <label for="networkName">Playlits Id</label>                                    
+                                    <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
+                                </div>
+                                <div class="form-group">        
+                                    <label for="networkName">Content Networks</label>                                
+                                    <select name="content_network[]" id="content_networks" multiple class="form-control select">                                    
+                                    <?php
+                                        foreach($content_networks as $network){
+                                            echo '<option value="'.$network->id.'">'.$network->name.'</option>';
+                                        }
+                                    ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">        
+                                    <label for="genre">Movie Genre</label>                                
+                                    <select name="genre[]" id="genre" multiple class="form-control select">                                    
+                                    <?php
+                                        foreach($genres as $genre){
+                                            echo '<option value="'.$genre->title.'">'.$genre->title.'</option>';
+                                        }
+                                    ?>
+                                    </select>
+                                </div>                                                            
+                            </form>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="submit" form="importmoviesForm" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        
+                        </div>
+                    </div>
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
-                    <table id="multi-column-ordering" class="table table-hover">
+                    <table id="multi-column-ordering" class="table table-hover" data-table="adult_movies">
                         <thead>
                             <tr>
-                                <th>Name</th>                                                                                                                         
+                                <th class="editable-th" data-column="name">Name</th>   
                                 <th>Banner Image</th>                                                                                                                         
                                 <th>Status</th>
                                 <th>Created Date</th>
@@ -209,8 +289,23 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[0, 'desc']],
-         ajax: "{{route('getAdultMoviesList')}}",
+         order: [[0, 'desc']],         
+         ajax: {
+            url: "{{route('getAdultMoviesList')}}",
+            data: function(d) {
+                // Only send when values are selected
+                let playlist_id = $('#select_playlist_id').val();
+                let status = $('#select_status').val();
+
+                if (playlist_id !== '') {
+                    d.playlist_id = playlist_id;
+                }
+
+                if (status !== '') {
+                    d.status = status;
+                }
+            }
+        },
          columns: [
             { data: 'name' },                        
             { data: 'banner', orderable: false, searchable: false  },                        
@@ -218,6 +313,15 @@
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
+         columnDefs: [
+            {
+                targets: 0, // index of 'name' column
+                createdCell: function(td, cellData, rowData, row, col) {
+                    // $(td).addClass('editable');
+                    $(td).attr('data-id', rowData.id); // Set data-id attribute
+                }
+            },            
+        ],
          drawCallback: function (settings) { 
             
             var response = settings.json;
@@ -227,10 +331,21 @@
             $('#deletedRecords').text(response.deletedRecords);
             console.log(response);
             $('[data-toggle="tooltip"]').tooltip();
-            updateIcon()
+            updateIcon();
+            setEditable();
         },
       });
     });
+
+    function setEditable(){
+    $('#multi-column-ordering thead th').each(function (index) {            
+        if ($(this).hasClass('editable-th')) {                           
+            $('#tableItem tr').each(function () {
+                $(this).find('td').eq(index).addClass('editable');                                
+            });
+        }
+    });
+}
 
     function deleteRowModal(id){ 
         $('#d_title').text('Movies')
@@ -253,6 +368,90 @@
             }
         })
     }
+
+    $('#select_status').on('change', function() {                    
+        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
+    });
+
+
+    $('#select_playlist_id').on('change', function() {
+        $('#multi-column-ordering').DataTable().ajax.reload(null, false);
+    });
+
+
+    document.addEventListener('dblclick', function (event){
+        const target = event.target
+        if (target.classList.contains('editable')) {        
+            if (target.querySelector('input')) return;
+            const currentText = target.textContent.trim();
+            const input = document.createElement('input'); 
+            const id = target.getAttribute('data-id');       
+
+            input.type = 'text';
+            input.value = currentText;
+            input.style.width = '100%';
+            input.classList.add('form-control');
+            input.setAttribute('data-id', id);
+
+            target.textContent = '';
+            target.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', function () {
+                const newValue = input.value.trim();
+                target.textContent = newValue || currentText; // fallback to old value if empty
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    input.blur(); // triggers blur above
+                    const table = document.getElementById('multi-column-ordering').getAttribute('data-table');                
+                    const td = input.closest('td');
+
+
+                    const column = document.querySelector('.editable-th').getAttribute('data-column');
+                    let id = input.getAttribute('data-id');
+
+                    console.log(id, table, column);
+                    // return false;
+                    
+
+                    $.ajax({
+                        method : 'POST',
+                        url : "{{route('update-column')}}",                    
+                        data: {
+                            id : id,                        
+                            table : table,
+                            column : column,  
+                            value : input.value, 
+                            _token: "{{ csrf_token() }}" // ✅ Add this line                     
+                        },
+                        success: function(response){
+                            if (response.success) {
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.success-message').html(`${capitalizedColumn} updated successfully !`);
+                                $('#alert-success').show();
+                                setTimeout(() => {
+                                    $('#alert-success').hide();
+                                }, 2000);
+                            }
+                            else{
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.error-message').html(response.message);
+                                $('#alert-danger').show();
+                                setTimeout(() => {
+                                    $('#alert-danger').hide();
+                                }, 2000);
+                                target.textContent = currentText;
+                                // $('#multi-column-ordering').DataTable().ajax.reload();
+                            }
+                        }
+                    })
+                    
+                }
+            });    
+        }
+    })
     </script>
 
    

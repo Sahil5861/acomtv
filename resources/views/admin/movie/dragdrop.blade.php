@@ -27,6 +27,12 @@
                             </div>           
                         </div>
                     </div>
+                    @if(session()->has('success'))
+                        <div class="alert alert-success alert-block">
+                            <button type="button" class="close" data-dismiss="alert">×</button>    
+                            <strong>{{ session()->get('success') }}</strong>
+                        </div>
+                    @endif
                     <div class="widget-content widget-content-area">
                         <div class='parent ex-1'>
                             <div class="row">
@@ -65,6 +71,7 @@
     </div>
 </div>
 @endsection
+
 
 @section('footer')
 <!-- BEGIN PAGE LEVEL SCRIPTS -->

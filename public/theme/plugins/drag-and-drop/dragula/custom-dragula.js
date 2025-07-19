@@ -58,7 +58,7 @@ setTimeout(()=>{
     }else{
       document.getElementById("start_no").value = new_channel_no;
       console.log('submit')
-      setTimeout(()=>{
+      setTimeout(()=>{        
         document.getElementById("order-form").submit();
       },100)
       

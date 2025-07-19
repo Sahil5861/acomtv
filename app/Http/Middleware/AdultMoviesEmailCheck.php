@@ -19,9 +19,12 @@ class AdultMoviesEmailCheck
     {
         $user = Auth::user();
     
-        if (trim($user->email) != 'above-18@gmail.com') {            
+        if (trim($user->email) == 'above-18@gmail.com' || env('IsDEveloper')) {            
+            return $next($request);
+        }
+        else{
             abort(403, 'You do not have permission to access This Page.');
         }
-        return $next($request);
+        
     }
 }

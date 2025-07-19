@@ -18,7 +18,12 @@ class AdultMovies extends Controller
 {
     public function index()
     {
-        return view('admin.adultmovie.index');
+        $content_networks = ContentNetwork::where('status', 1)->get();
+        $genres = Genre::where('status',1)->get();
+
+        $playlist_ids = AdultMovie::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();        
+
+        return view('admin.adultmovie.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
     
     public function deletedChannel(){
@@ -69,17 +74,46 @@ class AdultMovies extends Controller
         $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
+        $playlist_id = $request->input('playlist_id');
+        $status = $request->input('status');
+        // $status = number_format($status);
+
+        $movieQuery = AdultMovie::query()->whereNull('adult_movies.deleted_at');
+        if ($request->has('playlist_id') && $playlist_id != '') {         
+            $movieQuery->where('playlist_id', $playlist_id);
+        }
+
+        if ($request->has('status') && $status != '') {             
+            $movieQuery->where('adult_movies.status', (int)$status);                        
+        }
+
         // Total records
         // Total records
-        $totalRecords = AdultMovie::select('count(*) as allcount')->whereNull('adult_movies.deleted_at')->count();
-        $inactiveRecords = AdultMovie::select('count(*) as allcount')->where('status','0')->whereNull('adult_movies.deleted_at')->count();
-        $activeRecords = AdultMovie::select('count(*) as allcount')->where('status','1')->whereNull('adult_movies.deleted_at')->count();
-        $deletedRecords = AdultMovie::select('count(*) as allcount')->whereNotNull('adult_movies.deleted_at')->count();
+        $totalRecords = AdultMovie::select('count(*) as allcount')->whereNull('adult_movies.deleted_at');
+        $inactiveRecords = AdultMovie::select('count(*) as allcount')->where('status','0')->whereNull('adult_movies.deleted_at');
+        $activeRecords = AdultMovie::select('count(*) as allcount')->where('status','1')->whereNull('adult_movies.deleted_at');
+        $deletedRecords = AdultMovie::select('count(*) as allcount')->whereNotNull('adult_movies.deleted_at');
+
+        if ($request->has('playlist_id') && $playlist_id != '') {
+
+            $totalRecords = $totalRecords->where('playlist_id', $playlist_id);
+            $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
+            $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
+            $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+
+        }
+
+        $totalRecords = $totalRecords->count();
+        $inactiveRecords = $inactiveRecords->count();
+        $activeRecords = $activeRecords->count();
+        $deletedRecords = $deletedRecords->count();
 
 
         $totalRecordswithFilter = AdultMovie::select('count(*) as allcount')
-        ->where('name', 'like', '%' . $searchValue . '%')
-        // ->where('channels.status', '=', 1)
+        ->where(function ($query) use ($searchValue){
+            $query->where('name', 'like', '%' . $searchValue . '%')
+            ->orWhere('adult_movies.playlist_id', 'like', '%' . $searchValue . '%');
+        })            
         ->whereNull('adult_movies.deleted_at')
         ->count();
 
@@ -87,7 +121,10 @@ class AdultMovies extends Controller
         $records = AdultMovie::orderBy($columnName, $columnSortOrder)
             // ->where('channels.status', '=', 1)
             ->whereNull('adult_movies.deleted_at')
-            ->where('adult_movies.name', 'like', '%' . $searchValue . '%')
+            ->where(function ($query) use ($searchValue){
+                $query->where('name', 'like', '%' . $searchValue . '%')
+                ->orWhere('adult_movies.playlist_id', 'like', '%' . $searchValue . '%');
+            })   
 
             // ->orWhere('channels.description', 'like', '%' . $searchValue . '%')
             // ->orWhere('channels.contact_email', 'like', '%' . $searchValue . '%')
@@ -112,6 +149,7 @@ class AdultMovies extends Controller
             }
 
             $data_arr[] = array(
+                "id" => $record->id, 
                 "name" => $record->name,                                                            
                 "status" => $status,
                 "banner" => '<img src="'.$record->banner.'" width="100px">',
@@ -418,6 +456,114 @@ class AdultMovies extends Controller
         }else{
             echo json_encode(['message','Something went wrong!!']);
         }
+    }
+
+
+    public function importmovies(Request $request){
+        $request->validate([
+            'playlist_id' => 'required',
+            'genre' => 'required',
+            'content_network' => 'required'
+        ]);
+
+        // print_r($request->all()); exit;
+        $playlistId = $request->input('playlist_id');
+        $genres = implode(',', $request->genre) ?? '';
+
+        $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
+        $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
+        $nextPageToken = null;
+
+        do {
+            $url = $baseurl;
+            if ($nextPageToken) {
+                $url .= "&pageToken=" . $nextPageToken;
+            }
+
+            $ch = curl_init($url);
+    
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+            $response = curl_exec($ch);
+    
+            if(curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return response()->json(['success' => false, 'error' => $error_msg], 500);
+            }
+            curl_close($ch);
+            
+            $data = json_decode($response, true);        
+
+            if (!isset($data['items'])) break;
+
+            foreach ($data['items'] as $key => $item) {    
+                $snippet = $item['snippet'];
+                $movieName = $snippet['title'] ?? null;
+                $movie_url = $snippet['resourceId']['videoId'] ?? null;
+
+                if ($this->checkIsExist($movieName, $movie_url) || trim($movieName) == 'Private video') {
+                    continue;
+                }
+
+                $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
+                $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
+                        
+                $movie = new AdultMovie();
+
+                $channel_number = AdultMovie::whereNull('deleted_at')->count();
+                $formated_number = $channel_number + 1;   
+
+                $movie->name = $movieName;
+                $movie->description = $snippet['description'] ?? null;
+                
+                $movie->banner = $cleanBannerUrl;
+                $movie->status = 0;
+                $movie->source_type = 'YoutubeLive';            
+                $movie->youtube_trailer = '' ?? null;
+                $movie->movie_url = $movie_url;
+                $movie->genres = $genres;
+                $movie->index = $formated_number;
+                $movie->movie_order = $formated_number;
+                $movie->playlist_id = $playlistId;
+
+                if ($movie->save()) {
+                    if ($request->has('content_network') && !empty($request->content_network)) {
+                        $cur_movies = AdultMovie::where('id', $movie->id)->first();                        
+                        foreach ($request->content_network as $key => $network) {
+                            $MovieNetwork = new Above18MovieContentNetwork();
+                            $MovieNetwork->movie_id = $movie->id;
+                            $MovieNetwork->network_id = $network;
+                            
+                            if ($MovieNetwork->save()) {
+                                DB::table('content_network_log')->insert([
+                                    'content_id' => $movie->id,
+                                    'network_id' => $network,
+                                    'content_type' => $cur_movies->content_type,                            
+                                ]);
+                            }
+                        }
+                    }
+                }                
+            }
+
+            $nextPageToken = $data['nextPageToken'] ?? null;                    
+        } while ($nextPageToken);  
+
+        
+
+        return back()->with('message','Playlist Uploaded successfully');
+
+    }
+
+
+    public function checkIsExist($movie_name, $url){
+        return AdultMovie::where(function ($query) use ($movie_name, $url){
+            $query->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($movie_name))])
+                    ->orWhereRaw('LOWER(TRIM(movie_url)) = ?', [strtolower(trim($url))]);
+        })        
+        ->first();
     }
 
 }

@@ -21,7 +21,11 @@ class Movies extends Controller
         $content_networks = ContentNetwork::where('status', 1)->get();
         $genres = Genre::where('status',1)->get();
 
-
+        $movie_network_ids = MovieContentNetwork::pluck('network_id')->unique()->values();
+        // print_r($movie_network_ids); exit;
+        $networks = ContentNetwork::whereIn('id', $movie_network_ids)->get();
+        print_r($networks); exit;
+        
         $playlist_ids = Movie::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();        
         return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
@@ -675,7 +679,7 @@ class Movies extends Controller
         ]);
 
         // Sanitize table and column names to prevent SQL injection
-        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak', 'web_series_episoade', 'kids_shows_episodes']; // add more if needed
+        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak', 'web_series_episoade', 'kids_shows_episodes', 'adult_movies']; // add more if needed
         $allowedColumns = ['name', 'title', 'Episoade_Name']; // add other editable columns if needed
 
         if (!in_array($request->table, $allowedTables) || !in_array($request->column, $allowedColumns)) {

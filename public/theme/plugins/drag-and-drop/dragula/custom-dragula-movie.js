@@ -35,7 +35,7 @@ var drake = dragula([$('left-defaults'), $('right-defaults')],{moves: function (
        document.getElementById(item.id).innerHTML = i
        // $('#'+item.id).text(i)
        i++
-    });
+    });    
     document.getElementById('order-form').submit();
   },300)
 		

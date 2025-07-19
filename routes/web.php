@@ -440,7 +440,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/recover-channel/{id}', [StageShowsPak::class, 'recoverChannel'])->name('admin.stageshow.recoverMovie');
         Route::get('/add-stage-show', [StageShowsPak::class,'addChannel'])->name('addstageshow');
         Route::post('/addstageshow', [StageShowsPak::class,'add'])->name('savestageshow');
-        Route::post('/save-stage-show-orders', [StageShowsPak::class,'savestageshowOrder'])->name('saveMovieOrder');
+        Route::post('/save-stage-show-orders', [StageShowsPak::class,'savestageshowOrder'])->name('saveStageShowsPakOrder');
         Route::get('/edit-stage-show/{id}', [StageShowsPak::class,'editstageshow'])->name('edit-stageshow');
         Route::post('/stage-show/destroy', [StageShowsPak::class,'destroy'])->name('stageshow.destroy');
         
@@ -460,7 +460,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/recover-channel/{id}', [LaughterShows::class, 'recoverChannel'])->name('admin.laughtershow.recoverMovie');
         Route::get('/add-laughter-show', [LaughterShows::class,'addChannel'])->name('addlaughtershow');
         Route::post('/addlaughtershow', [LaughterShows::class,'add'])->name('savelaughtershow');
-        Route::post('/save-laughter-show-orders', [LaughterShows::class,'savelaughtershowOrder'])->name('saveMovieOrder');
+        Route::post('/save-laughter-show-orders', [LaughterShows::class,'savelaughtershowOrder'])->name('saveLaughterShowOrder');
         Route::get('/edit-laughter-show/{id}', [LaughterShows::class,'editlaughtershow'])->name('edit-laughtershow');
         Route::post('/laughter-show/destroy', [LaughterShows::class,'destroy'])->name('laughtershow.destroy');
         
@@ -484,10 +484,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
             Route::get('/recover-channel/{id}', [AdultMovies::class, 'recoverChannel'])->name('admin.add-above-18.recoverMovie');
             Route::get('/add-above-18', [AdultMovies::class,'add'])->name('add-above-18');
             Route::post('/addabove-18', [AdultMovies::class,'save'])->name('save-above-18');
-            Route::post('/save-above-18-orders', [AdultMovies::class,'saveChannelOrders'])->name('saveMovieOrders');
+            Route::post('/save-above-18-orders', [AdultMovies::class,'saveChannelOrders'])->name('saveAdultMovieOrders');
             Route::get('/edit-above-18-movie/{id}', [AdultMovies::class,'editChannel'])->name('edit-above-18-movie');
             Route::post('/adultmovies/destroy', [AdultMovies::class,'destroy'])->name('above-18.destroy');
             Route::get('/above-18/update-status/{id}', [AdultMovies::class,'updateStatus'])->name('above-18.update-status');        
+            Route::post('import-above18movies-playlits', [AdultMovies::class, 'importmovies'])->name('importadultmovies');
         });
         
 
