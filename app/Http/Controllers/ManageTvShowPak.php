@@ -152,6 +152,7 @@ class ManageTvShowPak extends Controller
             $tvshow = TvShowPak::find($request->id);
         } else {
             $tvshow = new TvShowPak();
+            $tvshow->order = $request->order ?? 0;
         }
 
         // print_r($request->all()); exit;

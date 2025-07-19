@@ -305,6 +305,7 @@ class LaughterShows extends Controller
             $laughter_show->release_date = $request->release_date ?? null;                                                                    
             $laughter_show->status = $request->status;
             $laughter_show->index = $request->index ?? 0;
+            $laughter_show->movie_order = $request->index ?? 0;
             $laughter_show->source_type = $request->source_type;
             $laughter_show->youtube_trailer = $request->trailer_url ?? null;
             $laughter_show->movie_url = $request->movie_url ?? null;
@@ -350,6 +351,7 @@ class LaughterShows extends Controller
             $laughter_show->release_date = $request->release_date ?? null;                                                                    
             $laughter_show->status = $request->status;
             $laughter_show->index = $request->index ?? 0;
+            $laughter_show->movie_order = $request->index ?? 0;
             $laughter_show->source_type = $request->source_type;                
             $laughter_show->movie_url = $request->source_type;                            
             $laughter_show->genres = implode(',', $request->movie_genre);

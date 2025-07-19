@@ -150,6 +150,7 @@ class ManageTvShowSeasonPak extends Controller
             $tvshow = TvShowSeasonPak::find($request->id);
         } else {
             $tvshow = new TvShowSeasonPak();
+            $tvshow->season_order = $request->season_order ?? 0;
         }
 
         // print_r($request->all()); exit;

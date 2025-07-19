@@ -48,6 +48,16 @@
                             </div>                            
                         </div>
 
+                        {{-- Sets order: uses existing value for edit, or calculates next order based on channel for add --}}
+                        @php
+                            $order = isset($tvshowspak)
+                                ? $tvshowspak->order
+                                : (\App\Models\TvShowPak::where('tv_channel_id', $id)
+                                    ->whereNull('deleted_at')
+                                    ->max('order') ?? 0) + 1;
+                        @endphp
+
+                        <input type="hidden" name="order" value="{{ old('order', $order) }}">
 
                         <!-- Logo -->
                         <div class="col-md-6 mb-4">

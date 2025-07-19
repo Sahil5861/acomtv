@@ -143,6 +143,7 @@ class ManageRelChannel extends Controller
             $relchannel = RelChannel::find($request->id);
         } else {
             $relchannel = new RelChannel();
+            $relchannel->rel_order = $request->rel_order ?? 0;
         }
 
         // print_r($request->all()); exit;

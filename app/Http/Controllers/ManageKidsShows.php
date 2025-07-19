@@ -161,6 +161,7 @@ class ManageKidsShows extends Controller
         $kidsshows->genre = implode(',', $request->genre);
         $kidsshows->description = $request->description;
         $kidsshows->status = $request->status;
+        $kidsshows->order = $request->order ?? 0;
 
 
         if (!empty($request->id)) {

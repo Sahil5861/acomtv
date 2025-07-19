@@ -241,7 +241,6 @@ class ManageTvShow extends Controller
         } else {
             $tvshow = new TvShow();
             $tvshow->order = $request->order ?? 0;
-
         }
 
         // print_r($request->all()); exit;

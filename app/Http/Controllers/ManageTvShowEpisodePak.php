@@ -206,6 +206,7 @@ class ManageTvShowEpisodePak extends Controller
 
         $episode->title = $request->title;
         $episode->episode_number = $request->episode_number;
+        $episode->episoade_order = $request->episode_number;
         $episode->season_id = $request->season_id;
         $episode->video_url = $request->video_url;
         $episode->streaming_type = $request->streaming_type ?? 'youtube';

@@ -45,6 +45,14 @@
                             </div>
                         </div>
 
+                        @php
+                            $maxOrder = \App\Models\RelChannel::whereNull('deleted_at')->max('rel_order') ?? 0;
+                            $nextOrder = $maxOrder + 1;
+                        @endphp
+
+                        <input type="hidden" name="rel_order" value="{{ old('rel_order', isset($rel_channels) ? $rel_channels->rel_order : $nextOrder) }}">
+                        @error('rel_order') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
                         <!-- Language -->
                         <div class="col-md-6 mb-4">
                             <label for="language">Language</label>

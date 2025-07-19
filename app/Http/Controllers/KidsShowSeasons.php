@@ -135,8 +135,7 @@ class KidsShowSeasons extends Controller
 
     public function save(Request $request){
         $request->validate([
-            'name' => 'required',            
-            'order' => 'required',            
+            'name' => 'required',                       
             'status'  => 'required',                       
             'banner'  => 'required',                       
         ]); 
@@ -166,7 +165,8 @@ class KidsShowSeasons extends Controller
             $season->season_order = $request->order;            
             $season->status = $request->status; 
             $season->banner = $request->banner;  
-            $season->show_id = $request->webseries_id;                     
+            $season->show_id = $request->webseries_id;
+            $season->season_order = $request->season_order ?? 0;                     
 
             if($season->save()){                                
                 // return back()->with('message','Season added successfully');
