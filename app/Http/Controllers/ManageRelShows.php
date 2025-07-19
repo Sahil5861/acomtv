@@ -150,6 +150,8 @@ class ManageRelShows extends Controller
             $relshows = RelShow::find($request->id);
         } else {
             $relshows = new RelShow();
+            $relshows->rel_order = $request->rel_order ?? 0;
+
         }
 
         // print_r($request->all()); exit;

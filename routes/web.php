@@ -489,6 +489,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
             Route::post('/adultmovies/destroy', [AdultMovies::class,'destroy'])->name('above-18.destroy');
             Route::get('/above-18/update-status/{id}', [AdultMovies::class,'updateStatus'])->name('above-18.update-status');        
             Route::post('import-above18movies-playlits', [AdultMovies::class, 'importmovies'])->name('importadultmovies');
+
+            Route::get('/adult-movie-order', [AdultMovies::class, 'getAdultMovieOrderList'])->name('admin.adultmovie.order');
+            Route::post('/save-adult-movie-orders', [AdultMovies::class,'saveAdultMovieOrder'])->name('saveAdultMovieOrder');
+        
         });
         
 

@@ -61,7 +61,7 @@
 
                         <div class="col-md-6 mb-4">
                             <label for="name">Order</label>
-                            <input type="number" class="form-control" id="order" name="order" value="{{ old('order', $sportcategory->sports_cat_order ?? $formatted) }}" required placeholder="0-999">
+                            <input type="number" class="form-control" id="order" name="sports_cat_order" value="{{ old('order', $sportcategory->sports_cat_order ?? $formatted) }}" required placeholder="0-999">
                             <div class="invalid-feedback">
                                 @error('name') {{ $message }} @enderror
                             </div>

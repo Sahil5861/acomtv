@@ -140,6 +140,8 @@ class ManageSportsCategory extends Controller
             $sport_cat = SportsCategory::find($request->id);
         } else {
             $sport_cat = new SportsCategory();
+            $sport_cat ->sports_cat_order = $request->sports_cat_order ?? 0;;
+
         }
 
         $sport_cat->title = $request->title;        
@@ -172,7 +174,7 @@ class ManageSportsCategory extends Controller
         $this->data['sportcategory'] = SportsCategory::find(base64_decode($id));  
         $sports_cat_count = SportsCategory::whereNull('deleted_at')->count();
         $formatted = $sports_cat_count + 1;      
-        $this->data['formatted'];
+        $this->data['formatted'] = $formatted;
         return view('admin.sportscategory.add', $this->data);
     }
 

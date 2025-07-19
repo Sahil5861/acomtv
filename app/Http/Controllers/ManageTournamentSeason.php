@@ -139,6 +139,7 @@ class ManageTournamentSeason extends Controller
             $tournamentseason = TournamentSeason::find($request->id);
         } else {
             $tournamentseason = new TournamentSeason();
+            $tournamentseason->season_order = $request->season_order ?? 0;
         }
 
         // print_r($request->all()); exit;

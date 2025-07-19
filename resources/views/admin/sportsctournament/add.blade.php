@@ -45,7 +45,18 @@
                                 @error('title') {{ $message }} @enderror
                             </div>
                         </div>
-                                                
+                        
+                        {{-- Sets order: uses existing value for edit, or calculates next order based on channel for add --}}
+                        @php
+                            $sports_cat_order = isset($tournament)
+                                ? $tournament->sports_cat_order
+                                : (\App\Models\SportsTournament::where('sports_category_id', $id)
+                                    ->whereNull('deleted_at')
+                                    ->max('sports_cat_order') ?? 0) + 1;
+                        @endphp
+
+                        <input type="hidden" name="sports_cat_order" value="{{ old('sports_cat_order', $sports_cat_order) }}">
+           
 
                         <!-- Logo -->
                         <div class="col-md-4 mb-4">

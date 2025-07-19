@@ -43,6 +43,17 @@ relshows
                     <input type="hidden" name="channel_id" id="channel_id" value="{{$id}}">
 
                     <div class="form-row">
+                        {{-- Sets order: uses existinglue for edit, or calculates next order based on channel for add --}}
+                        @php
+                            $rel_order = isset($shows)
+                                ? $tv_shows->rel_order
+                                : (\App\Models\RelShow::where('channel_id', $id)
+                                    ->whereNull('deleted_at')
+                                    ->max('rel_order') ?? 0) + 1;
+                        @endphp
+
+                        <input type="hidden" name="rel_order" value="{{ old('rel_order', $rel_order) }}">
+
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
                             <label for="name">Title*</label>
