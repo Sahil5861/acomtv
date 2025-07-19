@@ -22,9 +22,8 @@ class Movies extends Controller
         $genres = Genre::where('status',1)->get();
 
         $movie_network_ids = MovieContentNetwork::pluck('network_id')->unique()->values();
-        // print_r($movie_network_ids); exit;
+
         $networks = ContentNetwork::whereIn('id', $movie_network_ids)->get();
-        print_r($networks); exit;
         
         $playlist_ids = Movie::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();        
         return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids'));
@@ -33,7 +32,7 @@ class Movies extends Controller
     public function getMovieOrderList()
     {
         $this->data['movies'] = Movie::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
-        // echo count($this->data['movies']); exit;
+       
         $allMovies = [];
         $dataForLoop = [];
 
@@ -540,6 +539,7 @@ class Movies extends Controller
             echo json_encode(['message','Movie not deleted successfully']);
         }
     }
+    
     public function saveMovieOrder(Request $request)
     {
         $ids = $request->ids;
@@ -551,6 +551,7 @@ class Movies extends Controller
 
         return redirect()->back()->with('success', 'Movie order updated successfully.');
     }
+
     public function updateStatus($id){
         $movie = Movie::find(base64_decode($id));        
         if($movie){

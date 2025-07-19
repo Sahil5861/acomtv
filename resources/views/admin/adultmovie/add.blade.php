@@ -52,7 +52,6 @@
                             </div> --}}
 
                             <?php 
-                            
                                 $channel_number = \App\Models\AdultMovie::whereNull('deleted_at')->count();
                                 $formated_number = $channel_number + 1;
                             ?>

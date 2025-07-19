@@ -121,6 +121,7 @@
                     </div>
                 </div>   
                 <div class="text-right">
+                    <a href="{{url('adult-movie-order')}}" class="btn btn-primary mb-2">Order Movies</a>
                     <a href="{{url('add-above-18')}}" class="btn btn-primary mb-2">Add +</a>
                     <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
                         Import from Playlist

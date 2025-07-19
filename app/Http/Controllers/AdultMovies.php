@@ -26,6 +26,23 @@ class AdultMovies extends Controller
         return view('admin.adultmovie.index', compact('content_networks', 'genres', 'playlist_ids'));
     }
     
+    public function getAdultMovieOrderList()
+    {
+        $this->data['movies'] = AdultMovie::whereNull('deleted_at')->orderBy('movie_order', 'asc')->get();
+        $allAdultMovies = [];
+        $dataForLoop = [];
+
+        foreach ($this->data['movies'] as $movie) {
+            $allAdultMovies[] = $movie->movie_order;
+            $dataForLoop[$movie->movie_order] = $movie;
+        }
+
+        $this->data['dataForLoop'] = $dataForLoop;
+        $this->data['allAdultMovies'] = $allAdultMovies;
+
+        return view('admin.adultmovie.dragdrop', $this->data);
+    }
+
     public function deletedChannel(){
         return view('admin.adultmovie.deleted');
     }
@@ -322,6 +339,7 @@ class AdultMovies extends Controller
             $movie->release_date = $request->release_date ?? null;                                                                    
             $movie->status = $request->status;
             $movie->index = $request->index ?? 0;
+            $movie->movie_order = $request->index ?? 0;
             $movie->source_type = $request->source_type;
             $movie->youtube_trailer = $request->trailer_url ?? null;
             $movie->movie_url = $request->movie_url ?? null;
@@ -366,6 +384,7 @@ class AdultMovies extends Controller
             $movie->release_date = $request->release_date ?? null;                                                                    
             $movie->status = $request->status;
             $movie->index = $request->index ?? 0;
+            $movie->movie_order = $request->index ?? 0;
             $movie->source_type = $request->source_type;    
             $movie->youtube_trailer = $request->trailer_url ?? null;
             $movie->movie_url = $request->movie_url ?? null;
@@ -445,6 +464,18 @@ class AdultMovies extends Controller
         }else{
             echo json_encode(['message','Movie not deleted successfully']);
         }
+    }
+
+    public function saveAdultMovieOrder(Request $request)
+    {
+        $ids = $request->ids;
+        if (!empty($ids)) {
+            foreach ($ids as $index => $id) {
+                AdultMovie::where('id', $id)->update(['movie_order' => $index + 1]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Movie order updated successfully.');
     }
 
     public function updateStatus($id){
