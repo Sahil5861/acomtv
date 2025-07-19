@@ -51,6 +51,16 @@
                         </div>
 
 
+                         {{-- Sets order: uses existing value for edit, or calculates next order based on match for add --}}
+                        @php
+                            $match_order = isset($match)
+                                ? $match->match_order
+                                : (\App\Models\TournamentMatches::where('tournament_season_id', $id)
+                                    ->whereNull('deleted_at')
+                                    ->max('match_order') ?? 0) + 1;
+                        @endphp
+
+                        <input type="hidden" name="match_order" value="{{ old('match_order', $match_order) }}">
 
 
                         <!-- Match Date -->

@@ -210,6 +210,7 @@ class ManageTournamentMatches extends Controller
             $match = TournamentMatches::find($request->id);
         } else {
             $match = new TournamentMatches();
+            $match->match_order = $request->match_order ?? 0;
         }
 
         // print_r($request->all()); exit;

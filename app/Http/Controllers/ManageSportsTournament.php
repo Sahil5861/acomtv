@@ -144,6 +144,8 @@ class ManageSportsTournament extends Controller
             $tournament = SportsTournament::find($request->id);
         } else {
             $tournament = new SportsTournament();
+            $tournament->sports_cat_order  = $request->sports_cat_order ?? 0;
+
         }
 
         $tournament->title = $request->title;        
