@@ -24,10 +24,10 @@ class Movies extends Controller
         $movie_network_ids = MovieContentNetwork::pluck('network_id')->unique()->values();
         // print_r($movie_network_ids); exit;
         $networks = ContentNetwork::whereIn('id', $movie_network_ids)->get();
-        print_r($networks); exit;
+        // print_r($networks); exit;
         
         $playlist_ids = Movie::where('playlist_id', '!=', null)->whereNull('deleted_at')->pluck('playlist_id')->unique()->values();        
-        return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids'));
+        return view('admin.movie.index', compact('content_networks', 'genres', 'playlist_ids', 'networks'));
     }
     
     public function getMovieOrderList()
@@ -158,8 +158,11 @@ class Movies extends Controller
 
 
         $playlist_id = $request->input('playlist_id');
+        $network_id = $request->input('network_id');
         $status = $request->input('status');
         // $status = number_format($status);
+
+        $movie_ids = [];
 
         $movieQuery = Movie::query()->whereNull('movies.deleted_at');
         if ($request->has('playlist_id') && $playlist_id != '') {         
@@ -168,6 +171,12 @@ class Movies extends Controller
 
         if ($request->has('status') && $status != '') {             
             $movieQuery->where('movies.status', (int)$status);                        
+        }
+
+        if ($request->has('network_id') && !empty($network_id)) {
+            $movie_ids = MovieContentNetwork::whereIn('network_id', (array) $network_id)->pluck('movie_id')->toArray();
+
+            $movieQuery->whereIn('movies.id', $movie_ids);
         }
 
         
@@ -183,6 +192,15 @@ class Movies extends Controller
             $inactiveRecords = $inactiveRecords->where('playlist_id', $playlist_id);
             $activeRecords = $activeRecords->where('playlist_id', $playlist_id);
             $deletedRecords = $deletedRecords->where('playlist_id', $playlist_id);
+
+        }
+
+        if (!empty($movie_ids)) {
+            
+            $totalRecords = $totalRecords->whereIn('id', $movie_ids);
+            $inactiveRecords = $inactiveRecords->whereIn('id', $movie_ids);
+            $activeRecords = $activeRecords->whereIn('id', $movie_ids);
+            $deletedRecords = $deletedRecords->whereIn('id', $movie_ids);
 
         }
 

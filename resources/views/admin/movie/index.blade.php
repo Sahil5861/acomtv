@@ -126,6 +126,14 @@
                             <option value="0">Inactive</option>
                         </select>
                     </div>
+                    <div class="col-md-3">
+                        <select name="select_netword_id" id="select_netword_id" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter by Content Netword--</option>
+                            @foreach ($networks as $item)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>                                    
                 {{-- <div class="text-left" style="display: flex; justify-content:flex-end;align-items:center; gap:10px; width:30%;">
                 </div> --}}
@@ -247,10 +255,15 @@ function initializeDataTable(network_id = '') {
             data: function(d) {
                 // Only send when values are selected
                 let playlist_id = $('#select_playlist_id').val();
+                let network_id = $('#select_netword_id').val();
                 let status = $('#select_status').val();
 
                 if (playlist_id !== '') {
                     d.playlist_id = playlist_id;
+                }
+
+                if (network_id !== '') {
+                    d.network_id = network_id;
                 }
 
                 if (status !== '') {
@@ -313,7 +326,11 @@ $(document).ready(function() {
     });
 
 
-    $('#select_playlist_id').on('change', function() {
+    $('#select_playlist_id').on('change', function() {        
+        dataTable.ajax.reload(null, false);
+    });
+
+    $('#select_netword_id').on('change', function() {
         dataTable.ajax.reload(null, false);
     });
 
