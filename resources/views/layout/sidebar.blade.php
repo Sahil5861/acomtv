@@ -117,11 +117,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </a>
-            <ul class="collapse submenu list-unstyled <?php if(request()->is('*pak-tv-channel*')){ echo 'show';} ?>" id="tvapppak" data-parent="#accordionExample">
+            <ul class="collapse submenu list-unstyled <?php if(request()->is('*pak-tv-channel*') || request()->is('tv-channel-pak-order')){ echo 'show';} ?>" id="tvapppak" data-parent="#accordionExample">
                 <li class="<?php if(request()->is('*tvchannel')){ echo 'active';} ?>" >
                     <a href="{{route('admin.tvchannelpak')}}"> Channels List </a>
                 </li>
-                <li class="<?php if(request()->is('*tvchannel-order')){ echo 'active';} ?>">
+                <li class="<?php if(request()->is('tv-channel-pak-order')){ echo 'active';} ?>">
                     <a href="{{route('admin.tvchannelpak.order')}}"> Channels Order </a>
                 </li>
                 {{-- <li class="<?php if(request()->is('*tvshow')){ echo 'active';} ?>" >

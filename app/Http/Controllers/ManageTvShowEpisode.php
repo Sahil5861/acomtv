@@ -9,8 +9,7 @@ use App\Models\ContentNetwork;
 
 class ManageTvShowEpisode extends Controller
 {
-    public function index($id)    
-    {        
+    public function index($id)    {        
         $id = base64_decode($id);   
         $content_networks = ContentNetwork::where('status', 1)->get();
         $genres = Genre::where('status',1)->get(); 

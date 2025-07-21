@@ -299,7 +299,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::post('/tv-shows-pak-episode/destroy', [ManageTvShowEpisodePak::class,'destroy'])->name('tvshowepisodepak.destroy');
         
         Route::get('/tvshowepisodepak-order/{id}', [ManageTvShowEpisodePak::class, 'getTvShowEpisodesOrderList'])->name('admin.tvshowepisodepak.order');
-        Route::post('/save-tvshowepisodepak-orders', [ManageTvShowEpisodePak::class,'saveTvShowEpisodesOrders'])->name('saveTvShowEpisodesOrders');
+        Route::post('/save-tvshowepisodepak-orders', [ManageTvShowEpisodePak::class,'saveTvShowEpisodesOrders'])->name('saveTvShowEpisodesOrdersPak');
 
         Route::post('import-tv-shows-pak-episode-playlits', [ManageTvShowEpisodePak::class, 'importPlaylist'])->name('importtvshowsepisodepakplaylits');
 
