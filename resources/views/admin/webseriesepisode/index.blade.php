@@ -147,7 +147,7 @@
                         <div class="modal-body">                                
                             <form id="importmoviesForm" method="POST" action="{{route('importPlaylistsereis')}}">
                             @csrf
-                            <input type="text" name="seadon_id" id="seadson_id_playlist" value="{{$season->id}}">
+                            <input type="hidden" name="seadon_id" id="seadson_id_playlist" value="{{$season->id}}">
                                 <div class="form-group">
                                     <label for="networkName">Playlits Id</label>                                    
                                     <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 

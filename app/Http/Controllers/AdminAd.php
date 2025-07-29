@@ -104,13 +104,23 @@ class AdminAd extends Controller
     }
 
     public function create(){   
-        $super_admin_ads = SuperAdminAds::whereNull('deleted_at')->get();            
+        $super_admin_ads = AdminAds::whereNull('deleted_at')->get();            
         return view('admin.admin_ads.add', compact('super_admin_ads'));
     }
 
     public function getAdDetails(Request $request){
+
+
         $id = $request->id;
         $super_admin_ad = SuperAdminAds::where('id', $id)->first();
+
+        $user_current_amount = \Auth::User()->current_amount;
+        if ($user_current_amount < $super_admin_ad->price) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Insufficient Amount !! Choose other Plan or Upadte your Amount'
+            ]);
+        }
         if ($super_admin_ad) {
             return response()->json([
                 'status' => true,
@@ -150,17 +160,14 @@ class AdminAd extends Controller
         $admin_ad->status = $request->input('status');        
         $admin_ad->validity = $request->input('validity') ?? 30;        
         $admin_ad->user_id = \Auth::user()->id;
-
-        // print_r($admin_ad); exit;
-
+        
+        
         if ($admin_ad->save()) {
             return redirect()->back()->with('message', !empty($request->id) ? 'Ad updated Successfully !!' :  'Ad added Successfully !!');
         }
         else{
             return redirect()->back()->with('error', 'something went wrong !');
-        }
-        
-
+        }    
     }
 
     public function destroy(Request $request){

@@ -52,7 +52,7 @@
     <style type="text/css">
         .error{
             color: red;
-        }
+        }        
     </style>
     <div id="loader-screen" style="display:none;position: fixed;top: 0;left: 0;height: 100vh;width: 100vw;z-index: 99;">
         <div class="loader_2" style="margin: auto;"></div>
@@ -84,6 +84,20 @@
         <!--  BEGIN CONTENT AREA  -->
         <div id="content" class="main-content">
             @yield('content')
+            <style>
+                .ytp-expand-pause-overlay .ytp-pause-overlay{
+                    display: none !important;
+                    visibility: hidden !important;
+                }
+                .ytp-chrome-controls .ytp-button.ytp-youtube-button, .ytp-small-mode .ytp-chrome-controls .ytp-button.ytp-youtube-button, .ytp-embed .ytp-chrome-controls .ytp-button.ytp-youtube-button, .ytp-embed.ytp-small-mode .ytp-chrome-controls .ytp-button.ytp-youtube-button, .ytp-dni.ytp-embed .ytp-chrome-controls .ytp-button.ytp-youtube-button{
+                    display: none !important;
+                    visibility:  hidden !important;
+                }
+                .ytp-chrome-top-buttons{
+                    display: none !important;
+                    visibility: hidden !important;
+                }
+            </style>
             
             <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
@@ -91,7 +105,7 @@
                     
                     <div class="modal-body">                                
                         <div class="container-fluid p-3 bg-dark">
-                            <iframe frameborder="0" class="w-100" style="height: 600px;" id="video-player" allowfullscreen allow="autoplay" ></iframe>
+                            <iframe frameborder="0" class="w-100" style="height: 600px;" id="video-player" allowfullscreen allow="autoplay"></iframe>
                         </div>
                     </div>
                     

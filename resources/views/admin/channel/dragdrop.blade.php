@@ -50,7 +50,7 @@
                                                     &nbsp;
                                                         <div class="" style="width: 100%;margin-left: 20px;">
                                                             <h6 class="" style="margin-bottom: 3px">{{$dcl->channel_name}}</h6>
-                                                            <p class="" style="margin:0;opacity: 0.6;line-height: 10px;"><small>{{$dcl->language->title}}</small></p>
+                                                            {{-- <p class="" style="margin:0;opacity: 0.6;line-height: 10px;"><small>{{$dcl->language->title}}</small></p> --}}
                                                             <input type="hidden" name="numbers[]" value="{{$dcl->id}}">
                                                             <input type="hidden" id="position_locked_{{$key}}" name="position_locked[]" value="{{$dcl->position_locked}}">
                                                         </div>

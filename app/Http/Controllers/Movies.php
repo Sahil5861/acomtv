@@ -159,6 +159,7 @@ class Movies extends Controller
         $playlist_id = $request->input('playlist_id');
         $network_id = $request->input('network_id');
         $status = $request->input('status');
+        $stream_type = $request->input('stream_type');
         // $status = number_format($status);
 
         $movie_ids = [];
@@ -194,6 +195,15 @@ class Movies extends Controller
 
         }
 
+        if ($request->has('stream_type') && $stream_type != '') {
+
+            $totalRecords = $totalRecords->where('source_type', $stream_type);
+            $inactiveRecords = $inactiveRecords->where('source_type', $stream_type);
+            $activeRecords = $activeRecords->where('source_type', $stream_type);
+            $deletedRecords = $deletedRecords->where('source_type', $stream_type);
+
+        }
+
         if (!empty($movie_ids)) {
             
             $totalRecords = $totalRecords->whereIn('id', $movie_ids);
@@ -213,7 +223,8 @@ class Movies extends Controller
         $totalRecordswithFilter = (clone $movieQuery)
         ->where(function($query) use ($searchValue) {
             $query->where('movies.name', 'like', '%' . $searchValue . '%')
-                ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
+                ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%')
+                ->orWhere('movies.source_type', 'like', '%' . $searchValue . '%');
         })
         ->count();
 
@@ -222,7 +233,8 @@ class Movies extends Controller
         $records = (clone $movieQuery)
                     ->where(function($query) use ($searchValue) {
                         $query->where('movies.name', 'like', '%' . $searchValue . '%')
-                            ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%');
+                            ->orWhere('movies.playlist_id', 'like', '%' . $searchValue . '%')
+                            ->orWhere('movies.source_type', 'like', '%' . $searchValue . '%');
                     })
                     ->orderBy($columnName, $columnSortOrder)
                     ->select('movies.*')
@@ -249,6 +261,7 @@ class Movies extends Controller
                 "id" => $record->id,
                 "name" => $record->name,                                                            
                 "status" => $status, 
+                "stream_type" => $record->source_type == 'YoutubeLive' ? 'Youtube' : 'M3U8',
                 'playlist_id' => $record->playlist_id ?? '',               
                 "play_btn" => '<a href="javascript:void(0);" class="btn btn-primary play-video" data-video-id="'.$record->movie_url.'" onclick="openVideoModal(this)"><svg xmlns="http://www.w3.org/2000/svg" 
                     width="20" height="20" 
@@ -510,7 +523,6 @@ class Movies extends Controller
                 return back()->with('message','Movie not added successfully');
             }
         }
-
     }
 
     public function editChannel($id){  

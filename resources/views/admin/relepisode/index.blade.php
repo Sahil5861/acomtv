@@ -176,6 +176,7 @@
                     <table id="multi-column-ordering" class="table table-hover" data-table="rel_episodes">
                         <thead>
                             <tr>
+                                <th>Order</th>
                                 <th class="editable-th" data-column="title">Title</th>                                                                                                                         
                                 <th>Thumbnail</th>
                                 <th>Status</th>
@@ -193,6 +194,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
+                                <th>Order</th>
                                 <th>Title</th>                                                                                                                                
                                 <th>Thumbnail</th>
                                 <th>Status</th>
@@ -315,6 +317,7 @@
         },
          
          columns: [
+            { data: 'episode_order', width: '100px'},                        
             { data: 'title', width: '400px'},                        
             { data: 'image',orderable: false, searchable: false },                        
             { data: 'status',orderable: false, searchable: false  },
@@ -328,7 +331,7 @@
          ],
          columnDefs: [
             {
-                targets: 0, // index of 'name' column
+                targets: 1, // index of 'name' column
                 createdCell: function(td, cellData, rowData, row, col) {
                     // $(td).addClass('editable');
                     $(td).attr('data-id', rowData.id); // Set data-id attribute

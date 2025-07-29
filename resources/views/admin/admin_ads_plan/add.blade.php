@@ -144,12 +144,18 @@
             url: "{{ url('get-ad-details') }}",
             data: {id: id},
             success: function (response) {
-                let data = response.data;
-                $('#title').val(data.title);            
-                $('#price').val(data.price);            
-                $('#schedule_time').val(data.schedule);            
-                $('#validity').val(data.validity);
-                $('#time_slot').val(data.time_slot);
+                if (response.status == true) {                    
+                    let data = response.data;
+                    $('#title').val(data.title);            
+                    $('#price').val(data.price);            
+                    $('#schedule_time').val(data.schedule);            
+                    $('#validity').val(data.validity);
+                    $('#time_slot').val(data.time_slot);
+                }
+                else{
+                    let messaege = response.messaege;
+                    $('#error-message').html(messaege);
+                }
             }
         })
     })

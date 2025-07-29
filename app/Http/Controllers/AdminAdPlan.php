@@ -103,7 +103,8 @@ class AdminAdPlan extends Controller
     }
 
     public function create(){  
-        $this->data['super_admin_ads'] = SuperAdminAds::whereNull('deleted_at')->get();              
+                    
+        $this->data['super_admin_ads'] = SuperAdminAds::whereNull('deleted_at')->get();
         return view('admin.admin_ads_plan.add', $this->data);
     }
 
@@ -119,9 +120,7 @@ class AdminAdPlan extends Controller
             'title' => 'required',
             'price' => 'required'                                
         ]);  
-        ;
-        
-        
+
         $admin_ad_plan = !empty($request->id) ? AdminAdsPlan::firstwhere('id',$request->id) : new AdminAdsPlan();                       
 
         
@@ -134,16 +133,14 @@ class AdminAdPlan extends Controller
         $admin_ad_plan->image = $request->input('image') ?? '';        
         $admin_ad_plan->user_id = \Auth::user()->id;
 
-        // print_r($admin_ad_plan); exit;
-
-        if ($admin_ad_plan->save()) {
+        $ad_price = $request->input('price');
+        
+        if ($admin_ad_plan->save()) {            
             return redirect()->back()->with('message', !empty($request->id) ? 'Ad updated Successfully !!' :  'Ad added Successfully !!');
         }
         else{
             return redirect()->back()->with('error', 'something went wrong !');
         }
-        
-
     }
 
     public function destroy(Request $request){

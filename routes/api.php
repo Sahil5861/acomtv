@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Route::post('/userregister',[AppApiController::class,'userRegister']);
 
 Route::post('/login',[AppApiController::class,'login_pin']);
+Route::post('/login_app',[AppApiController::class,'login_pin_app']);
 Route::get('/get-slider',[AppApiController::class,'getSlider']);
 Route::get('/get-channels',[AppApiController::class,'getChannels']);
 Route::get('/get-channels-with-genre',[AppApiController::class,'getChannelsWithGenre']);

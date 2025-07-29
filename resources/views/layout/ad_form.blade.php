@@ -20,6 +20,7 @@
                 </option>
                 @endforeach
             </select>
+            <span id="error-message" class="text-danger"></span>
         </div>
         <div class="col-md-6 mb-4">
             <label for="fullName">Title*</label>

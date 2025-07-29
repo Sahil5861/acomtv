@@ -119,19 +119,27 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <select name="select_status" id="select_status" class="form-control w-25 select" style="width: 25%;">
                             <option value="">--Filter by Status--</option>
                             <option value="1">Active</option>
                             <option value="0">Inactive</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <select name="select_netword_id" id="select_netword_id" class="form-control w-25 select" style="width: 25%;">
                             <option value="">--Filter by Content Netword--</option>
                             @foreach ($networks as $item)
                                 <option value="{{$item->id}}">{{$item->name}}</option>
                             @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <select name="select_stream_type" id="select_stream_type" class="form-control w-25 select" style="width: 25%;">
+                            <option value="">--Filter Stream Type--</option>
+                            <option value="YoutubeLive">Youtube</option>
+                            <option value="M3U8">M3U8</option>                            
                         </select>
                     </div>
                 </div>                                    
@@ -206,6 +214,7 @@
                                 <th class="editable-th" data-column="name">Name</th>                                                                                                                         
                                 <th>Banner Image</th>                                                                                                                         
                                 <th>Status</th>
+                                <th>Stream Type</th>
                                 <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Created Date</th>
@@ -220,6 +229,7 @@
                                 <th>Name</th>  
                                 <th>Banner Image</th>                                                                                                                                                                                                                                                       
                                 <th>Status</th>
+                                <th>Stream Type</th>
                                 <th>Play</th>
                                 <th>Playlist Id</th>
                                 <th>Created Date</th>
@@ -249,13 +259,14 @@ function initializeDataTable(network_id = '') {
         serverSide: true,
         destroy: true, // destroy on re-initialize
         stateSave: true, 
-        order: [[5, 'desc']],
+        order: [[6, 'desc']],
         ajax: {
             url: "{{ route('getMovieList') }}",
             data: function(d) {
                 // Only send when values are selected
                 let playlist_id = $('#select_playlist_id').val();
                 let network_id = $('#select_netword_id').val();
+                let stream_type = $('#select_stream_type').val();
                 let status = $('#select_status').val();
 
                 if (playlist_id !== '') {
@@ -264,6 +275,9 @@ function initializeDataTable(network_id = '') {
 
                 if (network_id !== '') {
                     d.network_id = network_id;
+                }
+                if (stream_type !== '') {
+                    d.stream_type = stream_type;
                 }
 
                 if (status !== '') {
@@ -275,6 +289,7 @@ function initializeDataTable(network_id = '') {
             { data: 'name', width: '300px'},                        
             { data: 'banner', orderable: false, searchable: false },                        
             { data: 'status', orderable: false, searchable: false },
+            { data: 'stream_type', searchable: true, orderable: false},
             { data: 'play_btn', orderable: false, searchable: false },
             { data: 'playlist_id', orderable: true, searchable: true },
             { data: 'created_at' },
@@ -327,6 +342,10 @@ $(document).ready(function() {
 
 
     $('#select_playlist_id').on('change', function() {        
+        dataTable.ajax.reload(null, false);
+    });
+
+    $('#select_stream_type').on('change', function() {        
         dataTable.ajax.reload(null, false);
     });
 

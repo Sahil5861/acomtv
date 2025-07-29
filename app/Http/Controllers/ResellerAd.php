@@ -103,7 +103,9 @@ class ResellerAd extends Controller
     }
 
     public function create(){  
-        $this->data['super_admin_ads'] = AdminAds::whereNull('deleted_at')->get();              
+        $created_by = \Auth::User()->created_by;
+
+        $this->data['super_admin_ads'] = AdminAds::whereNull('deleted_at')->where('user_id', $created_by)->get();              
         // print_r($this->data); exit;
         return view('admin.reseller_ads.add', $this->data);
     }

@@ -36,9 +36,9 @@
                       </div>
                   @endif
 
-                  <div class="text-left">
+                  {{-- <div class="text-left">
                     <a href="{{route('admin.rel_episodes.episodes', base64_encode($id))}}" class="btn btn-primary mb-3">Back to List</a>
-                  </div>
+                  </div> --}}
                 <!-- <div class="row"> -->                    
                     {{-- novalidate --}}
                     <form id="user-form"  method="post" action="{{route('saverel_episodes', $id)}}" enctype="multipart/form-data"  class="simple-example" >

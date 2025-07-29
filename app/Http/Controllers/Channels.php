@@ -51,6 +51,8 @@ class Channels extends Controller
         $this->data['dataForLoop'] = $dataForLoop;
         $this->data['allChannels'] = $allChannels;
         $this->data['lockedChannels'] = $lockedChannels;
+
+        // print_r($this->data['dataForLoop']); exit;
         return view('admin.channel.dragdrop',$this->data);
     }
 

@@ -102,8 +102,8 @@
                 
                 <div class="text-left">
                     <p>
-                        <a href="{{route('admin.tvchannel')}}">{{strtoupper('TV Channels Pak')}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.tvshow', base64_encode($channel_id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvchannelpak')}}">{{strtoupper('TV Channels Pak')}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshowpak', base64_encode($channel_id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
                     </p>
                 </div>
                 

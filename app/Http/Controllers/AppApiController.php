@@ -27,6 +27,13 @@ use App\Models\TournamentSeason;
 use App\Models\TournamentMatches;
 use App\Models\StageshowPak;
 use App\Models\Laughterhow;
+use App\Models\TvChannelPak;
+use App\Models\TvShowPak;
+use App\Models\TvShowSeasonPak;
+use App\Models\TvShowEpisodePak;
+
+
+
 
 
 
@@ -102,6 +109,54 @@ class AppApiController extends Controller
             print_r(json_encode(array(
                 "status" => false,
                 "msg" => 'Auth key not found'
+            )));
+            exit;
+        }
+    }
+
+    public function get_user_pin()
+    {
+
+        $headers = getallheaders();
+        // print_r($headers); exit;
+        if (isset($headers['auth-key']) && $headers['auth-key'] != '')
+        {
+
+            $auth_key = $headers['auth-key'];
+
+            $userData = Userauth::where('auth_key', '=', $auth_key)->where('status',1)->first();
+
+            if ($userData)
+            {
+                $userId = $userData->user_id;
+                
+                $userPin = User::where('id', '=', $userId)->first()->over18_pin;
+                if ($userPin) {
+                    return $userPin;
+                }
+                else{
+                    print_r(json_encode(array(
+                        "status" => false,
+                        "msg" => 'User Pin Not Found'
+                    )));
+                }                
+            }
+            else
+            {
+                print_r(json_encode(array(
+                    "status" => false,
+                    "msg" => "Invalid authentication. Please login again",
+                    'login' => true
+                )));
+                exit;
+            }
+
+        }
+        else
+        {
+            print_r(json_encode(array(
+                "status" => false,
+                "msg" => 'Auth key not found for User Pin'
             )));
             exit;
         }
@@ -302,7 +357,7 @@ class AppApiController extends Controller
                 if(count($plans) == 0){
                     print_r(json_encode(array(
                         'status' => false,
-                        'msg' => 'You have not active plan. Kindly recharge your account.s'
+                        'msg' => 'You have not active plan. Kindly recharge your account.'
                     )));
                     exit;
                 }
@@ -1705,7 +1760,7 @@ class AppApiController extends Controller
         $user_id = $this->get_user_id();
         $post = json_decode(file_get_contents('php://input', 'r'));
 
-        $categories = SportsCategory::where('deleted_at', null)->where('status',1)->get();
+        $categories = SportsCategory::where('deleted_at', null)->where('status',1);
 
         if (isset($_GET['page']) && is_numeric($_GET['page'])) {
             $page = (int) $_GET['page'];
@@ -1859,7 +1914,9 @@ class AppApiController extends Controller
     }
 
     public function getAllAbove18Movies(Request $request, $pin){
-        if ($pin != '589983') {
+        $above_18_pin = $this->get_user_pin();
+        
+        if ($pin != $above_18_pin) {
             print_r(json_encode([
                 'status' => false,
                 'message' => 'Invalid Pin'

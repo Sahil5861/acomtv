@@ -36,9 +36,9 @@
                       </div>
                   @endif
 
-                  <div class="text-left">
+                  {{-- <div class="text-left">
                     <a href="{{route('admin.kid-shows.episodes', base64_encode($id))}}" class="btn btn-primary mb-3">Back to List</a>
-                  </div>
+                  </div> --}}
                 <!-- <div class="row"> -->                    
                     <form id="user-form"  method="post" action="{{route('savekidshowsEpisode', $id)}}" enctype="multipart/form-data" novalidate class="simple-example" >
                         @csrf

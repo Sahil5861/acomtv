@@ -319,7 +319,7 @@ class ManageTvShowEpisodePak extends Controller
                 $episode->video_url = $url;
                 $episode->status = 0;
                 $episode->streaming_type = 'youtube';
-                $episode->description = $snippet['description'] ?? null;
+                $episode->description = $snippet['description'] ?? null;    
                 $episode->thumbnail = $cleanBannerUrl;        
                 $episode->duration = 0;
                 $episode->playlist_id = $playlistId;

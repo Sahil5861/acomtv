@@ -170,7 +170,7 @@ class ManageTvShowSeasonPak extends Controller
         }
         else{
             if ($tvshow->save()) {
-                return redirect()->route('admin.tvshow.episode', base64_encode($tvshow->id))->with('message','Season added successfully');
+                return redirect()->route('admin.tvshowpak.episode', base64_encode($tvshow->id))->with('message','Season added successfully');
                 // return back()->with('message', $request->id ? 'Season added' : 'Season added');
             } else {
                 return back()->with('message', $request->id ? 'Season not added' : 'Season not added');

@@ -120,7 +120,7 @@
                         </select>
                     </div>
                 </div> 
-                
+
                 <?php                     
                     $season = \App\Models\TvShowSeasonPak::where('id', $id)->first();
                     $show = \App\Models\TvShowPak::where('id', $season->show_id)->first();
@@ -129,10 +129,10 @@
 
                 <div class="text-left" style="margin: 10px 0;">
                     <p>
-                        <a href="{{route('admin.tvchannel')}}">{{strtoupper('TV Channels Pak')}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.tvshow', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.tvshow.season', base64_encode($show->id))}}">{{strtoupper($show->name)}}</a>&nbsp; &gt;                        
-                        <a href="{{route('admin.tvshow.episode', base64_encode($id))}}">{{strtoupper($season->title)}}</a>
+                        <a href="{{route('admin.tvchannelpak')}}">{{strtoupper('TV Channels Pak')}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshowpak', base64_encode($channel->id))}}">{{strtoupper($channel->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshowpak.season', base64_encode($show->id))}}">{{strtoupper($show->name)}}</a>&nbsp; &gt;                        
+                        <a href="{{route('admin.tvshowpak.episode', base64_encode($id))}}">{{strtoupper($season->title)}}</a>
                     </p>
                 </div>
                 

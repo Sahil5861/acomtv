@@ -126,6 +126,7 @@ class RelShowEpisodes extends Controller
             $downloadable = $record->downloadable == 1 ? 'Yes' : 'No';
 
             $data_arr[] = array(
+                "episode_order" => $record->episode_order,
                 "id" => $record->id,
                 "title" => $record->title,                                                            
                 "playlist_id" => $record->playlist_id,
@@ -172,7 +173,7 @@ class RelShowEpisodes extends Controller
 
     public function create(Request $request, $id){                
         $id = base64_decode($id);
-        $this->data['id'] = $id;        
+        $this->data['id'] = $id;            
         return view('admin.relepisode.add',$this->data);
     }
 
@@ -183,7 +184,7 @@ class RelShowEpisodes extends Controller
         $this->data['episode'] = RelshowsEpisode::where('id', $id)->first();
         $this->data['id'] = $id;  
         
-        // print_r($this->data); exit;
+        print_r($this->data['id']); exit;
         return view('admin.relepisode.add',$this->data);
     }
 
