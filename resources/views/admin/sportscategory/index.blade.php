@@ -104,7 +104,7 @@
                         <thead>
                             <tr>
                                 <th>Title</th>
-                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                        
+                                <th>Logo</th>                                                                                                                                                                                                                                                                                                                        
                                 <th>Status</th>                                                                                                                             
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -116,7 +116,7 @@
                         <tfoot>
                             <tr>
                                 <th>Title</th>
-                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                                                                                
+                                <th>Logo</th>                                                                                                                                                                                                                                                                                                                                                                                
                                 <th>Status</th>                                                                   
                                 <th>Created Date</th>
                                 <th>Action</th>

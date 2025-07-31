@@ -69,7 +69,7 @@
 
                         <!-- Logo -->
                         <div class="col-md-6 mb-4">
-                            <label for="thumbnail">Thumbnail</label>
+                            <label for="thumbnail">Logo</label>
                             <input type="text" class="form-control" id="thumbnail" name="thumbnail" placeholder="Enter image path or URL" value="{{ old('thumbnail', $sportcategory->thumbnail ?? '') }}">
                             @if(isset($sportcategory) && $sportcategory->thumbnail)
                                 <img src="{{ $sportcategory->thumbnail }}" width="70" style="margin-top: 5px;" alt="Logo Preview">
