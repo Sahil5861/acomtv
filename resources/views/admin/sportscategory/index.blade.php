@@ -103,7 +103,8 @@
                     <table id="multi-column-ordering" class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Title</th>                                                                                                                                                                                                                                                                                                                        
+                                <th>Title</th>
+                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                        
                                 <th>Status</th>                                                                                                                             
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -114,7 +115,8 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>Title</th>                                                                                                                                                                                                                                                                                                                                                                                
+                                <th>Title</th>
+                                <th>Thumbnail</th>                                                                                                                                                                                                                                                                                                                                                                                
                                 <th>Status</th>                                                                   
                                 <th>Created Date</th>
                                 <th>Action</th>
@@ -214,8 +216,9 @@
          order: [[0, 'asc']],
          ajax: "{{route('getsportscategoryList')}}",
          columns: [
-            { data: 'title' },                                                                                  
-            { data: 'status' },
+            { data: 'title' }, 
+            { data: 'image',orderable: false, searchable: false },                                                                                  
+            { data: 'status' },                                               
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
@@ -243,7 +246,7 @@
         var id = $('#d_id').val();
         $.ajax({
             type: 'POST',
-            url: "{{route('tvshow.destroy')}}",
+            url: "{{route('sportscategory.destroy')}}",
             data: {
                 _token: '{{ csrf_token() }}',
                 id:id

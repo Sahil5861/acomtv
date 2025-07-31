@@ -1,5 +1,5 @@
 @extends('layout.default')
-@section('mytitle', 'Manage TvShow')
+@section('mytitle', 'sportcategory TvShow')
 @if(isset($tvchannel))
 @section('page', 'TvShow / Update')
 @else
@@ -67,7 +67,18 @@
                             </div>
                         </div>
 
-
+                        <!-- Logo -->
+                        <div class="col-md-6 mb-4">
+                            <label for="thumbnail">Thumbnail</label>
+                            <input type="text" class="form-control" id="thumbnail" name="thumbnail" placeholder="Enter image path or URL" value="{{ old('thumbnail', $sportcategory->thumbnail ?? '') }}">
+                            @if(isset($sportcategory) && $sportcategory->thumbnail)
+                                <img src="{{ $sportcategory->thumbnail }}" width="70" style="margin-top: 5px;" alt="Logo Preview">
+                            @endif
+                            <div class="invalid-feedback">
+                                @error('thumbnail') {{ $message }} @enderror
+                            </div>
+                        </div>
+                        
                         <!-- Status -->
                         <div class="col-md-6 mb-4">
                             <label for="status">Status</label>
