@@ -382,7 +382,7 @@ class AppApiController extends Controller
                     }else{
                         $this->loginAccessUser($data_user, 'app');
                     }
-                }else if($data_user->mac_app_address == $mac_app_address){
+                }else if($data_user->mac_address_app == $mac_address_app){
                     if($data_user->status=='2'){
                         print_r(json_encode(array(
                             "status" => false,
@@ -1188,9 +1188,6 @@ class AppApiController extends Controller
             print_r(json_encode($series));
             exit;
         }
-
-
-
     }
 
     public function getSeasons(Request $request, $id){
@@ -1264,6 +1261,70 @@ class AppApiController extends Controller
             print_r(json_encode($episodes));            
         }        
     }
+
+    public function getWebSeriesDetails(Request $request, $webseries_id){
+        // $user_id = $this->get_user_id();
+        $post = json_decode(file_get_contents('php://input', 'r'));
+
+        $webseries = WebSeries::where('id', $webseries_id)->where('status', 1)->where('deleted_at', null)->with('networks')->first();
+
+        if ($webseries) {            
+            $seasons = WebSeriesSeason::where('web_series_id', $webseries->id)->orderBy('season_order')->get();
+            
+            if (count($seasons) > 0) {                
+                $web_series_seasons = [];
+                foreach ($seasons as $key => $season) {
+                    $web_series_seasons[] = $season;
+                    $episodes = WebSeriesEpisode::where('season_id', $season->id)->orderBy('episoade_order')->get();                                
+
+                    if (count($episodes) > 0) {                        
+                        $web_episodes = [];
+                        foreach ($episodes as $key => $episode) {
+                            $web_episodes[] = $episode;
+                        }
+                        $season['episodes'] = $web_episodes;
+                    }
+                }    
+                $webseries['seasons'] = $web_series_seasons;
+            }
+
+            print_r(json_encode($webseries));
+        }
+        else{
+            print_r(json_encode([]));
+        }
+        
+
+        
+        // return response()->json([
+        //     'webseries' => $webseries,
+        // ]);
+
+    }
+
+    // public function getWebSeriesDetails(Request $request, $webseries_id){
+    //     $webseries = WebSeries::with([
+    //         'networks',
+    //         'seasons.episodes' => function ($query) {
+    //             $query->orderBy('episoade_order');
+    //         }
+    //     ])
+    //     ->where('id', $webseries_id)
+    //     ->where('status', 1)
+    //     ->whereNull('deleted_at')
+    //     ->first();
+
+    //     if ($webseries) {
+    //         // Sort seasons if needed
+    //         $webseries->seasons = $webseries->seasons->sortBy('season_order')->values();
+
+    //         return response()->json($webseries);
+    //     }
+
+    //     return response()->json([], 404);
+    // }
+
+
 
 
     public function getMoviePlayLinks(Request $request, $id, $type=0){

@@ -136,6 +136,7 @@ class ManageTournamentMatches extends Controller
             }
 
             $data_arr[] = array(
+                "id" => $record->id,
                 "match_title" => $record->match_title,                                                            
                 "match_type" => $record->match_type,                                                            
                 "desc" => $record->description,                                                            
@@ -278,13 +279,23 @@ class ManageTournamentMatches extends Controller
         return redirect()->back()->with('success', 'Matches order updated successfully.');
     }
 
-    public function importstageshows(Request $request){
-        $request->validate([
-            'playlist_id' => 'required',            
-        ]);
-        $playlistId = $request->input('playlist_id');
-        $genres = implode(',', $request->genre) ?? '';
+    public function importPlaylist(Request $request){
 
+        
+        $request->validate([
+            'playlist_id' => 'required',   
+            'match_type' => 'required',   
+            'stream_type' => 'required'            
+        ]);
+
+        
+        
+        $playlistId = $request->input('playlist_id');
+        $match_type = $request->input('match_type');
+        $stream_type = $request->input('stream_type');
+        $tournament_season_id = $request->input('tournament_season_id');
+        // print_r($request->all()); exit;
+        
         $apiKey = 'AIzaSyBrsmSKZ5yG6BFkVHsHMxLCkSsvzaH7szk';
         $baseurl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId={$playlistId}&key={$apiKey}";
         $nextPageToken = null;
@@ -315,34 +326,33 @@ class ManageTournamentMatches extends Controller
 
             foreach ($data['items'] as $key => $item) {    
                 $snippet = $item['snippet'];
-                $movieName = $snippet['title'] ?? null;
-                $movie_url = $snippet['resourceId']['videoId'] ?? null;
+                $match_title = $snippet['title'] ?? null;
+                $video_url = $snippet['resourceId']['videoId'] ?? null;
 
-                if ($this->checkIsExist($movieName, $movie_url) || trim($movieName) == 'Private video') {
+                if ($this->checkIsExist($match_title, $video_url) || trim($match_title) == 'Private video') {
                     continue;
                 }
 
                 $rawBannerUrl = $snippet['thumbnails']['high']['url'] ?? null;
                 $cleanBannerUrl = $rawBannerUrl ? explode('?', $rawBannerUrl)[0] : null;
                         
-                $movie = new TournamentMatches();
+                $match = new TournamentMatches();
 
-                $channel_number = TournamentMatches::whereNull('deleted_at')->count();
+                $channel_number = TournamentMatches::whereNull('deleted_at')->where('tournament_season_id', $tournament_season_id)->count();
                 $formated_number = $channel_number + 1;   
 
-                $movie->name = $movieName;
-                $movie->description = $snippet['description'] ?? null;
-                
-                $movie->banner = $cleanBannerUrl;
-                $movie->status = 0;
-                $movie->source_type = 'YoutubeLive';            
-                $movie->youtube_trailer = '' ?? null;
-                $movie->movie_url = $movie_url;
-                $movie->genres = $genres;
-                $movie->index = $formated_number;
-                $movie->playlist_id = $playlistId;
+                $match->match_title = $match_title;
+                $match->tournament_season_id  = $tournament_season_id;
+                $match->match_type = $match_type;
+                $match->match_order = $formated_number;
+                $match->description = $snippet['description'] ?? null;
+                $match->streaming_info = $stream_type;                            
+                $match->video_url = $video_url;                
+                $match->playlist_id = $playlistId;
+                $match->thumbnail_url = $cleanBannerUrl;                
+                $match->status = 0;
 
-                $movie->save();
+                $match->save();
 
                         
             }
@@ -357,10 +367,10 @@ class ManageTournamentMatches extends Controller
     }
 
 
-    public function checkIsExist($movie_name, $url){
-        return TournamentMatches::where(function ($query) use ($movie_name, $url){
-            $query->whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($movie_name))])
-                    ->orWhereRaw('LOWER(TRIM(movie_url)) = ?', [strtolower(trim($url))]);
+    public function checkIsExist($match_title, $video_url){
+        return TournamentMatches::where(function ($query) use ($match_title, $video_url){
+            $query->whereRaw('LOWER(TRIM(match_title)) = ?', [strtolower(trim($match_title))])
+                    ->orWhereRaw('LOWER(TRIM(video_url)) = ?', [strtolower(trim($video_url))]);
         })
         ->whereNull('deleted_at')
         ->first();

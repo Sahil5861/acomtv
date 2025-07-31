@@ -19,4 +19,8 @@ class WebSeries extends Model
     public function networks(){
         return $this->belongsToMany(ContentNetwork::class, 'web_series_content_network', 'webseries_id', 'network_id');
     }
+
+    public function seasons(){
+        return $this->hasMany(WebSeriesSeason::class, 'web_series_id');
+    }
 }

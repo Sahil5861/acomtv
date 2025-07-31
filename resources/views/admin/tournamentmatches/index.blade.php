@@ -86,6 +86,16 @@
             
             <div class="widget-content widget-content-area br-6">
 
+                <div class="alert alert-success alert-block" id="alert-success" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="success-message"></strong>
+                </div>
+
+                <div class="alert alert-danger alert-block" id="alert-danger" style="display: none;">
+                    <button type="button" class="close" data-dismiss="alert">×</button>    
+                    <strong class="error-message"></strong>
+                </div>
+
                 <div id="delete_bd_ms"></div>
                 @if(session()->has('message'))
                     <div class="alert alert-success alert-block">
@@ -131,9 +141,9 @@
                 <div class="text-right">                    
                     <a href="{{ route('admin.tournamentmatches.order', base64_encode($id)) }}" class="btn btn-primary mb-2">Order Matches</a>
                     <a href="{{route('addsportstournamentseasonepisodes', base64_encode($id))}}" class="btn btn-primary mb-2">Add +</a>
-                    {{-- <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
+                    <button type="button" class="btn btn-secondary mb-2" data-toggle="modal" data-target="#addContentModal">
                         Import from Playlist
-                    </button>   --}}
+                    </button>  
                 </div>
 
                 <div class="modal fade" id="addContentModal" tabindex="-1" role="dialog" aria-labelledby="addContentModalLabel" aria-hidden="true">
@@ -150,10 +160,27 @@
                         <div class="modal-body">                                
                             <form id="importStageShowsForm" method="POST" action="{{route('importsportsplaylits')}}">
                             @csrf
+                                <input type="hidden" name="tournament_season_id" value="{{$sesonId}}">
                                 <div class="form-group">
                                     <label for="networkName">Playlits Id</label>                                    
                                     <input type="text" class="form-control" name="playlist_id" id="playlist_id" required placeholder="Enter Playlist Id"> 
-                                </div>                                                                                         
+                                </div>    
+                                <div class="form-group">
+                                    <label for="match_type">Match Type</label>
+                                    <select class="form-control select" id="playlist_match_type" required name="match_type">
+                                        <option value="League">League</option>
+                                        <option value="Knockout">Knockout</option>
+                                        <option value="Final">Final</option>
+                                    </select>
+                                </div>                                                                            
+                                <div class="form-group">
+                                    <label for="stream_type">Stream Type</label>
+                                    <select class="form-control select" id="playlist_stream_type" required name="stream_type">
+                                        <option value="Live">Live</option>
+                                        <option value="Replay">Replay</option>
+                                        <option value="Highlights">Highlights</option>
+                                    </select>
+                                </div>                                                                                     
                             </form>
                         </div>
                         
@@ -167,16 +194,16 @@
                 </div>
                 <div class="table-responsive mb-4 mt-4">
                     
-                    <table id="multi-column-ordering" class="table table-hover">
+                    <table id="multi-column-ordering" class="table table-hover" data-table="tournament_matches">
                         <thead>
                             <tr>
-                                <th>Match Title</th>                                                                                                                                
+                                <th class="editable-th" data-column="match_title">Match Title</th>                                                                                                                                
                                 <th>Match Type</th>                                                                                                                                
                                 <th>Streaming Info</th> 
                                 <th>Date Time</th>                                                                                                                                                                          
                                 <th>Status</th>   
                                 <th>Play</th>                                                                                                                                                                                       
-                                <th>Description</th>                                                                
+                                {{-- <th>Description</th>                                                                 --}}
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -192,7 +219,7 @@
                                 <th>Date Time</th>                                                                                                                                                                          
                                 <th>Status</th>  
                                 <th>Play</th>                                                                                                                                                                                        
-                                <th>Description</th>                                                                
+                                {{-- <th>Description</th>                                                                 --}}
                                 <th>Created Date</th>
                                 <th>Action</th>
                             </tr>
@@ -288,7 +315,7 @@
       $('#multi-column-ordering').DataTable({
          processing: true,
          serverSide: true,
-         order: [[0, 'asc']],         
+         order: [[6, 'desc']],         
          ajax: {
             url: "{{route('get-sports-tournament-episodesList', $id)}}",
             data: function(d) {
@@ -312,7 +339,7 @@
             { data: 'match_datetime'},                                                
             { data: 'status' },            
             { data: 'play_btn' },            
-            { data: 'desc' },
+            // { data: 'desc' },
             { data: 'created_at' },
             { data: 'action', orderable: false, searchable: false },
          ],
@@ -336,10 +363,97 @@
             $('#deletedRecords').text(response.deletedRecords);
             console.log(response);
             $('[data-toggle="tooltip"]').tooltip();
-            updateIcon()
+            updateIcon();
+            setTimeout(() => {                
+                setEditable();
+            }, 500);
         },
       });
     });
+
+    function setEditable(){
+        $('#multi-column-ordering thead th').each(function (index) {            
+            if ($(this).hasClass('editable-th')) {                           
+                $('#tableItem tr').each(function () {
+                    $(this).find('td').eq(index).addClass('editable');                                
+                });
+            }
+        });
+    }
+
+    document.addEventListener('dblclick', function (event){
+        const target = event.target
+        if (target.classList.contains('editable')) {        
+            if (target.querySelector('input')) return;
+            const currentText = target.textContent.trim();
+            const input = document.createElement('input'); 
+            const id = target.getAttribute('data-id');       
+
+            input.type = 'text';
+            input.value = currentText;
+            input.style.width = '100%';
+            input.classList.add('form-control');
+            input.setAttribute('data-id', id);
+
+            target.textContent = '';
+            target.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', function () {
+                const newValue = input.value.trim();
+                target.textContent = newValue || currentText; // fallback to old value if empty
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    input.blur(); // triggers blur above
+                    const table = document.getElementById('multi-column-ordering').getAttribute('data-table');                
+                    const td = input.closest('td');
+
+
+                    const column = document.querySelector('.editable-th').getAttribute('data-column');
+                    let id = input.getAttribute('data-id');
+
+                    console.log(id, table, column);
+                    // return false;
+                    
+
+                    $.ajax({
+                        method : 'POST',
+                        url : "{{route('update-column')}}",                    
+                        data: {
+                            id : id,                        
+                            table : table,
+                            column : column,  
+                            value : input.value, 
+                            _token: "{{ csrf_token() }}" // ✅ Add this line                     
+                        },
+                        success: function(response){
+                            if (response.success) {
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.success-message').html(`${capitalizedColumn} updated successfully !`);
+                                $('#alert-success').show();
+                                setTimeout(() => {
+                                    $('#alert-success').hide();
+                                }, 2000);
+                            }
+                            else{
+                                const capitalizedColumn = column.charAt(0).toUpperCase() + column.slice(1);
+                                $('.error-message').html(response.message);
+                                $('#alert-danger').show();
+                                setTimeout(() => {
+                                    $('#alert-danger').hide();
+                                }, 2000);
+                                target.textContent = currentText;
+                                // $('#multi-column-ordering').DataTable().ajax.reload();
+                            }
+                        }
+                    })
+                    
+                }
+            });    
+        }
+    })
 
     $('#select_playlist_id').on('change', function() {
         $('#multi-column-ordering').DataTable().ajax.reload();

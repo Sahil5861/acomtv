@@ -710,8 +710,8 @@ class Movies extends Controller
         ]);
 
         // Sanitize table and column names to prevent SQL injection
-        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak', 'web_series_episoade', 'kids_shows_episodes', 'adult_movies']; // add more if needed
-        $allowedColumns = ['name', 'title', 'Episoade_Name']; // add other editable columns if needed
+        $allowedTables = ['movies', 'shows_episodes', 'rel_episodes', 'stage_shows_pak', 'web_series_episoade', 'kids_shows_episodes', 'adult_movies', 'tournament_matches']; // add more if needed
+        $allowedColumns = ['name', 'title', 'Episoade_Name', 'match_title']; // add other editable columns if needed
 
         if (!in_array($request->table, $allowedTables) || !in_array($request->column, $allowedColumns)) {
             return response()->json(['error' => 'Invalid table or column'], 400);

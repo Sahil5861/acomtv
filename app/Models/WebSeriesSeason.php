@@ -10,4 +10,9 @@ class WebSeriesSeason extends Model
     use HasFactory;
 
     protected $table = 'web_series_seasons';
+
+    public function episodes(){
+        return $this->hasMany(WebSeriesEpisode::class, 'season_id');
+    }
+
 }

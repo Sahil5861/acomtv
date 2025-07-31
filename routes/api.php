@@ -40,6 +40,11 @@ Route::get('/getAllMovies', [AppApiController::class, 'getAllMovies']);
 Route::get('/getAllWebSeries', [AppApiController::class, 'getAllWebSeries']);
 Route::get('/getSeasons/{id}', [AppApiController::class, 'getSeasons']);
 Route::get('/getEpisodes/{id}/0', [AppApiController::class, 'getEpisodes']);
+
+Route::get('/getWebSeriesDetails/{webseriesId}', [AppApiController::class, 'getWebSeriesDetails']);
+
+
+
 Route::get('/getMoviePlayLinks/{id}/0', [AppApiController::class, 'getMoviePlayLinks']);
 
 Route::get('/getNetworks', [AppApiController::class, 'getNetworks']);

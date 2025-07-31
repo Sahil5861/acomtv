@@ -333,7 +333,9 @@ class ManageUser extends Controller
             }
 
             if($request->updateAppPin){
-                $user->login_pin_app = User::generateLoginAppPin();                
+                $user->login_pin_app = User::generateLoginAppPin();  
+                $user->mac_address_app = '';   
+                Userauth::where('user_id', $request->id)->update(['status'=> 0]);           
             }
 
             if($request->updateOver18Pin){

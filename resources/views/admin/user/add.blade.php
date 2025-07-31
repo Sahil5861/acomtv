@@ -209,7 +209,7 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Login Pin (Mobile App)</label>
-                                <input type="text" class="form-control" id="login_pin_app" name="login_pin_app" placeholder="Login Pin App" value="{{old('login_pin_app')}}@if(isset($user)){{$user->login_pin_app}}@endif">
+                                <input type="text" class="form-control" id="login_pin_app" name="login_pin_app" placeholder="Login Pin App" value="{{old('login_pin_app')}}@if(isset($user)){{$user->login_pin_app}}@endif" disabled>
                                 <div class="n-chk mt-1">
                                     <label class="new-control new-checkbox checkbox-primary">
                                       <input type="checkbox" name="updateAppPin" class="new-control-input">
@@ -223,7 +223,7 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label for="fullName">Over 18 Pin</label>
-                                <input type="text" class="form-control" id="over18_pin" name="over18_pin" placeholder="Login Pin App" value="{{old('over18_pin')}}@if(isset($user)){{$user->over18_pin}}@endif">
+                                <input type="text" class="form-control" id="over18_pin" name="over18_pin" placeholder="Above 18 App" value="{{old('over18_pin')}}@if(isset($user)){{$user->over18_pin}}@endif" disabled>
                                 <div class="n-chk mt-1">
                                     <label class="new-control new-checkbox checkbox-primary">
                                       <input type="checkbox" name="updateOver18Pin" class="new-control-input">

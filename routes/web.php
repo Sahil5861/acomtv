@@ -365,7 +365,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/tournament-match-order/{id}', [ManageTournamentMatches::class, 'getTournamentMatchesOrderList'])->name('admin.tournamentmatches.order');
         Route::post('/save-tournament-match-orders', [ManageTournamentMatches::class,'saveTournamentMatchesOrders'])->name('saveTournamentMatchesOrders');
 
-        Route::post('import-sports-playlits', [ManageTvShowEpisodePak::class, 'importPlaylist'])->name('importsportsplaylits');
+        Route::post('import-sports-playlits', [ManageTournamentMatches::class, 'importPlaylist'])->name('importsportsplaylits');
 
         
 
