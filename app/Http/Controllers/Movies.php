@@ -437,6 +437,31 @@ class Movies extends Controller
             'movie_genre' => 'required',                                 
         ]);
         // print_r($request->all()); exit();
+
+        // $addedMovies = Movie::whereNull('deleted_at')->get();
+        // foreach ($addedMovies as $key => $movie) {
+        //     if ($movie->name == $request->name || $movie->movie_url == $request->movie_url) {
+        //         return redirect()->back()->withInput()->withErrors(['message' => 'Movie with the same name or URL already exists.']);
+        //     }
+        // }
+
+        $duplicateMovie = Movie::whereNull('deleted_at')
+            ->where(function($query) use ($request) {
+                $query->where('name', $request->name)
+                    ->orWhere('movie_url', $request->movie_url);
+            })
+            ->when(!empty($request->id), function($query) use ($request) {
+                $query->where('id', '!=', $request->id);
+            })
+            ->first();
+
+        if ($duplicateMovie) {
+            return redirect()->back()->withInput()->withErrors([
+                'message' => 'Movie with the same name or URL already exists.'
+            ]);
+        }
+
+
         if(!empty($request->id)){
 
             $movie = Movie::firstwhere('id',$request->id);
@@ -476,14 +501,7 @@ class Movies extends Controller
                 return back()->with('message','Movie not updated successfully');
             }
 
-        }else{
-
-            $addedMovies = Movie::whereNull('deleted_at')->get();
-            foreach ($addedMovies as $key => $movie) {
-                if ($movie->name == $request->name || $movie->movie_url == $request->movie_url) {
-                    return redirect()->back()->withInput()->withErrors(['message' => 'Movie with the same name or URL already exists.']);
-                }
-            }
+        }else{            
             $movie = new Movie();
             $movie->name = $request->name;
             $movie->banner = $request->banner;                                  

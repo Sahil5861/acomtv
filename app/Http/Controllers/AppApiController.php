@@ -1697,7 +1697,6 @@ class AppApiController extends Controller
         }
     }
 
-
     // 30 june 2025
 
     public function getReligiousChannel(Request $request){
